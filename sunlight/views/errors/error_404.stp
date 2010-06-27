@@ -1,0 +1,11 @@
+<?php
+#$asset->css("errors" . DS . "error_404.css");
+#$asset->js("errors" . DS . "error_404.js");
+
+$this->pageTitle = "Nothing here";
+$html->addCrumb($this->pageTitle);
+?>
+
+<p>There is nothing here. Maybe you mistyped the address.</p>
+
+<p><?php echo $html->link("Go to the start page", BASE_URL . DS); ?></p>

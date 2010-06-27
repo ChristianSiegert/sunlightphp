@@ -1,0 +1,60 @@
+
+INTRODUCTION
+============
+
+Hello there,
+
+thanks for downloading SunlightPHP. I put a lot of weeks into this small and
+fast PHP framework. I specifically created it for my needs, it is not an
+all-rounder and might not be suited for your purposes. Try it and find out.
+
+
+REQUIREMENTS
+============
+
+	* PHP 5
+	* Apache
+	* CouchDB (I tested SunlightPHP only with version 0.10)
+
+
+STEP 1
+======
+
+After copying SunlightPHP to the location of your choice, make sure your server
+is set up correctly. You can do this by browsing to
+
+	http://example.com/sunlightphp/maintenance.php
+	
+Replace "example.com" with your server's address.
+	
+
+STEP 2
+======
+
+Open the file app/config/core.php and adjust the settings to your
+needs.
+
+	STEP 2.1 (OPTIONAL)
+	-------------------
+	
+	If you enable JS and/or CSS compression, you need to download the
+	YUICompressor from http://developer.yahoo.com/yui/compressor/ and place it
+	in app/vendors/yuicompressor/yuicompressor-2.4.2.jar
+	
+
+	STEP 2.2 (OPTIONAL)
+	-------------------
+	
+	If you enable caching with APC, you need to have APC installed as a PHP
+	module.
+	
+	$ apt-get install php-apc
+	
+	
+	STEP 2.3 (OPTIONAL)
+	-------------------
+	
+	If you enable caching with Memcache, you need to have Memcache installed as
+	a PHP module.
+	
+	$ apt-get install php5-memcache
