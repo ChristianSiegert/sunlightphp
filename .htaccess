@@ -1,7 +1,7 @@
 # Also set "ServerTokens Prod" in httpd.conf.
 
 # Force PHP 5
-#AddHandler php5-script .php
+AddHandler php5-script .php
 
 AddDefaultCharset UTF-8
 AddCharset UTF-8 .css
