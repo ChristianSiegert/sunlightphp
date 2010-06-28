@@ -19,7 +19,7 @@ define("DATABASE_NAME", "database-name");
 // Used to create unique URLs for CSS and JS files. Always change this salt when
 // deploying new or changed CSS or JS code or else browsers will keep using the
 // old cached versions.
-define("URL_SALT", 201006270);
+define("URL_SALT", 201006280);
 
 // Compress assets using the YUI Compressor (best compression, extremely slow).
 // Only use in combination with caching assets (see below).
