@@ -12,9 +12,10 @@ all-rounder and might not be suited for your purposes. Try it and find out.
 REQUIREMENTS
 ============
 
-	* PHP 5
+	* PHP 5.3
+		* with CURL module ($ sudo apt-get install php5-curl)
 	* Apache
-	* CouchDB (I tested SunlightPHP only with version 0.10)
+	* CouchDB 0.10 ($ sudo apt-get install couchdb)
 
 
 STEP 1
@@ -48,7 +49,7 @@ needs.
 	If you enable caching with APC, you need to have APC installed as a PHP
 	module.
 	
-	$ apt-get install php-apc
+	$ sudo apt-get install php-apc
 	
 	
 	STEP 2.3 (OPTIONAL)
@@ -57,4 +58,4 @@ needs.
 	If you enable caching with Memcache, you need to have Memcache installed as
 	a PHP module.
 	
-	$ apt-get install php5-memcache
+	$ sudo apt-get install php5-memcache
