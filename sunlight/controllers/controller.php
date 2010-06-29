@@ -61,9 +61,19 @@ class Controller {
 	}
 
 	public function loadModels() {
-		// Include model files
+		// Include model file
 		include(CORE_DIR . DS . "models" . DS . "model.php");
-		include(CORE_DIR . DS . "models" . DS . "app_model.php");
+
+		// Include app model file
+		$appModelFile = DS . "models" . DS . "app_model.php";
+
+		if (file_exists(APP_DIR . $appModelFile)) {
+			include(APP_DIR . $appModelFile);
+		} else {
+			include(CORE_DIR . $appModelFile);
+		}
+
+		// Include custom model file
 		include(APP_DIR . DS . "models" . DS . Inflector::singularize($this->params["controller"]) . ".php");
 
 		// Load model
