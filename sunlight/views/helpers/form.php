@@ -51,6 +51,11 @@ class FormHelper extends Helper {
 
 	public function cancel($label = "Cancel", $value = ".", $options = array()) {
 		$options["name"] = "cancel";
+
+		if (is_array($value)) {
+			$value = $this->url($value);
+		}
+
 		return $this->button($label, $value, $options);
 	}
 
@@ -146,6 +151,17 @@ class FormHelper extends Helper {
 		}
 
 		return $selectElement->toString();
+	}
+
+	public function textarea($fieldName, $options = array()) {
+		$options["name"] = "data[" . $this->defaultModel . "][$fieldName]";
+		$options["id"] = sprintf("%s-%s-input", Inflector::singularize($this->params["controller"]), str_replace("_", "-", $fieldName));
+
+		if (isset($this->data[$fieldName])) {
+			$options["html"] = $this->data[$fieldName];
+		}
+
+		return $this->element("textarea", $options);
 	}
 }
 ?>
