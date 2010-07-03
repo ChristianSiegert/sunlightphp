@@ -53,5 +53,9 @@ if (ini_get("error_reporting") > 0) {
 	$errors[] = "error_reporting is not disabled.";
 }
 
+if (!class_exists("Normalizer", false)) {
+	$errors[] = "Normalizer module is not installed.";
+}
+
 debug($errors);
 ?>
