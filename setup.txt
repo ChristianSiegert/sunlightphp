@@ -13,8 +13,10 @@ REQUIREMENTS
 ============
 	
 	* PHP 5.3
-		* CURL module
+		* curl module
 			$ sudo apt-get install php5-curl
+		* intl module
+			$ sudo apt-get install php5-intl
 			
 	* Apache
 	
