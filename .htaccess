@@ -21,7 +21,7 @@ Options -Indexes
 	RewriteRule ^(.*)$ http\://example\.com/$1 [redirect=301,last]
 	
 	# SunlightPHP's rules		
-	RewriteCond %{REQUEST_FILENAME} !^maintenance.php$
+	RewriteCond %{REQUEST_FILENAME} !maintenance.php$
 	RewriteRule ^(.*)$ app/webroot/$1 [last]
 </IfModule>
 
