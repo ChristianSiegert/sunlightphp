@@ -156,22 +156,15 @@ class Model {
 		}
 	}
 
-	public function getView($designName, $viewName, $parameters = array(), $method = "GET", $data = null) {
+	public function getView($designName, $viewName, $parameters = array(), $method = "GET", $data = null, $jsonDecodeResponse = true) {
 		$parametersAsString = "?";
 
 		foreach ($parameters as $optionName => $optionValue) {
-			// Convert boolean into proper string
-			if ($optionValue === true) {
-				$parametersAsString .= $optionName . '=true&amp;';
-			} elseif ($optionValue === false) {
-				$parametersAsString .= $optionName . '=false&amp;';
-			} else {
-				$parametersAsString .= $optionName . '="' . $optionValue . '"&amp;';
-			}
+			$parametersAsString .= $optionName . "=" . json_encode($optionValue) . "&";
 		}
 
 		$url = DATABASE_HOST . "/" . DATABASE_NAME . "/_design/" . $designName . "/_view/" . $viewName . $parametersAsString;
-		list($status, $header, $data) = $this->query($url, $method, $data);
+		list($status, $header, $data) = $this->query($url, $method, $data, $jsonDecodeResponse);
 
 		if ($status === 200) {
 			return array($header, $data);

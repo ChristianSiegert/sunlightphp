@@ -9,8 +9,10 @@ AddCharset UTF-8 .js
 
 ServerSignature Off
 
+Options -Indexes
+
 <IfModule mod_rewrite.c>
-	RewriteEngine on
+	RewriteEngine On
 	
 	# Remove www prefix
 	RewriteCond %{HTTP_HOST} !^example\.com$ [nocase]
@@ -18,10 +20,9 @@ ServerSignature Off
 	RewriteCond %{HTTP_HOST} !^10.0.2.2$
 	RewriteRule ^(.*)$ http\://example\.com/$1 [redirect=301,last]
 	
-	# SunlightPHP's rules
-	RewriteRule ^$ app/webroot/ [last]
-	RewriteCond %{REQUEST_FILENAME} !maintenance.php
-	RewriteRule (.*) app/webroot/$1 [last]
+	# SunlightPHP's rules		
+	RewriteCond %{REQUEST_FILENAME} !maintenance.php$
+	RewriteRule ^(.*)$ app/webroot/$1 [last]
 </IfModule>
 
 # Enable gzip compression for text files

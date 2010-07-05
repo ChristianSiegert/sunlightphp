@@ -4,17 +4,27 @@ INTRODUCTION
 
 Hello there,
 
-thanks for downloading SunlightPHP. I put a lot of weeks into this small and
+thanks for downloading SunlightPHP. I put many weeks of work into this small and
 fast PHP framework. I specifically created it for my needs, it is not an
 all-rounder and might not be suited for your purposes. Try it and find out.
 
 
 REQUIREMENTS
 ============
-
-	* PHP 5
+	
+	* PHP 5.3
+		* curl module
+			$ sudo apt-get install php5-curl
+		* intl module
+			$ sudo apt-get install php5-intl
+			
 	* Apache
-	* CouchDB (I tested SunlightPHP only with version 0.10)
+	
+	* CouchDB 0.10
+		$ sudo apt-get install couchdb
+	
+	* Java
+		$ sudo apt-get install default-jre
 
 
 STEP 1
@@ -48,13 +58,14 @@ needs.
 	If you enable caching with APC, you need to have APC installed as a PHP
 	module.
 	
-	$ apt-get install php-apc
+	$ sudo apt-get install php-apc
 	
 	
 	STEP 2.3 (OPTIONAL)
 	-------------------
 	
-	If you enable caching with Memcache, you need to have Memcache installed as
-	a PHP module.
+	If you enable caching with Memcached, you need to have the Memcache module
+	installed for PHP.
+
+	$ sudo apt-get install memcached php5-memcache
 	
-	$ apt-get install php5-memcache

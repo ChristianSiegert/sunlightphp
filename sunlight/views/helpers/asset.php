@@ -132,7 +132,7 @@ class AssetHelper extends Helper {
 			}
 
 			$element = new Element("script", array(
-				"html" => $code,
+				"html" => "//<![CDATA[\n$code\n//]]>",
 				"type" => "text/javascript"
 			));
 
