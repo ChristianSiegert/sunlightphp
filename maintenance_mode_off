@@ -1,0 +1,20 @@
+
+INSTRUCTIONS
+============
+
+The app is in maintenance mode as long as a file named "maintenance_mode_on" is
+present. Otherwise the app is not in maintenance mode.
+
+	ENABLING MAINTENANCE MODE
+	-------------------------
+	
+	To enable maintenance mode, create a file named "maintenance_mode_on". You
+	could also just rename this file here.
+	
+	
+	DISABLING MAINTENANCE MODE
+	--------------------------
+	
+	To disable maintenance mode, delete the file named "maintenance_mode_on".
+	You could also just rename it from "maintenance_mode_on" to something else,
+	i.e. to "maintenance_mode_off".

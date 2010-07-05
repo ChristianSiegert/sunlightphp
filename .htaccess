@@ -11,18 +11,25 @@ ServerSignature Off
 
 Options -Indexes
 
+<IfModule mod_dir.c>
+	DirectoryIndex index.php
+</IfModule>
+
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 	
 	# Remove www prefix
 	RewriteCond %{HTTP_HOST} !^example\.com$ [nocase]
-	RewriteCond %{HTTP_HOST} !^localhost$ [nocase]
-	RewriteCond %{HTTP_HOST} !^10.0.2.2$
-	RewriteRule ^(.*)$ http\://example\.com/$1 [redirect=301,last]
+	RewriteCond %{REMOTE_ADDR} !^127\.0\.0\.1$
+	RewriteRule (.*) http\://example\.com/$1 [redirect=301,last]
 	
-	# SunlightPHP's rules		
-	RewriteCond %{REQUEST_FILENAME} !maintenance.php$
-	RewriteRule ^(.*)$ app/webroot/$1 [last]
+	# SunlightPHP's rules
+	RewriteCond %{DOCUMENT_ROOT}/sunlightphp/maintenance_mode_on -f
+	RewriteCond %{REMOTE_ADDR} !^127\.0\.0\.1$
+	RewriteRule .* maintenance/down.php [last]
+	
+	RewriteCond %{REQUEST_FILENAME} !maintenance/maintenance.php$
+	RewriteRule (.*) app/webroot/$1 [last]
 </IfModule>
 
 # Enable gzip compression for text files
