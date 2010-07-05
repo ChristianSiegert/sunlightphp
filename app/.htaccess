@@ -1,6 +1,9 @@
 <IfModule mod_rewrite.c>
-	RewriteEngine On	
-	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteRule ^(.*)$ index.php?url=$1 [qsappend,last]
+	RewriteEngine On
+	
+	RewriteCond %{DOCUMENT_ROOT}/sunlightphp/maintenance_mode_on -f
+	RewriteCond %{REMOTE_ADDR} !^127\.0\.0\.1$
+	RewriteRule .* ../maintenance/down.php [last]
+		
+	RewriteRule (.*) webroot/$1 [last]
 </IfModule>
