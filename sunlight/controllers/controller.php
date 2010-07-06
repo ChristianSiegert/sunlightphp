@@ -104,6 +104,11 @@ class Controller {
 		return $document;
 	}
 
+	/**
+	 * Sets the variables that can be accessed in a view.
+	 *
+	 * @param array Associative array
+	 */
 	public function set($variable) {
 		$this->passedVariables = array_merge($this->passedVariables, $variable);
 	}
