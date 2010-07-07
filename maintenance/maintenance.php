@@ -61,10 +61,6 @@ if (!isset($_SERVER["SERVER_PROTOCOL"])) {
 	$errors[] = '$_SERVER["SERVER_PROTOCOL"] is not "HTTP/1.1".';
 }
 
-if (!isset($_SERVER["REMOTE_ADDR"])) {
-	$errors[] = '$_SERVER["REMOTE_ADDR"] is not does not exist.';
-}
-
 if (ini_get("session.auto_start") == true) {
 	$errors[] = "session.auto_start is not disabled.";
 }
@@ -78,7 +74,7 @@ if (ini_get("error_reporting") > 0) {
 }
 
 if (!class_exists("Normalizer", false)) {
-	$errors[] = "Normalizer module is not installed.";
+	$errors[] = "intl module is not installed (Normalizer class is missing).";
 }
 ?>
 
