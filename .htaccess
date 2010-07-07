@@ -45,14 +45,13 @@ AddCharset UTF-8 .js
 
 <IfModule mod_rewrite.c>
 	# Replace "example.com" with your domain name.
-	# Replace "127.0.0.1" with your server's ip address.
 	# Replace "sunlightphp" with your app's directory name.
+	# Replace "127.0.0.1" with your server's ip address.
 	
 	RewriteEngine On
 	
 	# Remove www prefix
 	RewriteCond %{HTTP_HOST} !^www\. [nocase]
-	RewriteCond %{REMOTE_ADDR} !^127\.0\.0\.1$
 	RewriteRule (.*) http\://example\.com/sunlightphp/$1 [redirect=301,last]
 	
 	# SunlightPHP's rules
