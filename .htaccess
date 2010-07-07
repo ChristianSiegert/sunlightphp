@@ -1,21 +1,53 @@
-# Also set "ServerTokens Prod" in httpd.conf.
+# Do not show footer line under Apache-generated documents
+ServerSignature Off
 
-# Force PHP 5
-AddHandler php5-script .php
+# Do not list directory contents
+Options -Indexes
 
+# Make UTF-8 the default charset
 AddDefaultCharset UTF-8
 AddCharset UTF-8 .css
 AddCharset UTF-8 .js
 
-ServerSignature Off
-
-Options -Indexes
-
+# Reduce directory index look-ups to one file
 <IfModule mod_dir.c>
 	DirectoryIndex index.php
 </IfModule>
 
+# Enable compression for text files
+<IfModule mod_deflate.c>
+	AddOutputFilterByType DEFLATE application/javascript application/json application/x-javascript text/css text/html text/javascript text/js text/plain text/xml 
+</IfModule>
+
+# Set expiration date for static files
+<IfModule mod_expires.c> 
+	ExpiresActive On
+	ExpiresByType application/javascript "access plus 1 year"
+	ExpiresByType application/x-javascript "access plus 1 year"	
+	ExpiresByType image/gif "access plus 1 year"
+	ExpiresByType image/jpeg "access plus 1 year"
+	ExpiresByType image/png "access plus 1 year"
+	ExpiresByType image/x-icon "access plus 1 year"	
+	ExpiresByType text/css "access plus 1 year"
+	ExpiresByType text/javascript "access plus 1 year"
+	ExpiresByType text/js "access plus 1 year"	
+</IfModule>
+
+<IfModule mod_headers.c>
+	Header append Vary User-Agent
+	Header unset X-Powered-By
+	
+	<FilesMatch "\.(css|gif|ico|jpg|jpeg|js|png)$">
+		Header set Cache-Control "public"
+		Header unset Last-Modified
+	</FilesMatch>
+</IfModule>
+
 <IfModule mod_rewrite.c>
+	# Replace "example.com" with your domain name.
+	# Replace "127.0.0.1" with your server's ip address.
+	# Replace "sunlightphp" with your app's directory name.
+	
 	RewriteEngine On
 	
 	# Remove www prefix
@@ -30,39 +62,4 @@ Options -Indexes
 	
 	RewriteCond %{REQUEST_FILENAME} !maintenance/maintenance.php$
 	RewriteRule (.*) app/webroot/$1 [last]
-</IfModule>
-
-# Enable gzip compression for text files
-<IfModule mod_deflate.c>
-	AddOutputFilterByType DEFLATE application/javascript application/json application/x-javascript text/css text/html text/javascript text/js text/plain text/xml 
-</IfModule>
-
-# Set expiration date for static files
-# Do not cache text/html if pages are dynamic
-<IfModule mod_expires.c> 
-	ExpiresActive On
-	ExpiresByType application/javascript "access plus 1 year"
-	ExpiresByType application/x-javascript "access plus 1 year"	
-	ExpiresByType image/gif "access plus 1 year"
-	ExpiresByType image/jpeg "access plus 1 year"
-	ExpiresByType image/png "access plus 1 year"
-	ExpiresByType image/x-icon "access plus 1 year"	
-	ExpiresByType text/css "access plus 1 year"
-#	ExpiresByType text/html "access plus 1 year"
-	ExpiresByType text/javascript "access plus 1 year"
-	ExpiresByType text/js "access plus 1 year"
-#	ExpiresByType text/plain "access plus 1 year"	
-</IfModule>
-
-#FileETag none
-
-<IfModule mod_headers.c>
-	Header append Vary User-Agent
-	#Header unset ETag
-	Header unset X-Powered-By
-	
-	<FilesMatch "\.(css|gif|ico|jpg|jpeg|js|png)$">
-		Header set Cache-Control "public"
-		Header unset Last-Modified
-	</FilesMatch>
 </IfModule>

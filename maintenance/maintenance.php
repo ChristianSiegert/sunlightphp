@@ -1,8 +1,8 @@
 <?php
 // Prevent remote access
-if (!isset($_SERVER["REMOTE_ADDR"])
-		|| (isset($_SERVER["REMOTE_ADDR"])
-			&& $_SERVER["REMOTE_ADDR"] !== "127.0.0.1")) {
+if (!isset($_SERVER["SERVER_ADDR"])
+		|| !isset($_SERVER["REMOTE_ADDR"])
+		|| $_SERVER["SERVER_ADDR"] !== $_SERVER["REMOTE_ADDR"]) {
 	exit;
 }
 
