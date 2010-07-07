@@ -1,4 +1,7 @@
 <IfModule mod_rewrite.c>
+	# Replace "sunlightphp" with your app's directory name.
+	# Replace "127.0.0.1" with your server's ip address.
+
 	RewriteEngine On
 	
 	RewriteCond %{DOCUMENT_ROOT}/sunlightphp/maintenance_mode_on -f
