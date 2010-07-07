@@ -51,7 +51,7 @@ AddCharset UTF-8 .js
 	RewriteEngine On
 	
 	# Remove www prefix
-	RewriteCond %{HTTP_HOST} !^www\. [nocase]
+	RewriteCond %{HTTP_HOST} ^www\. [nocase]
 	RewriteRule (.*) http\://example\.com/sunlightphp/$1 [redirect=301,last]
 	
 	# SunlightPHP's rules
