@@ -5,7 +5,6 @@ class Model {
 	public $models = array();
 
 	public $modelName;
-	#public $tableName;
 
 	public $validate = array();
 	public $validationErrors = array();
@@ -13,7 +12,6 @@ class Model {
 	public function __construct(&$controller) {
 		$this->controller = $controller;
 		$this->modelName = ucfirst(Inflector::singularize($controller->params["controller"]));
-		#$this->tableName = $controller->params["controller"];
 	}
 
 	public function query($url, $method = "GET", $data = null, $jsonDecodeResponse = true) {
@@ -61,7 +59,7 @@ class Model {
 	}
 
 	public function getDocument($documentId, $method = "GET") {
-		$url = DATABASE_HOST . "/" . DATABASE_NAME . "/" . $documentId;
+		$url = DATABASE_HOST . "/" . urlencode(DATABASE_NAME) . "/" . urlencode($documentId);
 		list($status, $header, $data) = $this->query($url, $method);
 
 		if ($status === 200) {
@@ -109,7 +107,7 @@ class Model {
 				} elseif ($status === 409) {
 					throw new Exception("A document with this _id already exists.");
 				} else {
-					throw new Exception("Document could not be saved (Status $status");
+					throw new Exception("Document could not be saved (Status $status).");
 				}
 			} else {
 				throw new Exception("Data is not valid. Aborted storing document.");
@@ -137,7 +135,7 @@ class Model {
 	}
 
 	/**
-	 * Gets the revision by reading a documents e-tag.
+	 * Gets the revision by reading a document's e-tag.
 	 *
 	 * @param string $documentId
 	 * @return string Document revision ("_rev")
@@ -160,10 +158,10 @@ class Model {
 		$parametersAsString = "?";
 
 		foreach ($parameters as $optionName => $optionValue) {
-			$parametersAsString .= $optionName . "=" . json_encode($optionValue) . "&";
+			$parametersAsString .= $optionName . "=" . urlencode(json_encode($optionValue)) . "&";
 		}
 
-		$url = DATABASE_HOST . "/" . DATABASE_NAME . "/_design/" . $designName . "/_view/" . $viewName . $parametersAsString;
+		$url = DATABASE_HOST . "/" . urlencode(DATABASE_NAME) . "/_design/" . urlencode($designName) . "/_view/" . urlencode($viewName) . $parametersAsString;
 		list($status, $header, $data) = $this->query($url, $method, $data, $jsonDecodeResponse);
 
 		if ($status === 200) {
@@ -173,7 +171,7 @@ class Model {
 		} elseif ($status === 404) {
 			throw new Exception("CouchDB: View '$viewName' does not exist for design '$designName'.");
 		} else {
-			throw new Exception("CouchDB: Could not get view. (Status code: $status)");
+			throw new Exception("CouchDB: Could not get view (Status $status).");
 		}
 	}
 
