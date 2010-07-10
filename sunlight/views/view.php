@@ -25,18 +25,23 @@ class View {
 	}
 
 	private function loadHelpers() {
+		// Include core helper file
 		include(CORE_DIR . DS . "views" . DS . "helper.php");
 
 		for ($i = 0; $i < count($this->helpers); $i++) {
+			// Include helper file
 			include(CORE_DIR . DS . "views" . DS . "helpers" . DS . strtolower($this->helpers[$i]) . ".php");
 
+			// Instantiate helper
 			$helperClassName = $this->helpers[$i] . "Helper";
 			$helperObject = ${strtolower($this->helpers[$i])} = new $helperClassName($this);
 
+			// Queue all helpers this helper requires for loading
 			if (isset($helperObject->helpers)) {
 				$this->helpers = array_unique(array_merge($this->helpers, $helperObject->helpers));
 			}
 
+			// Make helper accessible to the view
 			$this->helperObjects = array_merge($this->helperObjects, array(
 				strtolower($this->helpers[$i]) => $helperObject
 			));
@@ -44,20 +49,23 @@ class View {
 	}
 
 	public function renderAction() {
-		// Make specified variables available to the view
-		foreach ($this->passedVariables as $name => $value) {
-			$$name = $value;
+		// Make passed variables available to the view
+		foreach ($this->passedVariables as $variableName => $variableValue) {
+			$$variableName = $variableValue;
 		}
 
-		// Make specified helpers available to the view
+		// Make helpers available to the view
 		foreach ($this->helperObjects as $helperName => $helperObject) {
 			$$helperName = $helperObject;
 		}
 
+		// Filename of the view
 		$view = DS . "views" . DS . $this->params["controller"] . DS . str_replace("-", "_", $this->params["action"]) . ".stp";
 
+		// Start buffering output
 		ob_start();
 
+		// Load view file
 		if (file_exists(APP_DIR . $view)) {
 			include(APP_DIR . $view);
 		} elseif (file_exists(CORE_DIR . $view)) {
@@ -68,6 +76,7 @@ class View {
 			}
 		}
 
+		// End buffering output
 		$contentForLayout = ob_get_contents();
 		ob_end_clean();
 
@@ -75,16 +84,18 @@ class View {
 	}
 
 	public function renderLayout($contentForLayout) {
+		// Make helpers available to the layout
 		foreach ($this->helperObjects as $helperName => $helperObject) {
 			$$helperName = $helperObject;
 		}
 
+		// Buffer output of the layout file
 		ob_start();
 		include(APP_DIR . DS . "views" . DS . "layouts" . DS . "default.stp");
 		$renderedLayout = ob_get_contents();
 		ob_end_clean();
 
-		// Remove whitespace between tags
+		// Remove whitespace between HTML tags
 		$renderedLayout = preg_replace("#>\s+<#", "><", $renderedLayout);
 
 		return $renderedLayout;
