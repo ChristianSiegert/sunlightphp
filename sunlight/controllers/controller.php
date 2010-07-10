@@ -52,7 +52,6 @@ class Controller {
 	}
 
 	public function startUpComponents() {
-		// StartUp() components
 		foreach ($this->components as $component) {
 			if (method_exists($this->$component, "startUp")) {
 				$this->$component->startUp();
