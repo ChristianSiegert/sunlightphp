@@ -17,14 +17,15 @@ REQUIREMENTS
 			$ sudo apt-get install php5-curl
 		* intl module
 			$ sudo apt-get install php5-intl
+	
+	* PHPUnit
+		$ sudo apt-get install phpunit
 			
 	* Apache
+		$ sudo apt-get install apache2
 	
 	* CouchDB 0.10
 		$ sudo apt-get install couchdb
-	
-	* Java
-		$ sudo apt-get install default-jre
 
 
 STEP 1
@@ -33,7 +34,7 @@ STEP 1
 After copying SunlightPHP to the location of your choice, make sure your server
 is set up correctly. You can do this by browsing to
 
-	http://example.com/sunlightphp/maintenance.php
+	http://example.com/sunlightphp/maintenance/maintenance.php
 	
 Replace "example.com" with your server's address.
 	
@@ -41,8 +42,7 @@ Replace "example.com" with your server's address.
 STEP 2
 ======
 
-Open the file app/config/core.php and adjust the settings to your
-needs.
+Open the file app/config/core.php and adjust the settings to suit your needs.
 
 	STEP 2.1 (OPTIONAL)
 	-------------------
@@ -50,6 +50,9 @@ needs.
 	If you enable JS and/or CSS compression, you need to download the
 	YUICompressor from http://developer.yahoo.com/yui/compressor/ and place it
 	in app/vendors/yuicompressor/yuicompressor-2.4.2.jar
+	
+	You will also need Java.
+		$ sudo apt-get install default-jre
 	
 
 	STEP 2.2 (OPTIONAL)
