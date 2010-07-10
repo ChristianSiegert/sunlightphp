@@ -76,6 +76,10 @@ if (ini_get("error_reporting") > 0) {
 if (!class_exists("Normalizer", false)) {
 	$errors[] = "intl module is not installed (Normalizer class is missing).";
 }
+
+if (!file_exists("PHPUnit" . DS . "Framework.php")) {
+	$errors[] = "PHPUnit is not installed.";
+}
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
