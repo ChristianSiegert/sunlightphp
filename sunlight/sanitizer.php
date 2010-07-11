@@ -1,7 +1,11 @@
 <?php
 class Sanitizer {
-	public static function html($string) {
-		return htmlentities($string, ENT_QUOTES, "UTF-8", false);
+	public static function encodeHtml($string) {
+		return htmlentities($string, ENT_QUOTES, mb_internal_encoding(), false);
+	}
+
+	public static function decodeHtml($string) {
+		return html_entity_decode($string, ENT_QUOTES, mb_internal_encoding());
 	}
 }
 ?>

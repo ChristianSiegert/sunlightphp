@@ -12,7 +12,7 @@ class SanitizerDataTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider htmlDataProvider
 	 */
 	public function testHtml($expected, $string) {
-		$result = Sanitizer::html($string);
+		$result = Sanitizer::encodeHtml($string);
 		$this->assertSame($expected, $result);
 	}
 
