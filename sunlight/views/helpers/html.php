@@ -51,12 +51,8 @@ class HtmlHelper extends Helper {
 	}
 
 	public function link($title, $url, $options = array()) {
-		if (is_array($url)) {
-			$url = $this->url($url);
-		}
-
 		$options["html"] = $title;
-		$options["href"] = $url;
+		$options["href"] = Router::url($url);
 
 		return $this->element("a", $options);
 	}

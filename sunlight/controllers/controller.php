@@ -113,7 +113,7 @@ class Controller {
 	}
 
 	public function redirect($url) {
-		header("Location: $url");
+		header("Location: " . Router::url($url));
 		exit;
 	}
 }

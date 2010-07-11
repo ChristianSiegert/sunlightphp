@@ -53,7 +53,7 @@ class FormHelper extends Helper {
 		$options["name"] = "cancel";
 
 		if (is_array($value)) {
-			$value = $this->url($value);
+			$value = Router::url($value);
 		}
 
 		return $this->button($label, $value, $options);

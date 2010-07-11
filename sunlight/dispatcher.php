@@ -1,6 +1,6 @@
 <?php
 class Dispatcher {
-	private $params;
+	public $params;
 
 	public function parseParams() {
 		$cacheKey = "dispatcher:parseParams:" . serialize($_GET);
