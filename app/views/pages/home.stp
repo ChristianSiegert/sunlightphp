@@ -10,4 +10,4 @@ $html->addCrumb($this->pageTitle);
 
 <p>What a beautiful day.</p>
 
-<p><?php echo $html->link("See if your server is set up correctly for SunlightPHP.", "maintenance.php"); ?></p>
+<p><?php echo $html->link("See if your server is set up correctly for SunlightPHP.", "maintenance/maintenance.php"); ?></p>

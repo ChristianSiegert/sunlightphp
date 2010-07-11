@@ -1,4 +1,6 @@
 <?php
+mb_internal_encoding("UTF-8");
+
 // Redirect to specified page if user pressed "Cancel" button in a form
 if (isset($_POST["cancel"])) {
 	header("Location: " . $_POST["cancel"]);
@@ -34,6 +36,7 @@ include(CORE_DIR . DS . "cache.php");
 include(CORE_DIR . DS . "config.php");
 include(CORE_DIR . DS . "dispatcher.php");
 include(CORE_DIR . DS . "element.php");
+include(CORE_DIR . DS . "router.php");
 
 // Include config file
 include(APP_DIR . DS . "config" . DS . "core.php");
@@ -41,6 +44,7 @@ include(APP_DIR . DS . "config" . DS . "core.php");
 // Start a beautiful day of work
 $dispatcher = new Dispatcher();
 $dispatcher->parseParams();
+Router::$params = $dispatcher->params;
 $dispatcher->dispatch();
 
 // Append statistics when debugging
