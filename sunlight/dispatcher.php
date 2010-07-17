@@ -29,7 +29,7 @@ class Dispatcher {
 			foreach ($params as $param) {
 				if ($param !== "") {
 					if ($i === 0) {
-						if (preg_match("/^[a-z]+$/", $param) === 1) {
+						if (preg_match('/^[a-z]+$/', $param) === 1) {
 							$this->params["controller"] = $param;
 						} else {
 							$this->params["controller"] = "errors";
@@ -37,7 +37,7 @@ class Dispatcher {
 							break;
 						}
 					} elseif ($i === 1) {
-						if (preg_match("/^[a-z-]+$/", $param) === 1) {
+						if (preg_match('/^[a-z-]+$/', $param) === 1) {
 							$this->params["action"] = $param;
 						} else {
 							$this->params["controller"] = "errors";

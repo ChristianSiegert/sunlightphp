@@ -58,7 +58,7 @@ class HtmlHelper extends Helper {
 	}
 
 	public function image($url, $title = "", $options = array()) {
-		if (preg_match("#^https?://#", $url) === 1) {
+		if (preg_match('#^https?://#', $url) === 1) {
 			$options["src"] = $url;
 		} else {
 			$options["src"] = BASE_URL . "/img/$url";

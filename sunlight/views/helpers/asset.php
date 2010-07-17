@@ -78,7 +78,7 @@ class AssetHelper extends Helper {
 			}
 
 			// Fix relative paths in stylesheets
-			$code = mb_ereg_replace("url(?:\s*)\(\.\./", "url(" . BASE_URL . "/", $code, "i");
+			$code = preg_replace('%url(?:\s*)\(\.\./%i', "url(" . BASE_URL . "/", $code);
 
 			$element = new Element("style", array(
 				"html" => $code,

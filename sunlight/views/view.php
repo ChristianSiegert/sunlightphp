@@ -96,7 +96,7 @@ class View {
 		ob_end_clean();
 
 		// Remove whitespace between HTML tags
-		$renderedLayout = preg_replace("#>\s+<#", "><", $renderedLayout);
+		$renderedLayout = preg_replace('#>\s+<#', "><", $renderedLayout);
 
 		return $renderedLayout;
 	}

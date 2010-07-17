@@ -212,7 +212,7 @@ class Model {
 	}
 
 	public function isNumeric($value) {
-		return mb_ereg_match("^[0-9]+$", $value);
+		return preg_match('/^[0-9]+$/', $value);
 	}
 
 	public function isInRange($value, $arguments) {
