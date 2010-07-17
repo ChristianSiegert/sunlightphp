@@ -86,7 +86,7 @@ if (!file_exists("PHPUnit" . DS . "Framework.php")) {
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <meta http-equiv="refresh" content="120">
+    <meta http-equiv="refresh" content="120" />
     <title>Maintenance panel</title>
     <style>
         html {
