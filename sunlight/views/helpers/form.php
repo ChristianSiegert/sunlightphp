@@ -14,11 +14,13 @@ class FormHelper extends Helper {
 	}
 
 	public function create($options = array()) {
-		$options["accept-charset"] = "utf-8";
+		$options["accept-charset"] = mb_internal_encoding();
 		$options["method"] = "post";
 
 		if (!isset($options["action"])) {
 			$options["action"] = "";
+		} else {
+			$options["action"] = Router::url($options["action"]);
 		}
 
 		return $this->element("form", $options, "noEndTag");
@@ -49,14 +51,14 @@ class FormHelper extends Helper {
 		return $this->element("button", $options);
 	}
 
-	public function cancel($label = "Cancel", $value = ".", $options = array()) {
-		$options["name"] = "cancel";
+	public function redirect($label, $redirectUrl = ".", $options = array()) {
+		$options["name"] = "redirectUrl";
 
-		if (is_array($value)) {
-			$value = Router::url($value);
+		if (is_array($redirectUrl)) {
+			$redirectUrl = Router::url($redirectUrl);
 		}
 
-		return $this->button($label, $value, $options);
+		return $this->button($label, $redirectUrl, $options);
 	}
 
 	public function input($fieldName, $options = array(), $fieldSuffix = null) {
@@ -113,7 +115,7 @@ class FormHelper extends Helper {
 		$elementId = sprintf("%s-%s-input%s", Inflector::singularize($this->params["controller"]), str_replace("_", "-", $field), $fieldSuffix);
 
 		if ($label === null) {
-			$label = ucfirst(mb_ereg_replace("_", " ", $field));
+			$label = ucfirst(preg_replace('/_/', " ", $field));
 		}
 
 		return $this->element("label", array(
