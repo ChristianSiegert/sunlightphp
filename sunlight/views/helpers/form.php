@@ -2,24 +2,20 @@
 class FormHelper extends Helper {
 	public $helpers = array("Html");
 
-	protected $defaultModel;
-
-	public function __construct(&$view) {
-		parent::__construct(&$view);
-		$this->defaultModel = ucfirst(Inflector::singularize($this->params["controller"]));
-	}
-
 	public function element($tag, $options = array(), $format = "") {
 		return $this->view->helperObjects["html"]->element($tag, $options, $format);
 	}
 
 	public function create($options = array()) {
 		$options["accept-charset"] = mb_internal_encoding();
-		$options["method"] = "post";
+
+		if (!isset($options["method"])) {
+			$options["method"] = "post";
+		}
 
 		if (!isset($options["action"])) {
 			$options["action"] = "";
-		} else {
+		} elseif (is_array($options["action"])) {
 			$options["action"] = Router::url($options["action"]);
 		}
 
@@ -41,7 +37,7 @@ class FormHelper extends Helper {
 		$options["html"] = $label;
 
 		if (!isset($options["name"])) {
-			$options["name"] =  "data[" . $this->defaultModel . "][" . mb_strtolower($label) . "]";
+			$options["name"] =  mb_strtolower($label);
 		}
 
 		if ($value !== null) {
@@ -51,8 +47,8 @@ class FormHelper extends Helper {
 		return $this->element("button", $options);
 	}
 
-	public function redirect($label, $redirectUrl = ".", $options = array()) {
-		$options["name"] = "redirectUrl";
+	public function redirect($label, $redirectUrl = array("action" => "index"), $options = array()) {
+		$options["name"] = "system[redirectUrl]";
 
 		if (is_array($redirectUrl)) {
 			$redirectUrl = Router::url($redirectUrl);
@@ -61,14 +57,16 @@ class FormHelper extends Helper {
 		return $this->button($label, $redirectUrl, $options);
 	}
 
-	public function input($fieldName, $options = array(), $fieldSuffix = null) {
-		// Set name attribute
-		$fieldAsArray = $fieldSuffix === null ? "" : "[]";
-		$options["name"] = "data[" . $this->defaultModel . "][$fieldName]$fieldAsArray";
+	public function input($fieldName, $options = array(), $fieldNameSuffix = null) {
+		// Set default name if necessary
+		if (!isset($options["name"])) {
+			$fieldAsArray = $fieldNameSuffix === null ? "" : "[]";
+			$options["name"] = $fieldName . $fieldAsArray;
+		}
 
 		// Set default id if necessary
 		if (!isset($options["id"])) {
-			$options["id"] = sprintf("%s-%s-input%s", Inflector::singularize($this->params["controller"]), str_replace("_", "-", $fieldName), $fieldSuffix);
+			$options["id"] = sprintf("%s-input%s", str_replace("_", "-", $fieldName), $fieldNameSuffix);
 		}
 
 		// Set default type to "textbox" if necessary
@@ -85,12 +83,12 @@ class FormHelper extends Helper {
 		$inputElement = $this->element("input", $options);
 
 		// Error messages
-		if (isset($this->validationErrors[$this->defaultModel][$fieldName])) {
+		if (isset($this->validationErrors[$fieldName])) {
 			$errorList = new Element("ul", array(
 				"class" => "form-error-list"
 			));
 
-			foreach ($this->validationErrors[$this->defaultModel][$fieldName] as $errorMessage) {
+			foreach ($this->validationErrors[$fieldName] as $errorMessage) {
 				$listItem = new Element("li", array(
 					"class" => "form-error-list-item",
 					"html" => $errorMessage
@@ -105,14 +103,13 @@ class FormHelper extends Helper {
 		return $inputElement;
 	}
 
-	public function checkbox($field, $value, $options = array(), $fieldSuffix = null) {
-		$options["value"] = $value;
+	public function checkbox($fieldName, $options = array(), $fieldNameSuffix = null) {
 		$options["type"] = "checkbox";
-		return $this->input($field, $options, $fieldSuffix);
+		return $this->input($fieldName, $options, $fieldNameSuffix);
 	}
 
 	public function label($field, $label = null, $fieldSuffix = null) {
-		$elementId = sprintf("%s-%s-input%s", Inflector::singularize($this->params["controller"]), str_replace("_", "-", $field), $fieldSuffix);
+		$elementId = sprintf("%s-input%s", str_replace("_", "-", $field), $fieldSuffix);
 
 		if ($label === null) {
 			$label = ucfirst(preg_replace('/_/', " ", $field));
@@ -125,15 +122,12 @@ class FormHelper extends Helper {
 	}
 
 	public function select($fieldName, $choices = array(), $options = array()) {
-		// Set name attribute
-		$options["name"] = "data[" . $this->defaultModel . "][$fieldName]";
+		$options["name"] = $fieldName;
 
-		// Set default id if necessary
 		if (!isset($options["id"])) {
-			$options["id"] = sprintf("%s-%s-input", Inflector::singularize($this->params["controller"]), str_replace("_", "-", $fieldName));
+			$options["id"] = sprintf("%s-input", str_replace("_", "-", $fieldName));
 		}
 
-		// Create element
 		$selectElement = new Element("select", $options);
 
 		// Fill element with provided choices
@@ -156,8 +150,8 @@ class FormHelper extends Helper {
 	}
 
 	public function textarea($fieldName, $options = array()) {
-		$options["name"] = "data[" . $this->defaultModel . "][$fieldName]";
-		$options["id"] = sprintf("%s-%s-input", Inflector::singularize($this->params["controller"]), str_replace("_", "-", $fieldName));
+		$options["name"] = $fieldName;
+		$options["id"] = sprintf("%s-input", str_replace("_", "-", $fieldName));
 
 		if (isset($this->data[$fieldName])) {
 			$options["html"] = $this->data[$fieldName];

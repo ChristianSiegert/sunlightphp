@@ -52,7 +52,7 @@ class HtmlHelper extends Helper {
 
 	public function link($title, $url, $options = array()) {
 		$options["html"] = $title;
-		$options["href"] = Router::url($url);
+		$options["href"] = is_array($url) ? Router::url($url) : $url;
 
 		return $this->element("a", $options);
 	}

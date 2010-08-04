@@ -9,8 +9,9 @@ class Router {
 	 * @return string
 	 */
 	public static function url($url) {
-		if (!is_array($url)) {
-			return $url;
+		// Set controller if necessary
+		if (!isset($url["controller"])) {
+			$url["controller"] = Router::$params["controller"];
 		}
 
 		$cacheKey = "router:url:" . serialize($url);
@@ -20,37 +21,30 @@ class Router {
 			return $string;
 		}
 
-		$string = BASE_URL;
+		// Create first part of URL
+		$string = BASE_URL . "/" . $url["controller"];
+
+		// Set action if necessary
+		if (!isset($url["action"])) {
+			$url["action"] = "index";
+		}
 
 		// Concatenate all passed values
-		$pass = "";
+		$passedValues = "";
 
 		foreach ($url as $key => $value) {
 			if ($key !== "controller" && $key !== "action") {
-				$pass .= "/$value";
+				$passedValues .= "/" . $value;
 			}
 		}
 
-		// Set controller
-		if (isset($url["controller"])) {
-			$string .= "/" . $url["controller"];
-		} else {
-			$string .= "/" . Router::$params["controller"];
-		}
-
-		// Set action if necessary
-		if ($pass === "") {
-			if (isset($url["action"])) {
-				if ($url["action"] !== "index") {
-					$string .= "/" . $url["action"];
-				}
+		// Append action and passed values to URL
+		if ($passedValues === "") {
+			if ($url["action"] !== "index") {
+				$string .= "/" . $url["action"];
 			}
 		} else {
-			if (isset($url["action"])) {
-				$string .= "/" . $url["action"] . $pass;
-			} else {
-				$string .= "/" . Router::$params["action"] . $pass;
-			}
+			$string .= "/" . $url["action"] . $passedValues;
 		}
 
 		Cache::store($cacheKey, $string);

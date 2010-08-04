@@ -20,7 +20,7 @@ class AuthComponent {
 		if (!$this->isAuthorized()) {
 			$this->controller->Session->setFlash($this->authError, "auth");
 			$this->controller->Session->write("Auth.redirect", BASE_URL . $this->params["url"]["url"]);
-			$this->controller->redirect(BASE_URL . "/users/sign-in");
+			$this->controller->redirect(array("controller" => "users", "action" => "sign-in"));
 		}
 	}
 

@@ -9,15 +9,15 @@ class Dispatcher {
 		if ($params !== false) {
 			$this->params = unserialize($params);
 		} else {
+			if (!isset($_GET["url"])) {
+				$_GET["url"] = "";
+			}
+
 			// Dump all $_GET content into $this->params["url"]
 			$this->params["url"] = $_GET;
 
 			// Prepend slash to URL
-			if (!isset($this->params["url"]["url"])) {
-				$this->params["url"]["url"] = "/";
-			} else {
-				$this->params["url"]["url"] = "/" . $this->params["url"]["url"];
-			}
+			$this->params["url"]["url"] = "/" . $this->params["url"]["url"];
 
 			// Initialize "pass" field
 			$this->params["pass"] = array();
@@ -29,21 +29,9 @@ class Dispatcher {
 			foreach ($params as $param) {
 				if ($param !== "") {
 					if ($i === 0) {
-						if (preg_match('/^[a-z]+$/', $param) === 1) {
-							$this->params["controller"] = $param;
-						} else {
-							$this->params["controller"] = "errors";
-							$this->params["action"] = "error-404";
-							break;
-						}
+						$this->params["controller"] = $param;
 					} elseif ($i === 1) {
-						if (preg_match('/^[a-z-]+$/', $param) === 1) {
-							$this->params["action"] = $param;
-						} else {
-							$this->params["controller"] = "errors";
-							$this->params["action"] = "error-404";
-							break;
-						}
+						$this->params["action"] = $param;
 					} else {
 						$this->params["pass"][$i-2] = $param;
 					}
@@ -61,6 +49,8 @@ class Dispatcher {
 
 			Cache::store($cacheKey, serialize($this->params), 60, "apcOnly");
 		}
+
+		unset($_GET["url"]);
 	}
 
 	public function dispatch() {
@@ -79,17 +69,18 @@ class Dispatcher {
 		// Include custom controller file
 		$customControllerFile = DS . "controllers" . DS . $this->params["controller"] . "_controller.php";
 
-		if (file_exists(APP_DIR . $customControllerFile)
-				&& $this->params["controller"] !== "errors") {
+		if (preg_match('/^[a-z]+$/', $this->params["controller"]) === 1
+				&& file_exists(APP_DIR . $customControllerFile)) {
 			include(APP_DIR . $customControllerFile);
 
 			// Create controller object
 			$controllerClassName = ucfirst($this->params["controller"]) . "Controller";
 			$controller = new $controllerClassName($this->params);
 
-			$methodName = str_replace("-", "_", $controller->params["action"]);
+			$methodName = str_replace("-", "_", $this->params["action"]);
 
-			if (!method_exists($controller, $methodName)) {
+			if (preg_match('/^[a-z-]+$/', $this->params["action"]) === 0
+					|| !method_exists($controller, $methodName)) {
 				$errorMessage = "Method $methodName() does not exist in " . $controllerClassName . ".";
 			}
 		} else {
@@ -103,15 +94,15 @@ class Dispatcher {
 			$this->params["controller"] = "errors";
 			$this->params["action"] = "error-404";
 
-			$controller = new ErrorsController($this->params, $errorMessage);
-			$methodName = str_replace("-", "_", $controller->params["action"]);
+			$controller = new ErrorsController($this->params);
+			$methodName = str_replace("-", "_", $this->params["action"]);
 		}
 
 		if ($controller->autoRender && $controller->cacheActions) {
-			$cacheKey = "dispatcher:dispatch:" . $controller->params["controller"] . ":" . $controller->params["action"] . ":" . serialize($controller->params["pass"]);
+			$cacheKey = "dispatcher:dispatch:" . $this->params["controller"] . ":" . $this->params["action"] . ":" . serialize($this->params["pass"]);
 			$page = Cache::fetch($cacheKey);
 
-			if ($page !== false) {
+			if ($page !== false && Config::read("debug") === 0) {
 				echo $page;
 				return;
 			}
@@ -137,7 +128,7 @@ class Dispatcher {
 		if ($controller->autoRender) {
 			$page = $controller->render();
 
-			if ($controller->cacheActions) {
+			if ($controller->cacheActions && Config::read("debug") === 0) {
 				Cache::store($cacheKey, $page);
 			}
 

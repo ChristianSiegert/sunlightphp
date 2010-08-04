@@ -21,12 +21,15 @@ REQUIREMENTS
 	* PHPUnit
 		$ sudo apt-get install phpunit
 			
-	* Apache
+	* Apache 2
 		$ sudo apt-get install apache2
+		
+		* Add directive "AllowEncodedSlashes On" to Apache server config or
+		virtual host file.
 	
 	* CouchDB 0.10
 		$ sudo apt-get install couchdb
-
+		
 
 STEP 1
 ======

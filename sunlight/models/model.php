@@ -59,7 +59,7 @@ class Model {
 	}
 
 	public function getDocument($documentId, $method = "GET") {
-		$url = DATABASE_HOST . "/" . urlencode(DATABASE_NAME) . "/" . urlencode($documentId);
+		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId);
 		list($status, $header, $data) = $this->query($url, $method);
 
 		if ($status === 200) {
@@ -67,12 +67,12 @@ class Model {
 		} elseif ($status === 404) {
 			throw new Exception("The document you try to fetch does not exist.");
 		} else {
-			throw new Exception("The document could not be fetched.");
+			throw new Exception("The document could not be fetched (Status $status).");
 		}
 	}
 
 	public function storeDocument($data, $options) {
-		if (!isset($data[$this->modelName]["_id"])) {
+		if (!isset($data["_id"])) {
 			throw new Exception("No _id provided. Can't store document without _id.");
 		}
 
@@ -80,46 +80,42 @@ class Model {
 			throw new Exception("Please whitelist fields. Aborted storing document.");
 		}
 
-		if (isset($data[$this->modelName]) && is_array($data[$this->modelName])) {
-			// Abort if non-whitelisted fields are present
-			foreach ($data[$this->modelName] as $fieldName => $value) {
-				if (!in_array($fieldName, $options["fieldList"])) {
-					throw new Exception("Non-whitelisted field '$fieldName' is present. Aborted storing document.");
-				}
+		// Abort if non-whitelisted fields are present
+		foreach ($data as $fieldName => $value) {
+			if (!in_array($fieldName, $options["fieldList"])) {
+				throw new Exception("Non-whitelisted field '$fieldName' is present. Aborted storing document.");
 			}
+		}
 
-			// Add type field
-			if (!isset($data[$this->modelName]["type"])) {
-				$data[$this->modelName]["type"] = lcfirst($this->modelName);
-			}
+		// Add type field
+		if (!isset($data["type"])) {
+			$data["type"] = lcfirst($this->modelName);
+		}
 
-			// Validate data
-			$this->validationErrors = $this->validate($data);
-			$this->controller->validationErrors = $this->validationErrors;
+		// Validate data
+		$this->validationErrors = $this->validate($data);
+		$this->controller->validationErrors = $this->validationErrors;
 
-			if (empty($this->validationErrors)) {
-				$url = DATABASE_HOST . "/" . urlencode(DATABASE_NAME) . "/" . urlencode($data[$this->modelName]["_id"]);
+		if (empty($this->validationErrors)) {
+			$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($data["_id"]);
 
-				list($status, $header, $data) = $this->query($url, "PUT", json_encode($data[$this->modelName]));
+			list($status, $header, $data) = $this->query($url, "PUT", json_encode($data));
 
-				if ($status === 201) {
-					return array($header, $data);
-				} elseif ($status === 409) {
-					throw new Exception("A document with this _id already exists.");
-				} else {
-					throw new Exception("Document could not be saved (Status $status).");
-				}
+			if ($status === 201) {
+				return array($header, $data);
+			} elseif ($status === 409) {
+				throw new Exception("A document with this _id already exists.");
 			} else {
-				throw new Exception("Data is not valid. Aborted storing document.");
+				throw new Exception("Document could not be saved (Status $status).");
 			}
 		} else {
-			throw new Exception("Did not find any data to store. Aborted storing document.");
+			throw new Exception("Data is not valid. Aborted storing document.");
 		}
 	}
 
 	public function updateDocument($documentId, $data, $options = array()) {
-		$data[$this->modelName]["_id"] = $documentId;
-		$data[$this->modelName]["_rev"] = $this->getRevision($documentId);
+		$data["_id"] = $documentId;
+		$data["_rev"] = $this->getRevision($documentId);
 
 		$options["fieldList"][] = "_id";
 		$options["fieldList"][] = "_rev";
@@ -130,7 +126,7 @@ class Model {
 	public function deleteDocument($documentId) {
 		$revision = $this->getRevision($documentId);
 
-		$url = DATABASE_HOST . "/" . urlencode(DATABASE_NAME) . "/" . urlencode($documentId) . "?rev=" . urlencode($revision);
+		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId) . "?rev=" . rawurlencode($revision);
 		return $this->query($url, "DELETE");
 	}
 
@@ -157,11 +153,15 @@ class Model {
 	public function getView($designName, $viewName, $parameters = array(), $method = "GET", $data = null, $jsonDecodeResponse = true) {
 		$parametersAsString = "?";
 
-		foreach ($parameters as $optionName => $optionValue) {
-			$parametersAsString .= $optionName . "=" . urlencode(json_encode($optionValue)) . "&";
+		foreach ($parameters as $parameterName => $parameterValue) {
+			$parametersAsString .= $parameterName . "=" . rawurlencode(json_encode($parameterValue)) . "&";
 		}
 
-		$url = DATABASE_HOST . "/" . urlencode(DATABASE_NAME) . "/_design/" . urlencode($designName) . "/_view/" . urlencode($viewName) . $parametersAsString;
+		if ($data !== null) {
+			$data = json_encode($data);
+		}
+
+		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_design/" . rawurlencode($designName) . "/_view/" . rawurlencode($viewName) . $parametersAsString;
 		list($status, $header, $data) = $this->query($url, $method, $data, $jsonDecodeResponse);
 
 		if ($status === 200) {
@@ -181,14 +181,14 @@ class Model {
 		foreach ($this->validate as $fieldName => $ruleSet) {
 			if (!empty($ruleSet)) {
 				foreach ($ruleSet as $ruleName => $rule) {
-					if (!isset($data[$this->modelName][$fieldName])) {
-						$data[$this->modelName][$fieldName] = "";
+					if (!isset($data[$fieldName])) {
+						$data[$fieldName] = "";
 					}
 
 					if (is_string($rule["rule"])) {
-						$validates = $this->$rule["rule"]($data[$this->modelName][$fieldName]);
+						$validates = $this->$rule["rule"]($data[$fieldName]);
 					} elseif (is_array($rule["rule"])) {
-						$validates = $this->$rule["rule"][0]($data[$this->modelName][$fieldName], $rule["rule"]);
+						$validates = $this->$rule["rule"][0]($data[$fieldName], $rule["rule"]);
 					}
 
 					if (!$validates) {
@@ -198,7 +198,7 @@ class Model {
 							$errorMessage = $ruleName;
 						}
 
-						$validationErrors[$this->modelName][$fieldName][] = $errorMessage;
+						$validationErrors[$fieldName][] = $errorMessage;
 					}
 				}
 			}
@@ -225,14 +225,6 @@ class Model {
 
 	public function isTimestamp($value) {
 		if ($this->isNumeric($value) && $value >= 0 && $value <= time()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	public function isVersion($value) {
-		if ($this->isNumeric($value) && $value >= 201005010 && $value <= date("Ymd") . 9) {
 			return true;
 		}
 

@@ -21,8 +21,10 @@ class Controller {
 	function __construct(&$params) {
 		$this->params = $params;
 
-		if (isset($_POST["data"])) {
-			$this->data = $_POST["data"];
+		if (!empty($_POST)) {
+			$this->data = $_POST;
+		} else {
+			$this->data = $_GET;
 		}
 	}
 
@@ -113,7 +115,11 @@ class Controller {
 	}
 
 	public function redirect($url) {
-		header("Location: " . Router::url($url));
+		if (is_array($url)) {
+			$url = Router::url($url);
+		}
+
+		header("Location: $url");
 		exit;
 	}
 }
