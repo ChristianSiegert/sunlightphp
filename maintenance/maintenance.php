@@ -6,6 +6,8 @@ if (!isset($_SERVER["SERVER_ADDR"])
 	exit;
 }
 
+ini_set("display_errors", true);
+
 define("DS", DIRECTORY_SEPARATOR);
 define("ROOT_DIR", dirname(dirname(__FILE__)));
 define("APP_DIR", ROOT_DIR . DS . "app");
@@ -21,9 +23,13 @@ define("JS_URL", BASE_URL . "/js");
 define("CCSS_URL", BASE_URL . "/ccss");
 define("CJS_URL", BASE_URL . "/cjs");
 
+// Include some core files
 include(CORE_DIR . DS . "basics.php");
 include(CORE_DIR . DS . "cache.php");
 include(CORE_DIR . DS . "config.php");
+include(CORE_DIR . DS . "router.php");
+
+// Include config file
 include(APP_DIR . DS . "config" . DS . "core.php");
 
 $errors = array();
