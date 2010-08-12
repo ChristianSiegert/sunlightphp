@@ -22,29 +22,26 @@ class Dispatcher {
 			// Initialize "pass" field
 			$this->params["pass"] = array();
 
+			// Get route for current URL
+			$route = Router::getRoute($this->params["url"]["url"]);
+
 			// Extract controller and action from URL if possible
-			$params = explode("/", $this->params["url"]["url"]);
+			$params = explode("/", trim($this->params["url"]["url"], "/"));
 			$i = 0;
 
 			foreach ($params as $param) {
-				if ($param !== "") {
-					if ($i === 0) {
-						$this->params["controller"] = $param;
-					} elseif ($i === 1) {
-						$this->params["action"] = $param;
-					} else {
-						$this->params["pass"][$i-2] = $param;
-					}
-					$i++;
+				if ($i === 0) {
+					$this->params["controller"] = isset($route["controller"]) ? $route["controller"] : $param;
+				} elseif ($i === 1) {
+					$this->params["action"] = isset($route["action"]) ? $route["action"] : $param;
+				} else {
+					$this->params["pass"][$i-2] = $param;
 				}
+				$i++;
 			}
 
-			// Set default controller and/or action if necessary
-			if (empty($this->params["controller"])) {
-				$this->params["controller"] = "pages";
-				$this->params["action"] = "home";
-			} elseif (empty($this->params["action"])) {
-				$this->params["action"] = "index";
+			if (empty($this->params["action"])) {
+				$this->params["action"] = isset($route["action"]) ? $route["action"] : "index";
 			}
 
 			Cache::store($cacheKey, serialize($this->params), 60, "apcOnly");

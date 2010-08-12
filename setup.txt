@@ -74,4 +74,25 @@ Open the file app/config/core.php and adjust the settings to suit your needs.
 	installed for PHP.
 
 	$ sudo apt-get install memcached php5-memcache
+
+
+TIPS
+====
+
+If you want to access CouchDB on a remote server, i.e. for administration with
+the pretty front-end Futon, you can make it accessible with:
+
+	$ ssh -L {1}:localhost:{2} {3}@{4}
 	
+		{1}	The port on your localhost you want to bind the CouchDB from the
+			remote server to.
+		{2}	The port CouchDB occupies on your remote server. CouchDB listens by
+			default to port 5984.
+		{3} Your username for the remote server.
+		{4} The IP address of your remote server.
+		
+With all the placeholders replaced, it can look something like this:
+	$ ssh -L 5985:localhost:5984 root@109.74.204.144
+
+Congratulations, you can now access your remote server's CouchDB simply by
+browsing to http://localhost:5985/ .

@@ -2,6 +2,8 @@
 class Router {
 	public static $params;
 
+	public static $routes = array();
+
 	/**
 	 * Creates a URL.
 	 *
@@ -49,6 +51,14 @@ class Router {
 
 		Cache::store($cacheKey, $string);
 		return $string;
+	}
+
+	public static function connect($url, $route) {
+		self::$routes[$url] = $route;
+	}
+
+	public static function getRoute($url) {
+		return isset(self::$routes[$url]) ? self::$routes[$url] : false;
 	}
 }
 ?>
