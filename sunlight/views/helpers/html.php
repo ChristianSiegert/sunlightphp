@@ -14,7 +14,6 @@ class HtmlHelper extends Helper {
 		$element = $element->toString($format);
 
 		Cache::store($cacheKey, $element, 0, "apcOnly");
-
 		return $element;
 	}
 
@@ -38,15 +37,18 @@ class HtmlHelper extends Helper {
 
 		$numberOfCrumbs = count($this->crumbs);
 		for ($i = 0; $i < $numberOfCrumbs; $i++) {
+			if ($prefix !== "" || $i > 0) {
+				$string .= $glue;
+			}
+
 			if ($i < $numberOfCrumbs - 1) {
-				$string .= $glue . $this->link($this->crumbs[$i][0], $this->crumbs[$i][1]);
+				$string .= $this->link($this->crumbs[$i][0], $this->crumbs[$i][1]);
 			} else {
-				$string .= $glue . $this->crumbs[$i][0];
+				$string .= $this->crumbs[$i][0];
 			}
 		}
 
 		Cache::store($cacheKey, $string, 0, "apcOnly");
-
 		return $string;
 	}
 
