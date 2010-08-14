@@ -79,10 +79,13 @@ Open the file app/config/core.php and adjust the settings to suit your needs.
 TIPS
 ====
 
-If you want to access CouchDB on a remote server, i.e. for administration with
-the pretty front-end Futon, you can make it accessible with:
+	TIP ONE
+	-------
 
-	$ ssh -L {1}:localhost:{2} {3}@{4}
+	If you want to access CouchDB on a remote server, e.g. for administration
+	with the pretty front-end Futon, you can make it accessible with:
+
+		$ ssh -L {1}:localhost:{2} {3}@{4}
 	
 		{1}	The port on your localhost you want to bind the CouchDB from the
 			remote server to.
@@ -91,8 +94,37 @@ the pretty front-end Futon, you can make it accessible with:
 		{3} Your username for the remote server.
 		{4} The IP address of your remote server.
 		
-With all the placeholders replaced, it can look something like this:
-	$ ssh -L 5985:localhost:5984 root@109.74.204.144
+	With all the placeholders replaced, it can look something like this:
+		$ ssh -L 5985:localhost:5984 root@109.74.204.144
 
-Congratulations, you can now access your remote server's CouchDB simply by
-browsing to http://localhost:5985/ .
+	Congratulations, you can now access your remote server's CouchDB simply by
+	browsing to http://localhost:5985/ .
+	
+	
+	TIP TWO
+	-------
+	
+	If you want to access SunlightPHP's maintenance panel on a remote server,
+	follow these steps:
+			
+	1.	Add "127.0.0.1 {name}" to the /etc/hosts file on your localhost. Replace
+		{name} with a unique name you made up, e.g. an abbreviation of your
+		domain name, so you can remember it well.
+		
+		For projects hosted on christian-siegert.com I use "cs" as name, i.e. my
+		localhost /etc/hosts file contains "127.0.0.1 cs".
+		
+	2.	Add the name as a server alias in your remote server's VirtualHost
+		configuration file. This file is usually located at /etc/apache2/sites-
+		available. Look for a line starting with "ServerAlias" and append the
+		name there.
+				
+		Continuing with the example from above, I edited /etc/apache2/sites-
+		available/christian-siegert.com and updated the list of server aliases
+		to "ServerAlias www.christian-siegert.com cs"
+		
+	3.	You can now access the SunlightPHP maintenance panel on your remote
+		server from your localhost with something like:
+			$ ssh -L 8080:christian-siegert.com:80 root@109.74.204.144
+			
+		Browse to http://cs:8080/ on your localhost to see it.
