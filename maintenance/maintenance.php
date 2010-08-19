@@ -45,6 +45,15 @@ if (defined("APC_IS_ENABLED") && defined("MEMCACHE_IS_ENABLED")) {
 	$errors[] = "Constant APC_IS_ENABLED and/or MEMCACHE_IS_ENABLED is not set.";
 }
 
+// Check PHP version
+if (preg_match("/[0-9]+\.[0-9]+\.[0-9]+/", phpversion(), $phpVersion) === 1) {
+	if ($phpVersion[0] < "5.3.0") {
+		$errors[] = "SunlightPHP requires PHP 5.3 or higher. The installed version is $phpVersion[0].";
+	}
+} else {
+	$errors[] = "SunlightPHP requires PHP 5.3 or higher. The installed version could not be determined.";
+}
+
 $sessionsDir = APP_DIR . DS . "tmp" . DS . "sessions";
 if (!is_writable($sessionsDir)) {
 	$errors[] = "$sessionsDir is not writable.";
@@ -80,8 +89,21 @@ if (ini_get("error_reporting") > 0) {
 	$errors[] = "error_reporting is not disabled.";
 }
 
-if (!class_exists("Normalizer", false)) {
-	$errors[] = "intl module is not installed (Normalizer class is missing).";
+if (!in_array("curl", get_loaded_extensions())) {
+	$errors[] = "The curl module is not installed.";
+}
+
+if (!in_array("intl", get_loaded_extensions())
+		|| !class_exists("Normalizer", false)) {
+	$errors[] = "The intl module is not installed (Normalizer class is missing).";
+}
+
+if (!in_array("apc", get_loaded_extensions())) {
+	$errors[] = "The APC module is not installed.";
+}
+
+if (!in_array("memcache", get_loaded_extensions())) {
+	$errors[] = "The memcache module is not installed.";
 }
 
 if (!file_exists("PHPUnit" . DS . "Framework.php")) {
