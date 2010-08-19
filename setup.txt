@@ -127,4 +127,5 @@ TIPS
 		server from your localhost with something like:
 			$ ssh -L 8080:christian-siegert.com:80 root@109.74.204.144
 			
-		Browse to http://cs:8080/ on your localhost to see it.
+		Browse to http://cs:8080/sunlightphp/maintenance/maintenance.php on your
+		localhost to see it.
