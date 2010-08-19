@@ -1,5 +1,5 @@
 <?php
-ini_set("display_errors", "1");
+ini_set("display_errors", true);
 
 define("DS", DIRECTORY_SEPARATOR);
 define("ROOT_DIR", dirname(dirname(dirname(dirname(__FILE__)))));

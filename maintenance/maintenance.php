@@ -6,6 +6,7 @@ if (!isset($_SERVER["SERVER_ADDR"])
 	exit;
 }
 
+$displayErrors = ini_get("display_errors");
 ini_set("display_errors", true);
 
 define("DS", DIRECTORY_SEPARATOR);
@@ -71,7 +72,7 @@ if (ini_get("session.auto_start") == true) {
 	$errors[] = "session.auto_start is not disabled.";
 }
 
-if (ini_get("display_errors") == true) {
+if ($displayErrors == true) {
 	$errors[] = "display_errors is not disabled.";
 }
 
@@ -90,51 +91,52 @@ if (!file_exists("PHPUnit" . DS . "Framework.php")) {
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <meta http-equiv="refresh" content="120" />
-    <title>Maintenance panel</title>
-    <style>
-        html {
-            background: #fff;
-            color: #444;
-            font-family: "DejaVu Sans", "Lucida Grande", "Helvetica Neue", Tahoma, Helvetica, Arial, sans-serif;
-            font-size: 13px;
-        }
+	<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta http-equiv="refresh" content="120" />
+	<title>Maintenance panel</title>
+		<style type="text/css">
+			html {
+				background: #fff;
+				color: #444;
+				font-family: "DejaVu Sans", "Lucida Grande", "Helvetica Neue", Tahoma, Helvetica, Arial, sans-serif;
+				font-size: 13px;
+			}
 
-        body {
-            margin: 0 auto;
-            width: 760px;
-        }
+			body {
+				margin: 0 auto;
+				width: 760px;
+			}
 
-        a {
-          text-decoration: none;
-        }
+			a {
+				text-decoration: none;
+			}
 
-        a:hover {
-          text-decoration: underline;
-        }
+			a:hover {
+				text-decoration: underline;
+			}
 
-        h1 {
-            font-size: 30px;
-            margin: 30px 0 0;
-        }
-    </style>
-  </head>
-  <body>
-    <h1>Maintenance panel</h1>
-    <p>
-        <a href="?cache=clear">Clear APC and Memcached cache.</a>
+			h1 {
+				font-size: 30px;
+				margin: 30px 0 0;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Maintenance panel</h1>
 
-		<?php if (isset($_GET["cache"]) && $_GET["cache"] === "cleared") { ?>
-            Cache was cleared.
-		<?php } ?>
-    </p>
+		<p>
+			<a href="?cache=clear">Clear APC and Memcached cache.</a>
 
-    <ul>
-		<?php foreach ($errors as $error) { ?>
-			<li><?php echo $error; ?></li>
-		<?php }?>
-    </ul>
-  </body>
+			<?php if (isset($_GET["cache"]) && $_GET["cache"] === "cleared") { ?>
+				Cache was cleared.
+			<?php } ?>
+		</p>
+
+		<ul>
+			<?php foreach ($errors as $error) { ?>
+				<li><?php echo $error; ?></li>
+			<?php }?>
+		</ul>
+	</body>
 </html>
