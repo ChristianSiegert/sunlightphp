@@ -1,4 +1,6 @@
 <?php
+$startTime = microtime(true);
+
 mb_internal_encoding("UTF-8");
 
 // Redirect to specified page if user pressed "Cancel" button in a form
@@ -9,13 +11,6 @@ if (isset($_POST["system"]["redirectUrl"])) {
 	header("Location: " . $_GET["system"]["redirectUrl"]);
 	exit;
 }
-
-function microtime_float() {
-	list($microtime, $time) = explode(" ", microtime());
-	return (float) $time + (float) $microtime;
-}
-
-$startTime = microtime_float();
 
 // Commonly used directory paths and URLs
 define("DS", DIRECTORY_SEPARATOR);
@@ -54,7 +49,7 @@ $dispatcher->dispatch();
 if (Config::read("debug") > 0) {
 	$memoryUsage = ceil(memory_get_usage() / 1024) . " KiB";
 	$memoryPeakUsage = ceil(memory_get_peak_usage() / 1024) . " KiB";
-	$executionTime = round((microtime_float() - $startTime) * 1000, 1);
+	$executionTime = round((microtime(true) - $startTime) * 1000, 1);
 	printf('<pre style="clear: both; color: #444; margin: 2em 0 0;">Memory: %s (Peak: %s)<br />%sms<br />', $memoryUsage, $memoryPeakUsage, $executionTime);
 	printf('Cache hits:   %s<br />Cache misses: %s</pre>', Cache::$fetchCount - Cache::$storeCount, Cache::$storeCount);
 }
