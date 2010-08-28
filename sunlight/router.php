@@ -10,26 +10,8 @@ class Router {
 	 * @param array|string $url
 	 * @return string
 	 */
-	public static function url($url) {
-		// Set controller if necessary
-		if (!isset($url["controller"])) {
-			$url["controller"] = Router::$params["controller"];
-		}
-
-		$cacheKey = "router:url:" . serialize($url);
-		$string = Cache::fetch($cacheKey);
-
-		if ($string !== false) {
-			return $string;
-		}
-
-		// Create first part of URL
-		$string = BASE_URL . "/" . $url["controller"];
-
-		// Set action if necessary
-		if (!isset($url["action"])) {
-			$url["action"] = "index";
-		}
+	public static function url($url, $makeAbsolute = false) {
+		$string = "";
 
 		// Concatenate all passed values
 		$passedValues = "";
@@ -38,6 +20,13 @@ class Router {
 			if ($key !== "controller" && $key !== "action") {
 				$passedValues .= "/" . $value;
 			}
+		}
+
+		// Set action if necessary
+		if (isset($url["controller"]) && !isset($url["action"])) {
+			$url["action"] = "index";
+		} elseif (!isset($url["controller"]) && !isset($url["action"])) {
+			$url["action"] = Router::$params["action"];
 		}
 
 		// Append action and passed values to URL
@@ -49,15 +38,24 @@ class Router {
 			$string .= "/" . $url["action"] . $passedValues;
 		}
 
-		Cache::store($cacheKey, $string);
+		// Set controller if necessary
+		if (!isset($url["controller"])) {
+			$url["controller"] = Router::$params["controller"];
+		}
+
+		// Create first part of URL
+		$string = ($makeAbsolute ? "http://" . $_SERVER["HTTP_HOST"] : "") . BASE_URL . "/" . $url["controller"] . $string;
+
 		return $string;
 	}
 
 	public static function connect($url, $route) {
+		$url = rtrim($url, "/");
 		self::$routes[$url] = $route;
 	}
 
 	public static function getRoute($url) {
+		$url = rtrim($url, "/");
 		return isset(self::$routes[$url]) ? self::$routes[$url] : false;
 	}
 }
