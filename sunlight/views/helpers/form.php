@@ -69,13 +69,14 @@ class FormHelper extends Helper {
 			$options["id"] = sprintf("%s-input%s", str_replace("_", "-", $fieldName), $fieldNameSuffix);
 		}
 
-		// Set default type to "textbox" if necessary
+		// Set default type to "text" if necessary
 		if (!isset($options["type"])) {
 			$options["type"] = "text";
 		}
 
 		// Auto-populate value attribute if possible
-		if (isset($this->data[$fieldName])) {
+		if (!isset($options["value"])
+				&& isset($this->data[$fieldName])) {
 			$options["value"] = $this->data[$fieldName];
 		}
 
@@ -103,17 +104,34 @@ class FormHelper extends Helper {
 		return $inputElement;
 	}
 
-	public function checkbox($fieldName, $options = array(), $fieldNameSuffix = null) {
-		$options["type"] = "checkbox";
+	public function text($fieldName, $options = array(), $fieldNameSuffix = null) {
+		$options["type"] = "text";
 		return $this->input($fieldName, $options, $fieldNameSuffix);
 	}
 
-	public function label($field, $label = null, $fieldSuffix = null) {
-		$elementId = sprintf("%s-input%s", str_replace("_", "-", $field), $fieldSuffix);
+	public function checkbox($fieldName, $value = "on", $options = array(), $fieldNameSuffix = null) {
+		$options["type"] = "checkbox";
+		$options["value"] = $value;
 
-		if ($label === null) {
-			$label = ucfirst(preg_replace('/_/', " ", $field));
+		if (isset($this->data[$fieldName])) {
+			$options["checked"] = "checked";
 		}
+
+		return $this->input($fieldName, $options, $fieldNameSuffix);
+	}
+
+	public function hidden($fieldName, $value, $options = array(), $fieldNameSuffix = null) {
+		$options["type"] = "hidden";
+		$options["value"] = $value;
+		return $this->input($fieldName, $options, $fieldNameSuffix);
+	}
+
+	public function label($fieldName, $label = null, $fieldNameSuffix = null) {
+		if ($label === null) {
+			$label = ucfirst(preg_replace('/_/', " ", $fieldName));
+		}
+
+		$elementId = sprintf("%s-input%s", str_replace("_", "-", $fieldName), $fieldNameSuffix);
 
 		return $this->element("label", array(
 			"for" => $elementId,
