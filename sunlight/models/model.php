@@ -71,12 +71,17 @@ class Model {
 		}
 	}
 
-	public function storeDocument($data, $options) {
-		if (!isset($data["_id"])) {
-			throw new Exception("No _id provided. Can't store document without _id.");
+	public function documentExists($documentId) {
+		try {
+			$this->getDocument($documentId, "HEAD");
+			return true;
+		} catch (Exception $exception) {
+			return false;
 		}
+	}
 
-		if (!isset($options["fieldList"]) || empty($options["fieldList"])) {
+	public function storeDocument($documentId, $data, $options) {
+		if (empty($options["fieldList"])) {
 			throw new Exception("Please whitelist fields. Aborted storing document.");
 		}
 
@@ -86,6 +91,9 @@ class Model {
 				throw new Exception("Non-whitelisted field '$fieldName' is present. Aborted storing document.");
 			}
 		}
+
+		// Add _id field
+		$data["_id"] = $documentId;
 
 		// Add type field
 		if (!isset($data["type"])) {
@@ -114,17 +122,16 @@ class Model {
 	}
 
 	public function updateDocument($documentId, $data, $options = array()) {
-		$data["_id"] = $documentId;
 		$data["_rev"] = $this->getRevision($documentId);
-
-		$options["fieldList"][] = "_id";
 		$options["fieldList"][] = "_rev";
 
-		return $this->storeDocument($data, $options);
+		return $this->storeDocument($documentId, $data, $options);
 	}
 
-	public function deleteDocument($documentId) {
-		$revision = $this->getRevision($documentId);
+	public function deleteDocument($documentId, $revision = null) {
+		if ($revision === null) {
+			$revision = $this->getRevision($documentId);
+		}
 
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId) . "?rev=" . rawurlencode($revision);
 		return $this->query($url, "DELETE");
