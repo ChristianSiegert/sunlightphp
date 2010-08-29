@@ -10,12 +10,19 @@ class AssetHelper extends Helper {
 		"js" => array()
 	);
 
+	protected $standaloneAssets = array(
+		"css" => array(),
+		"js" => array()
+	);
+
 	public function css($filename, $options = array()) {
-		if (is_array($options) === false) {
+		if (!is_array($options)) {
 			$options = array($options);
 		}
 
-		if (in_array("top", $options)) {
+		if (in_array("standalone", $options)) {
+			array_push($this->standaloneAssets["css"], $filename);
+		} elseif (in_array("top", $options)) {
 			array_push($this->assetsTop["css"], $filename);
 		} else {
 			array_push($this->assets["css"], $filename);
@@ -23,11 +30,13 @@ class AssetHelper extends Helper {
 	}
 
 	public function js($filename, $options = array()) {
-		if (is_array($options) === false) {
+		if (!is_array($options)) {
 			$options = array($options);
 		}
 
-		if (in_array("top", $options)) {
+		if (in_array("standalone", $options)) {
+			array_push($this->standaloneAssets["js"], $filename);
+		} elseif (in_array("top", $options)) {
 			array_push($this->assetsTop["js"], $filename);
 		} else {
 			array_push($this->assets["js"], $filename);
@@ -62,7 +71,7 @@ class AssetHelper extends Helper {
 			}
 
 			$element = new Element("link", array(
-				"href" => CCSS_URL . "/" . $cacheFilename,
+				"href" => CCSS_URL . "/$cacheFilename",
 				"rel" => "stylesheet",
 				"type" => "text/css"
 			));
@@ -95,6 +104,16 @@ class AssetHelper extends Helper {
 	 * @return string <script> tag
 	 */
 	public function jsForLayout() {
+		$standaloneAssets = "";
+
+		foreach ($this->standaloneAssets["js"] as $filename) {
+			$element = new Element("script", array(
+				"src" => BASE_URL . "/js/$filename",
+				"type" => "text/javascript"
+			));
+			$standaloneAssets .= $element->toString();
+		}
+
 		if (CACHE_JS) {
 			$cacheKey = "asset:jsForLayout:" . serialize($this->assetsTop["js"]) . ":" . serialize($this->assets["js"]);
 			$element = Cache::fetch($cacheKey, "apcOnly");
@@ -117,10 +136,10 @@ class AssetHelper extends Helper {
 			}
 
 			$element = new Element("script", array(
-				"src" => CJS_URL . "/" . $cacheFilename,
+				"src" => CJS_URL . "/$cacheFilename",
 				"type" => "text/javascript"
 			));
-			$element = $element->toString();
+			$element = $standaloneAssets . $element->toString();
 
 			Cache::store($cacheKey, $element, 0, "apcOnly");
 			return $element;
@@ -136,7 +155,7 @@ class AssetHelper extends Helper {
 				"type" => "text/javascript"
 			));
 
-			return $element->toString();
+			return $standaloneAssets . $element->toString();
 		}
 	}
 
