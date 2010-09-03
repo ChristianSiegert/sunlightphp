@@ -2,8 +2,8 @@
 class Cache {
 	private static $memcache = null;
 
-	public static $fetchCount = 0;
-	public static $storeCount = 0;
+	public static $readCount = 0;
+	public static $writeCount = 0;
 
 	private static function readyMemcache() {
 		if (self::$memcache === null) {
@@ -48,7 +48,7 @@ class Cache {
 			self::$memcache->set($key, $value, MEMCACHE_COMPRESSED, $ttl);
 		}
 
-		self::$storeCount++;
+		self::$writeCount++;
 	}
 
 	public static function fetch($key, $cacheType = null) {
@@ -64,8 +64,7 @@ class Cache {
 			$value = self::$memcache->get($key, MEMCACHE_COMPRESSED);
 		}
 
-		self::$fetchCount++;
-
+		self::$readCount++;
 		return $value;
 	}
 }
