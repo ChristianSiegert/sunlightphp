@@ -3,6 +3,7 @@
 #$asset->js("pages" . DS . "home.js");
 
 $this->pageTitle = "Welcome to SunlightPHP";
+#$html->addCrumb("Parent crumb", array("controller" => "controller", "action" => "index"));
 $html->addCrumb($this->pageTitle);
 ?>
 

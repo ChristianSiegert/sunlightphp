@@ -1,18 +1,28 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <title><?php echo $this->pageTitle; ?></title>
-    <?php echo $html->metaForLayout(); ?>
-    <?php echo $asset->cssForLayout(); ?>
-  </head>
-  <body>
-    <div id="content">
-	  <?php $session->flash("auth"); ?>
-	  <?php $session->flash(); ?>
-	  <?php echo $contentForLayout; ?>
-    </div>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<title><?php echo $this->pageTitle; ?></title>
+		<?php echo $html->metaForLayout(); ?>
 
-	<?php echo $asset->jsForLayout(); ?>
-  </body>
+		<?php $asset->css("reset.css", "top"); ?>
+		<?php $asset->css("sunlight.css", "top"); ?>
+
+		<?php echo $asset->cssForLayout(); ?>
+	</head>
+	<body>
+		<div id="content">
+			<?php if ($this->params["url"]["url"] !== "/") { ?>
+				<div id="breadcrumbs">You are here: <?php echo $html->getCrumbs(); ?></div>
+			<?php } else { ?>
+				<div id="breadcrumbs"></div>
+			<?php } ?>
+
+			<?php $session->flash("auth"); ?>
+			<?php $session->flash(); ?>
+			<?php echo $contentForLayout; ?>
+		</div>
+
+		<?php echo $asset->jsForLayout(); ?>
+	</body>
 </html>
