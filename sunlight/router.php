@@ -11,14 +11,17 @@ class Router {
 	 * @return string
 	 */
 	public static function url($url, $makeAbsolute = false) {
-		$string = "";
-
-		// Concatenate all passed values
+		// Concatenate all passed and named values
+		$namedValues = "";
 		$passedValues = "";
 
 		foreach ($url as $key => $value) {
 			if ($key !== "controller" && $key !== "action") {
-				$passedValues .= "/" . $value;
+				if (is_string($key)) {
+					$namedValues .= "/$key:$value";
+				} else {
+					$passedValues .= "/$value";
+				}
 			}
 		}
 
@@ -29,13 +32,15 @@ class Router {
 			$url["action"] = Router::$params["action"];
 		}
 
+		$string = "";
+
 		// Append action and passed values to URL
-		if ($passedValues === "") {
+		if ($passedValues === "" && $namedValues === "") {
 			if ($url["action"] !== "index") {
 				$string .= "/" . $url["action"];
 			}
 		} else {
-			$string .= "/" . $url["action"] . $passedValues;
+			$string .= "/" . $url["action"] . $passedValues . $namedValues;
 		}
 
 		// Set controller if necessary
