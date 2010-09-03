@@ -30,10 +30,10 @@ class Element {
 	/**
 	 * Returns element as string.
 	 *
-	 * @param string $option Nothing or "noEndTag"
+	 * @param string $option Empty string, "noEndTag" or "emptyTag"
 	 * @return string Element in string form
 	 */
-	public function toString($option = null) {
+	public function toString($option = "") {
 		// Create string for attributes
 		$attributes = "";
 		foreach ($this->attributes as $attribute => $value) {
@@ -41,7 +41,7 @@ class Element {
 		}
 
 		// Create string for open-tag
-		$string = "<" . $this->tag . $attributes . ">" . $this->html;
+		$string = "<" . $this->tag . $attributes . ($option === "emptyTag" ? "/>" : ">" . $this->html);
 
 		// Create string for children elements
 		foreach ($this->children as $child) {
@@ -53,7 +53,7 @@ class Element {
 		}
 
 		// Create string for close-tag
-		if ($option !== "noEndTag") {
+		if (empty($option)) {
 			$string .= "</" . $this->tag . ">";
 		}
 
