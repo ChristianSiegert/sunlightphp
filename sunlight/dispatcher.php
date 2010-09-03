@@ -3,48 +3,42 @@ class Dispatcher {
 	public $params;
 
 	public function parseParams() {
-		$cacheKey = "dispatcher:parseParams:" . serialize($_GET);
-		$params = Cache::fetch($cacheKey, "apcOnly");
+		if (!isset($_GET["url"])) {
+			$_GET["url"] = "";
+		}
 
-		if ($params !== false) {
-			$this->params = unserialize($params);
-		} else {
-			if (!isset($_GET["url"])) {
-				$_GET["url"] = "";
-			}
+		// Dump all $_GET content into $this->params["url"]
+		$this->params["url"] = $_GET;
 
-			// Dump all $_GET content into $this->params["url"]
-			$this->params["url"] = $_GET;
+		// Prepend slash to URL
+		$this->params["url"]["url"] = "/" . $this->params["url"]["url"];
 
-			// Prepend slash to URL
-			$this->params["url"]["url"] = "/" . $this->params["url"]["url"];
+		// Initialize "pass" and "named" field
+		$this->params["pass"] = array();
+		$this->params["named"] = array();
 
-			// Initialize "pass" field
-			$this->params["pass"] = array();
+		// Get route for current URL
+		$route = Router::getRoute($this->params["url"]["url"]);
 
-			// Get route for current URL
-			$route = Router::getRoute($this->params["url"]["url"]);
+		// Extract controller and action from URL if possible
+		$params = explode("/", trim($this->params["url"]["url"], "/"));
 
-			// Extract controller and action from URL if possible
-			$params = explode("/", trim($this->params["url"]["url"], "/"));
-			$i = 0;
-
-			foreach ($params as $param) {
-				if ($i === 0) {
-					$this->params["controller"] = isset($route["controller"]) ? $route["controller"] : $param;
-				} elseif ($i === 1) {
-					$this->params["action"] = isset($route["action"]) ? $route["action"] : $param;
+		foreach ($params as $i => $param) {
+			if ($i === 0) {
+				$this->params["controller"] = isset($route["controller"]) ? $route["controller"] : $param;
+			} elseif ($i === 1) {
+				$this->params["action"] = isset($route["action"]) ? $route["action"] : $param;
+			} else {
+				if (preg_match("/^([^:]+):(.*)$/", $param, $match)) {
+					$this->params["named"][$match[1]] = $match[2];
 				} else {
-					$this->params["pass"][$i-2] = $param;
+					$this->params["pass"][] = $param;
 				}
-				$i++;
 			}
+		}
 
-			if (empty($this->params["action"])) {
-				$this->params["action"] = isset($route["action"]) ? $route["action"] : "index";
-			}
-
-			Cache::store($cacheKey, serialize($this->params), 60, "apcOnly");
+		if (empty($this->params["action"])) {
+			$this->params["action"] = isset($route["action"]) ? $route["action"] : "index";
 		}
 
 		unset($_GET["url"]);
