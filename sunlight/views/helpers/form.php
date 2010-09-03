@@ -3,7 +3,7 @@ class FormHelper extends Helper {
 	public $helpers = array("Html");
 
 	public function element($tag, $options = array(), $format = "") {
-		return $this->view->helperObjects["html"]->element($tag, $options, $format);
+		return $this->view->helperObjects["html"]->element($tag, $options, $format, 1);
 	}
 
 	public function create($options = array()) {
@@ -30,7 +30,7 @@ class FormHelper extends Helper {
 		$options["value"] = $label;
 		$options["type"] = "submit";
 
-		return $this->element("input", $options);
+		return $this->element("input", $options, "emptyTag");
 	}
 
 	public function button($label, $value = null, $options = array()) {
@@ -81,7 +81,7 @@ class FormHelper extends Helper {
 		}
 
 		// Create element
-		$inputElement = $this->element("input", $options);
+		$inputElement = $this->element("input", $options, "emptyTag");
 
 		// Error messages
 		if (isset($this->validationErrors[$fieldName])) {
@@ -113,7 +113,8 @@ class FormHelper extends Helper {
 		$options["type"] = "checkbox";
 		$options["value"] = $value;
 
-		if (isset($this->data[$fieldName])) {
+		if (isset($this->data[$fieldName])
+				&& ($fieldNameSuffix === null || in_array($value, $this->data[$fieldName]))) {
 			$options["checked"] = "checked";
 		}
 
@@ -126,17 +127,17 @@ class FormHelper extends Helper {
 		return $this->input($fieldName, $options, $fieldNameSuffix);
 	}
 
-	public function label($fieldName, $label = null, $fieldNameSuffix = null) {
-		if ($label === null) {
+	public function label($fieldName, $label = "", $options = array(), $fieldNameSuffix = null) {
+		if (empty($label)) {
 			$label = ucfirst(preg_replace('/_/', " ", $fieldName));
 		}
 
 		$elementId = sprintf("%s-input%s", str_replace("_", "-", $fieldName), $fieldNameSuffix);
 
-		return $this->element("label", array(
-			"for" => $elementId,
-			"html" => $label
-		));
+		$options["for"] = $elementId;
+		$options["html"] = $label;
+
+		return $this->element("label", $options);
 	}
 
 	public function select($fieldName, $choices = array(), $options = array()) {
