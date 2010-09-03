@@ -2,19 +2,23 @@
 class HtmlHelper extends Helper {
 	protected $crumbs = array();
 
-	public function element($tag, $options = array(), $format = "") {
+	public function element($tag, $options = array(), $format = "", $ttl = 0) {
+		if ($ttl === false) {
+			throw new Exception("TTL value is false." . debug_backtrace());
+		}
+
 		$cacheKey = "htmlHelper:element:$tag:" . serialize($options) . ":$format";
 		$element = Cache::fetch($cacheKey, "apcOnly");
 
 		if ($element !== false) {
 			return $element;
+		} else {
+			$element = new Element($tag, $options);
+			$element = $element->toString($format);
+
+			Cache::store($cacheKey, $element, $ttl, "apcOnly");
+			return $element;
 		}
-
-		$element = new Element($tag, $options);
-		$element = $element->toString($format);
-
-		Cache::store($cacheKey, $element, 0, "apcOnly");
-		return $element;
 	}
 
 	public function addCrumb($title, $url = null) {
@@ -27,49 +31,41 @@ class HtmlHelper extends Helper {
 
 		if ($string !== false) {
 			return $string;
-		}
-
-		if (count($this->crumbs) > 0) {
-			$string = $this->link($prefix, BASE_URL . "/");
 		} else {
-			$string = $prefix;
-		}
+			$numberOfCrumbs = count($this->crumbs);
 
-		$numberOfCrumbs = count($this->crumbs);
-		for ($i = 0; $i < $numberOfCrumbs; $i++) {
-			if ($prefix !== "" || $i > 0) {
-				$string .= $glue;
+			$string = $numberOfCrumbs > 0 ? $this->link($prefix, BASE_URL . "/") : $prefix;
+
+			for ($i = 0; $i < $numberOfCrumbs; $i++) {
+				if ($prefix !== "" || $i > 0) {
+					$string .= $glue;
+				}
+
+				if ($i < $numberOfCrumbs - 1) {
+					$string .= $this->link($this->crumbs[$i][0], $this->crumbs[$i][1], array(), 60);
+				} else {
+					$string .= $this->crumbs[$i][0];
+				}
 			}
 
-			if ($i < $numberOfCrumbs - 1) {
-				$string .= $this->link($this->crumbs[$i][0], $this->crumbs[$i][1]);
-			} else {
-				$string .= $this->crumbs[$i][0];
-			}
+			Cache::store($cacheKey, $string, 60, "apcOnly");
+			return $string;
 		}
-
-		Cache::store($cacheKey, $string, 0, "apcOnly");
-		return $string;
 	}
 
-	public function link($title, $url = "", $options = array()) {
+	public function link($title, $url = "", $options = array(), $ttl = 0) {
 		$options["html"] = $title;
 		$options["href"] = is_array($url) ? Router::url($url) : $url;
 
-		return $this->element("a", $options);
+		return $this->element("a", $options, "", $ttl);
 	}
 
-	public function image($url, $title = "", $options = array()) {
-		if (preg_match('#^https?://#', $url) === 1) {
-			$options["src"] = $url;
-		} else {
-			$options["src"] = BASE_URL . "/img/$url";
-		}
-
+	public function image($url, $title = "", $options = array(), $ttl = 0) {
+		$options["src"] = preg_match('#^https?://#', $url) ? $url : BASE_URL . "/img/$url";
 		$options["title"] = $title;
 		$options["alt"] = $title;
 
-		return $this->element("img", $options);
+		return $this->element("img", $options, "emptyTag", $ttl);
 	}
 
 	public function metaForLayout() {
@@ -92,7 +88,7 @@ class HtmlHelper extends Helper {
 	 * the webroot directory.
 	 *
 	 * @param string $filename Name of the icon file
-	 * @param array $options Attributes added when cr
+	 * @param array $options Attributes of the element
 	 */
 	public function icon($filename) {
 		return $this->element("link", array(
@@ -100,6 +96,13 @@ class HtmlHelper extends Helper {
 			"rel" => "shortcut icon",
 			"type" => "image/x-icon"
 		));
+	}
+
+	public function script($code, $ttl = 0) {
+		return $this->element("script", array(
+			"html" => "//<![CDATA[\n$code\n//]]>",
+			"type" => "text/javascript"
+		), "", $ttl);
 	}
 }
 ?>
