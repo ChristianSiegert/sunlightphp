@@ -25,7 +25,7 @@ class HtmlHelper extends Helper {
 		$this->crumbs[] = array($title, $url);
 	}
 
-	public function getCrumbs($glue = " &raquo; ", $prefix = "Home") {
+	public function getCrumbs($glue = " &rsaquo; ", $prefix = "Home") {
 		$cacheKey = "htmlHelper:getCrumbs:$glue:$prefix:" . serialize($this->crumbs);
 		$string = Cache::fetch($cacheKey, "apcOnly");
 
