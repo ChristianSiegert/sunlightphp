@@ -36,7 +36,7 @@ class View {
 			$helperClassName = $this->helpers[$i] . "Helper";
 			$helperObject = ${strtolower($this->helpers[$i])} = new $helperClassName($this);
 
-			// Queue all helpers this helper requires for loading
+			// Queue all helpers that this helper requires for loading
 			if (isset($helperObject->helpers)) {
 				$this->helpers = array_unique(array_merge($this->helpers, $helperObject->helpers));
 			}
@@ -49,15 +49,9 @@ class View {
 	}
 
 	public function renderAction() {
-		// Make passed variables available to the view
-		foreach ($this->passedVariables as $variableName => $variableValue) {
-			$$variableName = $variableValue;
-		}
-
-		// Make helpers available to the view
-		foreach ($this->helperObjects as $helperName => $helperObject) {
-			$$helperName = $helperObject;
-		}
+		// Make passed variables and helpers available to the view
+		extract($this->passedVariables);
+		extract($this->helperObjects);
 
 		// Filename of the view
 		$view = DS . "views" . DS . $this->params["controller"] . DS . str_replace("-", "_", $this->params["action"]) . ".stp";
@@ -85,9 +79,7 @@ class View {
 
 	public function renderLayout($contentForLayout) {
 		// Make helpers available to the layout
-		foreach ($this->helperObjects as $helperName => $helperObject) {
-			$$helperName = $helperObject;
-		}
+		extract($this->helperObjects);
 
 		// Buffer output of the layout file
 		ob_start();
