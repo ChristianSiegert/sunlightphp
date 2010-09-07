@@ -1,22 +1,22 @@
 <?php
 class Controller {
-	public $components = array();
-
-	public $data = array();
+	public $components = array("Session");
 
 	public $helpers = array("Asset", "Html", "Session");
-
-	public $params;
-
-	public $passedVariables = array();
-
-	public $validationErrors;
 
 	public $autoRender = true;
 
 	public $cacheActions = false;
 
 	public $loadModel = true;
+
+	public $passedVariables = array();
+
+	public $params;
+
+	public $data;
+
+	public $validationErrors;
 
 	function __construct(&$params) {
 		$this->params = $params;

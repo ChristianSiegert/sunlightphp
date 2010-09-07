@@ -1,0 +1,11 @@
+
+INCOMPATIBLE CHANGES
+====================
+
+2010-09-05	Removed parameters $method and $jsonDecodeResponse from Model::getView().
+2010-09-05	Changed return values of Model::getView(). Instead of returning array($headers, $data), it now returns only $data["rows"].
+
+2010-09-05	Removed parameter $method from Model::getDocument().
+2010-09-05	Changed return values of Model::getDocument(), Model::storeDocument(), Model::updateDocument() and Model::deleteDocument(). Instead of returning array($headers, $data), they now return only $data.
+
+2010-09-04	Added parameter $revision to Model::updateDocument() which changed the order of paramaters.

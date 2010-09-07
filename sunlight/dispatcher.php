@@ -89,7 +89,7 @@ class Dispatcher {
 			$methodName = str_replace("-", "_", $this->params["action"]);
 		}
 
-		if ($controller->autoRender && $controller->cacheActions) {
+		if ($controller->autoRender && $controller->cacheActions && Config::read("debug") === 0) {
 			$cacheKey = "dispatcher:dispatch:" . $this->params["controller"] . ":" . $this->params["action"] . ":" . serialize($this->params["pass"]);
 			$page = Cache::fetch($cacheKey);
 
