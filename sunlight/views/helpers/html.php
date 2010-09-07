@@ -3,22 +3,23 @@ class HtmlHelper extends Helper {
 	protected $crumbs = array();
 
 	public function element($tag, $options = array(), $format = "", $ttl = 0) {
-		if ($ttl === false) {
-			throw new Exception("TTL value is false." . debug_backtrace());
+		if ($ttl !== false) {
+			$cacheKey = "htmlHelper:element:$tag:" . serialize($options) . ":$format";
+			$element = Cache::fetch($cacheKey, "apcOnly");
+
+			if ($element !== false) {
+				return $element;
+			}
 		}
 
-		$cacheKey = "htmlHelper:element:$tag:" . serialize($options) . ":$format";
-		$element = Cache::fetch($cacheKey, "apcOnly");
+		$element = new Element($tag, $options);
+		$element = $element->toString($format);
 
-		if ($element !== false) {
-			return $element;
-		} else {
-			$element = new Element($tag, $options);
-			$element = $element->toString($format);
-
+		if ($ttl !== false) {
 			Cache::store($cacheKey, $element, $ttl, "apcOnly");
-			return $element;
 		}
+
+		return $element;
 	}
 
 	public function addCrumb($title, $url = null) {
@@ -98,11 +99,11 @@ class HtmlHelper extends Helper {
 		));
 	}
 
-	public function script($code, $ttl = 0) {
+	public function script($code) {
 		return $this->element("script", array(
 			"html" => "//<![CDATA[\n$code\n//]]>",
 			"type" => "text/javascript"
-		), "", $ttl);
+		), "", false);
 	}
 }
 ?>
