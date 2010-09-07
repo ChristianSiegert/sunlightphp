@@ -3,7 +3,7 @@ class FormHelper extends Helper {
 	public $helpers = array("Html");
 
 	public function element($tag, $options = array(), $format = "") {
-		return $this->view->helperObjects["html"]->element($tag, $options, $format, 1);
+		return $this->view->helperObjects["html"]->element($tag, $options, $format, false);
 	}
 
 	public function create($options = array()) {
@@ -57,10 +57,10 @@ class FormHelper extends Helper {
 		return $this->button($label, $redirectUrl, $options);
 	}
 
-	public function input($fieldName, $options = array(), $fieldNameSuffix = null) {
+	public function input($fieldName, $options = array(), $fieldNameSuffix = "") {
 		// Set default name if necessary
 		if (!isset($options["name"])) {
-			$fieldAsArray = $fieldNameSuffix === null ? "" : "[]";
+			$fieldAsArray = !empty($fieldNameSuffix) ? "[]" : "";
 			$options["name"] = $fieldName . $fieldAsArray;
 		}
 
@@ -104,30 +104,30 @@ class FormHelper extends Helper {
 		return $inputElement;
 	}
 
-	public function text($fieldName, $options = array(), $fieldNameSuffix = null) {
+	public function text($fieldName, $options = array(), $fieldNameSuffix = "") {
 		$options["type"] = "text";
 		return $this->input($fieldName, $options, $fieldNameSuffix);
 	}
 
-	public function checkbox($fieldName, $value = "on", $options = array(), $fieldNameSuffix = null) {
+	public function checkbox($fieldName, $value = "on", $options = array(), $fieldNameSuffix = "") {
 		$options["type"] = "checkbox";
 		$options["value"] = $value;
 
 		if (isset($this->data[$fieldName])
-				&& ($fieldNameSuffix === null || in_array($value, $this->data[$fieldName]))) {
+				&& (empty($fieldNameSuffix) || in_array($value, $this->data[$fieldName]))) {
 			$options["checked"] = "checked";
 		}
 
 		return $this->input($fieldName, $options, $fieldNameSuffix);
 	}
 
-	public function hidden($fieldName, $value, $options = array(), $fieldNameSuffix = null) {
+	public function hidden($fieldName, $value, $options = array(), $fieldNameSuffix = "") {
 		$options["type"] = "hidden";
 		$options["value"] = $value;
 		return $this->input($fieldName, $options, $fieldNameSuffix);
 	}
 
-	public function label($fieldName, $label = "", $options = array(), $fieldNameSuffix = null) {
+	public function label($fieldName, $label = "", $options = array(), $fieldNameSuffix = "") {
 		if (empty($label)) {
 			$label = ucfirst(preg_replace('/_/', " ", $fieldName));
 		}
