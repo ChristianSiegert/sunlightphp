@@ -35,7 +35,7 @@ function express($expression, $nestingLevel = 0) {
 		case "double":
 			return $expression;
 		case "string":
-			return "\"$expression\"";
+			return "\"" . mb_convert_encoding($expression, mb_internal_encoding()) . "\"";
 		case "array":
 			$output = "array(";
 
