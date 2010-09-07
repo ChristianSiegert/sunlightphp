@@ -9,53 +9,87 @@ class Model {
 	public $validationRules = array();
 	public $validationErrors = array();
 
+	public static $queryCount = 0;
+
 	public function __construct(&$controller) {
 		$this->controller = $controller;
 		$this->modelName = ucfirst(Inflector::singularize($controller->params["controller"]));
 	}
 
-	public function query($url, $method = "GET", $data = null, $jsonDecodeResponse = true) {
+	// TODO: Test if $data = array() creates different response behavior than $data = null
+	public function query($url, $method = "GET", $data = array(), $jsonDecodeResponse = true) {
 		$handle = curl_init();
 
-		curl_setopt_array($handle, array(
+		$curlOptions = array(
 			CURLOPT_CUSTOMREQUEST => $method,
+			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_HEADER => true,
+			CURLOPT_VERBOSE => true,
+			CURLOPT_MAXREDIRS => 5,
 			CURLOPT_NOBODY => $method === "HEAD",
-			CURLOPT_POSTFIELDS => $data,
 			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_URL => $url
-		));
+			CURLOPT_TIMEOUT => 10,
+			CURLOPT_URL => $url,
+			CURLOPT_USERAGENT => USERAGENT
+		);
+
+		if ($method === "POST" || $method === "PUT") {
+			$curlOptions[CURLOPT_POSTFIELDS] = $data;
+		}
+
+		curl_setopt_array($handle, $curlOptions);
 
 		$rawResponse = curl_exec($handle);
+		self::$queryCount++;
+
+		if (curl_errno($handle)) {
+			throw new Exception("Curl: " . curl_error($handle) . " (Error code: " . curl_errno($handle) . ").");
+		}
+
+		$info = curl_getinfo($handle);
 		curl_close($handle);
 
-		// Split response text at empty lines to separate headers and data
-		$response = explode("\r\n\r\n", $rawResponse);
+		// Convert encoding if necessary
+		if (preg_match('#charset=(.+)$#', $info["content_type"], $match)
+				&& mb_convert_case($match[1], MB_CASE_UPPER) !== mb_internal_encoding()) {
+			$rawResponse = mb_convert_encoding($rawResponse, mb_internal_encoding(), $match[1]);
+		}
 
-		// Get most recent header from all received headers
-		$rawHeader = explode("\r\n", $response[count($response) - 2]);
+		$headers = array();
 
-		// Get status code and header fields
-		$header = array();
-		foreach ($rawHeader as $i => $line) {
-			if ($i === 0) {
-				 $rawStatus = explode(" ", $line);
-				 $status = (integer) $rawStatus[1];
-				 $header["Status"] = $line;
+		// Matches header at the beginning of a string
+		$pattern = '#^HTTP/1\..*(?=(?:\n|\r\n){2,})#sU';
+
+		while (true) {
+			if (preg_match($pattern, $rawResponse, $rawHeader)) {
+				$header = array();
+
+				foreach (explode("\r\n", $rawHeader[0]) as $i => $line) {
+					if ($i === 0) {
+						$header["Status"] = $line;
+					} else {
+						$explodedLine = explode(": ", $line, 2);
+						$header[$explodedLine[0]] = isset($explodedLine[1]) ? $explodedLine[1] : "";
+					}
+				}
+
+				$headers[] = $header;
+
+				// Remove header from $rawResponse
+				$rawResponse = trim(preg_replace($pattern, "", $rawResponse, 1));
 			} else {
-				list($fieldName, $fieldValue) = explode(": ", $line, 2);
-				$header[$fieldName] = $fieldValue;
+				break;
 			}
 		}
 
-		// Get data
-		$data = $response[count($response) - 1];
+		// $rawResponse now contains only data as we have removed all headers
+		$data = trim($rawResponse);
 
 		if ($jsonDecodeResponse) {
 			$data = json_decode($data, true);
 		}
 
-		return array($status, $header, $data);
+		return array($info["http_code"], $headers, $data, $info);
 	}
 
 	/**
@@ -70,59 +104,58 @@ class Model {
 	 * @param string $method HTTP method used when querying CouchDB
 	 * @return array Array containing HTTP response header and document
 	 */
-	public function getDocument($documentId, $revision = "", $parameters = array(), $method = "GET") {
+	public function getDocument($documentId, $revision = "", $parameters = array()) {
 		if (!empty($revision)) {
 			$parameters["rev"] = $revision;
 		}
 
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId) . $this->encodeParameters($parameters);
-		list($status, $header, $data) = $this->query($url, $method);
+		list($status, $headers, $document) = $this->query($url);
 
 		if ($status === 200) {
-			return array($header, $data);
+			return $document;
 		} elseif ($status === 404) {
 			throw new Exception("The document you try to fetch does not exist.");
 		} else {
-			debug($header, $data);
 			throw new Exception("The document could not be fetched (Status $status).");
 		}
 	}
 
-	/**
-	 * Checks if document exists.
-	 *
-	 * @param string $documentId
-	 * @return bool
-	 */
-	public function documentExists($documentId) {
-		try {
-			$this->getDocument($documentId, "", array(), "HEAD");
-			return true;
-		} catch (Exception $exception) {
-			return false;
+	public function deleteDocument($documentId, $revision = "") {
+		$parameters = array(
+			"rev" => empty($revision) ? $this->getRevision($documentId) : $revision
+		);
+
+		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId) . $this->encodeParameters($parameters);
+		list($status, $headers, $data) = $this->query($url, "DELETE");
+
+		if ($status === 200) {
+			return $data;
+		} else {
+			throw new Exception("Document could not be deleted (Status $status).");
 		}
 	}
 
-	public function storeDocument($documentId, $data, $options) {
+	public function storeDocument($documentId, $document, $options) {
 		if (empty($options["fieldList"])) {
 			throw new Exception("Please whitelist fields. Aborted storing document.");
 		}
 
 		// Abort if non-whitelisted fields are present
-		foreach ($data as $fieldName => $value) {
+		foreach ($document as $fieldName => $value) {
 			if (!in_array($fieldName, $options["fieldList"])) {
 				throw new Exception("Non-whitelisted field '$fieldName' is present. Aborted storing document.");
 			}
 		}
 
 		// Add type field
-		if (!isset($data["type"])) {
-			$data["type"] = lcfirst($this->modelName);
+		if (!isset($document["type"])) {
+			$document["type"] = lcfirst($this->modelName);
 		}
 
 		// Validate data if rules are defined for this document type
-		if (isset($this->validationRules[$data["type"]])) {
-			$this->validationErrors = $this->validate($data, $this->validationRules[$data["type"]]);
+		if (isset($this->validationRules[$document["type"]])) {
+			$this->validationErrors = $this->validate($document, $this->validationRules[$document["type"]]);
 			$this->controller->validationErrors = $this->validationErrors;
 		} else {
 			throw new Exception("Please define validation rules. Not validating data is a security risk. Aborted storing document.");
@@ -130,10 +163,10 @@ class Model {
 
 		if (empty($this->validationErrors)) {
 			$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId);
-			list($status, $header, $data) = $this->query($url, "PUT", json_encode($data));
+			list($status, $headers, $data) = $this->query($url, "PUT", json_encode($document));
 
 			if ($status === 201) {
-				return array($header, $data);
+				return $data;
 			} elseif ($status === 409) {
 				throw new Exception("A document with this id already exists.");
 			} else {
@@ -144,26 +177,11 @@ class Model {
 		}
 	}
 
-	public function updateDocument($documentId, $data, $options = array()) {
-		$data["_rev"] = $this->getRevision($documentId);
+	public function updateDocument($documentId, $revision = "", $document, $options = array()) {
+		$document["_rev"] = empty($revision) ? $this->getRevision($documentId) : $revision;
 		$options["fieldList"][] = "_rev";
 
-		return $this->storeDocument($documentId, $data, $options);
-	}
-
-	public function deleteDocument($documentId, $revision = null) {
-		if ($revision === null) {
-			$revision = $this->getRevision($documentId);
-		}
-
-		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId) . $this->encodeParameters(array("rev" => $revision));
-		list($status, $header, $data) = $this->query($url, "DELETE");
-
-		if ($status === 200) {
-			return array($header, $data);
-		} else {
-			throw new Exception("Document could not be deleted (Status $status).");
-		}
+		return $this->storeDocument($documentId, $document, $options);
 	}
 
 	/**
@@ -173,34 +191,134 @@ class Model {
 	 * @return string Document revision ("_rev")
 	 */
 	public function getRevision($documentId) {
-		list($header) = $this->getDocument($documentId, "", array(), "HEAD");
+		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId);
+		list($status, $headers) = $this->query($url, "HEAD");
 
-		if (isset($header["Etag"])) {
-			if (preg_match('/^"([^"]+)"$/', $header["Etag"], $eTag) === 1) {
-				return $eTag[1];
-			} else {
-				throw new Exception("Could not parse e-tag from response header. Getting the latest revision failed.");
-			}
+		$mostRecentHeader = count($headers) - 1;
+
+		if ($status === 200
+				&& isset($headers[$mostRecentHeader]["Etag"])
+				&& preg_match('/^"([^"]+)"$/', $headers[$mostRecentHeader]["Etag"], $eTag)) {
+			return $eTag[1];
 		} else {
-			throw new Exception("E-tag is not present in response header. Getting the latest revision failed.");
+			throw new Exception("Getting the latest revision failed.");
 		}
 	}
 
-	public function getView($designName, $viewName, $parameters = array(), $method = "GET", $data = null, $jsonDecodeResponse = true) {
-		if ($data !== null) {
-			$data = json_encode($data);
-		}
+	/**
+	 * Checks if document exists.
+	 *
+	 * @param string $documentId
+	 * @return bool
+	 */
+	public function documentExists($documentId, $revision = "") {
+		$parameters = !empty($revision) ? array("rev" => $revision) : array();
 
-		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_design/" . rawurlencode($designName) . "/_view/" . rawurlencode($viewName) . $this->encodeParameters($parameters);
-		list($status, $header, $data) = $this->query($url, $method, $data, $jsonDecodeResponse);
+		try {
+			$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId) . $this->encodeParameters($parameters);
+			list($status) = $this->query($url, "HEAD");
+			return $status === 200;
+		} catch (Exception $exception) {
+			return false;
+		}
+	}
+
+	public function getDocuments($documentIds = array(), $parameters = array()) {
+		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_all_docs" . $this->encodeParameters($parameters);
+		list($status, $headers, $data) = $this->query($url, empty($documentIds) ? "GET" : "POST", json_encode(array("keys" => $documentIds)));
 
 		if ($status === 200) {
-			return array($header, $data);
+			return $data["rows"];
+		} else {
+			throw new Exception("The documents could not be fetched (Status $status).");
+		}
+	}
+
+	public function storeDocuments($documents, $options) {
+		if (empty($options["fieldList"])) {
+			throw new Exception("Please whitelist fields. Aborted storing documents.");
+		}
+
+		$documentCount = count($documents);
+		for ($i = 0; $i < $documentCount; $i++) {
+			// Abort if no id is provided
+			if (!isset($documents[$i]["_id"])) {
+				throw new Exception("Please provide an id. Aborted storing documents.");
+			}
+
+			// Abort if non-whitelisted fields are present
+			foreach ($documents[$i] as $fieldName => $value) {
+				if (!in_array($fieldName, $options["fieldList"])) {
+					throw new Exception("Non-whitelisted field '$fieldName' is present. Aborted storing documents.");
+				}
+			}
+
+			// Add type field
+			if (!isset($documents[$i]["type"])) {
+				$documents[$i]["type"] = lcfirst($this->modelName);
+			}
+
+			// Validate data if rules are defined for this document type
+			if (isset($this->validationRules[$documents[$i]["type"]])) {
+				$this->validationErrors = $this->validate($documents[$i], $this->validationRules[$documents[$i]["type"]]);
+				$this->controller->validationErrors = $this->validationErrors;
+			} else {
+				throw new Exception("Please define validation rules for document type '{$documents[$i]["type"]}'. Aborted storing documents.");
+			}
+		}
+
+		if (empty($this->validationErrors)) {
+			$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_bulk_docs";
+			list($status, $headers, $data) = $this->query($url, "POST", json_encode(array("docs" => $documents)));
+
+			if ($status === 201) {
+				return $data;
+			} else {
+				debug($headers, $data);
+				throw new Exception("Documents could not be stored (Status $status).");
+			}
+		} else {
+			throw new Exception("Data is not valid. Aborted storing documents.");
+		}
+	}
+
+	public function deleteDocuments($documents) {
+		foreach ($documents as $document) {
+			if (!isset($document["_id"])) {
+				throw new Exception("Missing document id. Aborted deleting documents.");
+			}
+
+			if (!isset($document["_rev"])) {
+				throw new Exception("Missing document rev. Aborted deleting documents.");
+			}
+
+			if (!isset($document["_deleted"])) {
+				throw new Exception("Missing 'deleted' field. Aborted deleting documents.");
+			}
+		}
+
+		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_bulk_docs";
+		list($status, $headers, $data) = $this->query($url, "POST", json_encode(array("docs" => $documents)));
+
+		if ($status === 201) {
+			return $data;
+		} else {
+			debug($headers, $data);
+			throw new Exception("Documents could not be deleted (Status $status).");
+		}
+	}
+
+	public function getView($designName, $viewName, $parameters = array(), $data = array()) {
+		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_design/" . rawurlencode($designName) . "/_view/" . rawurlencode($viewName) . $this->encodeParameters($parameters);
+		list($status, $headers, $data) = $this->query($url, empty($data) ? "GET" : "POST", json_encode($data));
+
+		if ($status === 200) {
+			return $data["rows"];
 		} elseif ($status === 400) {
 			if (isset($data["error"]) && isset($data["reason"])) {
-				throw new Exception("CouchDB: {$data["error"]} &hellip; {$data["reason"]}.");
+				throw new Exception("CouchDB: {$data["error"]} ... {$data["reason"]}");
 			} else {
-				throw new Exception("CouchDB: Something is wrong with the request.<pre>" . print_r($data, true) . "</pre>");
+				throw new Exception("CouchDB: Something is wrong with the request. <pre>" . express($data) . "</pre>");
 			}
 		} elseif ($status === 404) {
 			throw new Exception("CouchDB: View '$viewName' does not exist for design '$designName'.");
