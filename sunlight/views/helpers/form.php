@@ -60,7 +60,7 @@ class FormHelper extends Helper {
 	public function input($fieldName, $options = array(), $fieldNameSuffix = "") {
 		// Set default name if necessary
 		if (!isset($options["name"])) {
-			$fieldAsArray = !empty($fieldNameSuffix) ? "[]" : "";
+			$fieldAsArray = $fieldNameSuffix !== "" ? "[]" : "";
 			$options["name"] = $fieldName . $fieldAsArray;
 		}
 
