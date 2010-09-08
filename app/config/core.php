@@ -49,4 +49,7 @@ define("SESSION_NAME", "app-name");
 
 // Maximum session lifetime in seconds
 define("SESSION_MAX_LIFETIME", 1209600);
+
+// The user agent used in an HTTP request
+define("USERAGENT", "");
 ?>
