@@ -147,6 +147,9 @@ class Model {
 			}
 		}
 
+		// Add _id field so it can be validated
+		$document["_id"] = $documentId;
+
 		// Add type field
 		if (!isset($document["type"])) {
 			$document["type"] = lcfirst($this->modelName);

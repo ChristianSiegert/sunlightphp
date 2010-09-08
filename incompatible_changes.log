@@ -8,4 +8,6 @@ INCOMPATIBLE CHANGES
 2010-09-05	Removed parameter $method from Model::getDocument().
 2010-09-05	Changed return values of Model::getDocument(), Model::storeDocument(), Model::updateDocument() and Model::deleteDocument(). Instead of returning array($headers, $data), they now return only $data.
 
+2010-09-05	Renamed Model::validate to Model::validationRules. Changed structure of validationRules.
+
 2010-09-04	Added parameter $revision to Model::updateDocument() which changed the order of paramaters.
