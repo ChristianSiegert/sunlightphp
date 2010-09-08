@@ -24,7 +24,6 @@ class Model {
 			CURLOPT_CUSTOMREQUEST => $method,
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_HEADER => true,
-			CURLOPT_VERBOSE => true,
 			CURLOPT_MAXREDIRS => 5,
 			CURLOPT_NOBODY => $method === "HEAD",
 			CURLOPT_RETURNTRANSFER => true,
