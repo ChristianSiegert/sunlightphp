@@ -17,10 +17,10 @@ class Model {
 	}
 
 	// TODO: Test if $data = array() creates different response behavior than $data = null
-	public function query($url, $method = "GET", $data = array(), $jsonDecodeResponse = true) {
+	public function query($url, $method = "GET", $data = array(), $jsonDecodeResponse = true, $curlOptions = array()) {
 		$handle = curl_init();
 
-		$curlOptions = array(
+		$finalCurlOptions = array(
 			CURLOPT_CUSTOMREQUEST => $method,
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_HEADER => true,
@@ -32,17 +32,21 @@ class Model {
 			CURLOPT_USERAGENT => USERAGENT
 		);
 
-		if ($method === "POST" || $method === "PUT") {
-			$curlOptions[CURLOPT_POSTFIELDS] = $data;
+		foreach ($curlOptions as $key => $value) {
+			$finalCurlOptions[$key] = $value;
 		}
 
-		curl_setopt_array($handle, $curlOptions);
+		if ($method === "POST" || $method === "PUT") {
+			$finalCurlOptions[CURLOPT_POSTFIELDS] = $data;
+		}
+
+		curl_setopt_array($handle, $finalCurlOptions);
 
 		$rawResponse = curl_exec($handle);
 		self::$queryCount++;
 
 		if (curl_errno($handle)) {
-			throw new Exception("Curl: " . curl_error($handle) . " (Error code: " . curl_errno($handle) . ").");
+			throw new Exception("Curl: " . curl_error($handle) . " (Curl error code: " . curl_errno($handle) . ").");
 		}
 
 		$info = curl_getinfo($handle);
