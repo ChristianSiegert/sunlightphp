@@ -79,7 +79,7 @@ class Dispatcher {
 		}
 
 		if (isset($errorMessage)) {
-			header("HTTP/1.1 404 Page not found");
+			header("HTTP/1.1 404 Not found");
 			include(CORE_DIR . DS . "controllers" . DS . "errors_controller.php");
 
 			$this->params["controller"] = "errors";
@@ -89,11 +89,11 @@ class Dispatcher {
 			$methodName = str_replace("-", "_", $this->params["action"]);
 		}
 
-		if ($controller->autoRender && $controller->cacheActions && Config::read("debug") === 0) {
+		if ($controller->cacheActions && $controller->autoRender && Config::read("debug") === 0) {
 			$cacheKey = "dispatcher:dispatch:" . $this->params["controller"] . ":" . $this->params["action"] . ":" . serialize($this->params["pass"]);
 			$page = Cache::fetch($cacheKey);
 
-			if ($page !== false && Config::read("debug") === 0) {
+			if ($page !== false) {
 				echo $page;
 				return;
 			}
@@ -106,7 +106,7 @@ class Dispatcher {
 		$controller->startUpComponents();
 
 		if ($controller->loadModel) {
-			$controller->loadModels();
+			$controller->loadModel();
 		}
 
 		// Execute action

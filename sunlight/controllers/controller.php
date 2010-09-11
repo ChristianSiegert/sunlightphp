@@ -61,7 +61,7 @@ class Controller {
 		}
 	}
 
-	public function loadModels() {
+	public function loadModel() {
 		// Include model file
 		include(CORE_DIR . DS . "models" . DS . "model.php");
 
