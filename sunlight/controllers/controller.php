@@ -1,14 +1,16 @@
 <?php
 class Controller {
-	public $components = array("Session");
+	public $components = array();
 
 	public $helpers = array("Asset", "Html", "Session");
 
-	public $autoRender = true;
+	public $loadModel = true;
 
 	public $cacheActions = false;
 
-	public $loadModel = true;
+	public $autoRender = true;
+
+	public $removeWhitespace = true;
 
 	public $passedVariables = array();
 
@@ -100,7 +102,7 @@ class Controller {
 		// Create view object
 		$view = new View($this);
 		$contentForLayout = $view->renderAction();
-		$document = $view->renderLayout($contentForLayout);
+		$document = $view->renderLayout($contentForLayout, $this->removeWhitespace);
 
 		return $document;
 	}

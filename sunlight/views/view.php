@@ -77,7 +77,7 @@ class View {
 		return $contentForLayout;
 	}
 
-	public function renderLayout($contentForLayout) {
+	public function renderLayout($contentForLayout, $removeWhitespace) {
 		// Make helpers available to the layout
 		extract($this->helperObjects);
 
@@ -88,7 +88,9 @@ class View {
 		ob_end_clean();
 
 		// Remove whitespace between HTML tags
-		$renderedLayout = preg_replace('#>\s+<#', "><", $renderedLayout);
+		if ($removeWhitespace) {
+			$renderedLayout = preg_replace('#>\s+<#', "><", $renderedLayout);
+		}
 
 		return $renderedLayout;
 	}
