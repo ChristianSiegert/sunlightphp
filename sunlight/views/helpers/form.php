@@ -81,32 +81,7 @@ class FormHelper extends Helper {
 		}
 
 		// Create element
-		$inputElement = $this->element("input", $options, "emptyTag");
-
-		// Error messages
-		if (isset($this->validationErrors[$fieldName])) {
-			$errorList = new Element("ul", array(
-				"class" => "form-error-list"
-			));
-
-			foreach ($this->validationErrors[$fieldName] as $errorMessage) {
-				$listItem = new Element("li", array(
-					"class" => "form-error-list-item",
-					"html" => $errorMessage
-				));
-
-				$listItem->inject($errorList);
-			}
-
-			return $inputElement . $errorList->toString();
-		}
-
-		return $inputElement;
-	}
-
-	public function text($fieldName, $options = array(), $fieldNameSuffix = "") {
-		$options["type"] = "text";
-		return $this->input($fieldName, $options, $fieldNameSuffix);
+		return $this->element("input", $options, "emptyTag") . $this->errorMessageList($fieldName);
 	}
 
 	public function checkbox($fieldName, $value = "on", $options = array(), $fieldNameSuffix = "") {
@@ -121,9 +96,22 @@ class FormHelper extends Helper {
 		return $this->input($fieldName, $options, $fieldNameSuffix);
 	}
 
-	public function hidden($fieldName, $value, $options = array(), $fieldNameSuffix = "") {
+	public function hidden($fieldName, $value = "", $options = array(), $fieldNameSuffix = "") {
 		$options["type"] = "hidden";
-		$options["value"] = $value;
+
+		if (!empty($value)) {
+			$options["value"] = $value;
+		}
+
+		return $this->input($fieldName, $options, $fieldNameSuffix);
+	}
+
+	public function password($fieldName = "password", $options = array("type" => "password"), $fieldNameSuffix = "") {
+		return $this->input($fieldName, $options, $fieldNameSuffix);
+	}
+
+	public function text($fieldName, $options = array(), $fieldNameSuffix = "") {
+		$options["type"] = "text";
 		return $this->input($fieldName, $options, $fieldNameSuffix);
 	}
 
@@ -171,12 +159,33 @@ class FormHelper extends Helper {
 	public function textarea($fieldName, $options = array()) {
 		$options["name"] = $fieldName;
 		$options["id"] = sprintf("%s-input", str_replace("_", "-", $fieldName));
+		$options["rows"] = 3;
+		$options["cols"] = 27;
 
 		if (isset($this->data[$fieldName])) {
 			$options["html"] = $this->data[$fieldName];
 		}
 
-		return $this->element("textarea", $options);
+		return $this->element("textarea", $options) . $this->errorMessageList($fieldName);
+	}
+
+	public function errorMessageList($fieldName) {
+		if (isset($this->validationErrors[$fieldName])) {
+			$errorList = new Element("ul", array(
+				"class" => "form-error-list"
+			));
+
+			foreach ($this->validationErrors[$fieldName] as $errorMessage) {
+				$listItem = new Element("li", array(
+					"class" => "form-error-list-item",
+					"html" => $errorMessage
+				));
+
+				$listItem->inject($errorList);
+			}
+
+			return $errorList->toString();
+		}
 	}
 }
 ?>
