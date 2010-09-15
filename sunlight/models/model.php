@@ -130,12 +130,12 @@ class Model {
 		);
 
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId) . $this->encodeParameters($parameters);
-		list($status, $headers, $data) = $this->query($url, "DELETE");
+		list($status, $headers, $response) = $this->query($url, "DELETE");
 
 		if ($status === 200) {
-			return $data;
+			return $response;
 		} else {
-			throw new Exception("Document could not be deleted (Status $status).");
+			throw new Exception($this->describeError($response));
 		}
 	}
 
@@ -169,14 +169,12 @@ class Model {
 
 		if (empty($this->validationErrors)) {
 			$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId);
-			list($status, $headers, $data) = $this->query($url, "PUT", json_encode($document));
+			list($status, $headers, $response) = $this->query($url, "PUT", json_encode($document));
 
 			if ($status === 201) {
-				return $data;
-			} elseif ($status === 409) {
-				throw new Exception("A document with this id already exists.");
+				return $response;
 			} else {
-				throw new Exception("Document could not be stored (Status $status).");
+				throw new Exception($this->describeError($response));
 			}
 		} else {
 			throw new Exception("Data is not valid. Aborted storing document.");
@@ -184,8 +182,10 @@ class Model {
 	}
 
 	public function updateDocument($documentId, $revision = "", $document, $options = array()) {
-		$document["_rev"] = empty($revision) ? $this->getRevision($documentId) : $revision;
-		$options["fieldList"][] = "_rev";
+		if (!isset($document["_rev"])) {
+			$document["_rev"] = empty($revision) ? $this->getRevision($documentId) : $revision;
+			$options["fieldList"][] = "_rev";
+		}
 
 		return $this->storeDocument($documentId, $document, $options);
 	}
@@ -320,16 +320,8 @@ class Model {
 
 		if ($status === 200) {
 			return $data["rows"];
-		} elseif ($status === 400) {
-			if (isset($data["error"]) && isset($data["reason"])) {
-				throw new Exception("CouchDB: {$data["error"]} ... {$data["reason"]}");
-			} else {
-				throw new Exception("CouchDB: Something is wrong with the request. <pre>" . express($data) . "</pre>");
-			}
-		} elseif ($status === 404) {
-			throw new Exception("CouchDB: View '$viewName' does not exist for design '$designName'.");
 		} else {
-			throw new Exception("CouchDB: Could not get view (Status $status).");
+			throw new Exception($this->describeError($data, $designName, $viewName));
 		}
 	}
 
@@ -347,6 +339,31 @@ class Model {
 		return $parametersAsString;
 	}
 
+	public function describeError($error) {
+		if (isset($error["error"]) && isset($error["reason"])) {
+			$arguments = func_get_args();
+
+			switch ($error["error"]) {
+				case "conflict":
+					switch ($error["reason"]) {
+						case "Document update conflict.":
+							return "CouchDB: The document could not be updated/deleted.";
+						default: break;
+					}
+				case "not_found":
+					switch ($error["reason"]) {
+						case "missing_named_view":
+							return "CouchDB: View '{$arguments[2]}' does not exist in design '{$arguments[1]}'.";
+						case "no_db_file":
+							return "CouchDB: Database '" . DATABASE_NAME . "' does not exist.";
+						default: break;
+					}
+			}
+		}
+
+		return express($error);
+	}
+
 	public function validate($document, $rules) {
 		$validationErrors = array();
 
@@ -360,7 +377,7 @@ class Model {
 					$validates = $this->$rule($document[$fieldName]);
 
 					if (!$validates) {
-						$validationErrors[$fieldName] = "Invalid $fieldName.";
+						$validationErrors[$fieldName][] = "Invalid $fieldName.";
 					}
 				} elseif (is_array($rule)) {
 					if (isset($rule[0])) {
@@ -372,13 +389,13 @@ class Model {
 						$validates = call_user_func_array($function, $parameters);
 
 						if (!$validates) {
-							$validationErrors[$fieldName] = "Invalid $fieldName.";
+							$validationErrors[$fieldName][] = "Invalid $fieldName.";
 						}
 					} else {
 						$errors = $this->validate($document[$fieldName], $rules[$fieldName]);
 
 						if (!empty($errors)) {
-							$validationErrors[$fieldName] = $errors;
+							$validationErrors[$fieldName][] = $errors;
 						}
 					}
 				}
