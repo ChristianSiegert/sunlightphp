@@ -16,7 +16,6 @@ class Model {
 		$this->modelName = ucfirst(Inflector::singularize($controller->params["controller"]));
 	}
 
-	// TODO: Test if $data = array() creates different response behavior than $data = null
 	public function query($url, $method = "GET", $data = array(), $jsonDecodeResponse = true, $curlOptions = array()) {
 		$handle = curl_init();
 
@@ -63,36 +62,32 @@ class Model {
 		// Matches header at the beginning of a string
 		$pattern = '#^HTTP/1\..*(?=(?:\n|\r\n){2,})#sU';
 
-		while (true) {
-			if (preg_match($pattern, $rawResponse, $rawHeader)) {
-				$header = array();
+		while (preg_match($pattern, $rawResponse, $rawHeader)) {
+			$header = array();
 
-				foreach (explode("\r\n", $rawHeader[0]) as $i => $line) {
-					if ($i === 0) {
-						$header["Status"] = $line;
-					} else {
-						$explodedLine = explode(": ", $line, 2);
-						$header[$explodedLine[0]] = isset($explodedLine[1]) ? $explodedLine[1] : "";
-					}
+			foreach (explode("\r\n", $rawHeader[0]) as $i => $line) {
+				if ($i === 0) {
+					$header["Status"] = $line;
+				} else {
+					$explodedLine = explode(": ", $line, 2);
+					$header[$explodedLine[0]] = isset($explodedLine[1]) ? $explodedLine[1] : "";
 				}
-
-				$headers[] = $header;
-
-				// Remove header from $rawResponse
-				$rawResponse = trim(preg_replace($pattern, "", $rawResponse, 1));
-			} else {
-				break;
 			}
+
+			$headers[] = $header;
+
+			// Remove header from $rawResponse
+			$rawResponse = trim(preg_replace($pattern, "", $rawResponse, 1));
 		}
 
 		// $rawResponse now contains only data as we have removed all headers
-		$data = trim($rawResponse);
+		$response = trim($rawResponse);
 
 		if ($jsonDecodeResponse) {
-			$data = json_decode($data, true);
+			$response = json_decode($response, true);
 		}
 
-		return array($info["http_code"], $headers, $data, $info);
+		return array($info["http_code"], $headers, $response, $info);
 	}
 
 	/**
@@ -113,14 +108,12 @@ class Model {
 		}
 
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId) . $this->encodeParameters($parameters);
-		list($status, $headers, $document) = $this->query($url);
+		list($status, $headers, $response) = $this->query($url);
 
 		if ($status === 200) {
-			return $document;
-		} elseif ($status === 404) {
-			throw new Exception("The document you try to fetch does not exist.");
+			return $response;
 		} else {
-			throw new Exception("The document could not be fetched (Status $status).");
+			throw new Exception($this->describeError($response));
 		}
 	}
 
@@ -207,7 +200,7 @@ class Model {
 				&& preg_match('/^"([^"]+)"$/', $headers[$mostRecentHeader]["Etag"], $eTag)) {
 			return $eTag[1];
 		} else {
-			throw new Exception("Getting the latest revision failed.");
+			throw new Exception("CouchDB: Getting the document's latest revision failed.");
 		}
 	}
 
@@ -231,12 +224,12 @@ class Model {
 
 	public function getDocuments($documentIds = array(), $parameters = array()) {
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_all_docs" . $this->encodeParameters($parameters);
-		list($status, $headers, $data) = $this->query($url, empty($documentIds) ? "GET" : "POST", json_encode(array("keys" => $documentIds)));
+		list($status, $headers, $response) = $this->query($url, empty($documentIds) ? "GET" : "POST", json_encode(array("keys" => $documentIds)));
 
 		if ($status === 200) {
-			return $data["rows"];
+			return $response["rows"];
 		} else {
-			throw new Exception("The documents could not be fetched (Status $status).");
+			throw new Exception($this->describeError($response));
 		}
 	}
 
@@ -275,13 +268,12 @@ class Model {
 
 		if (empty($this->validationErrors)) {
 			$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_bulk_docs";
-			list($status, $headers, $data) = $this->query($url, "POST", json_encode(array("docs" => $documents)));
+			list($status, $headers, $response) = $this->query($url, "POST", json_encode(array("docs" => $documents)));
 
 			if ($status === 201) {
-				return $data;
+				return $response;
 			} else {
-				debug($headers, $data);
-				throw new Exception("Documents could not be stored (Status $status).");
+				throw new Exception($this->describeError($response));
 			}
 		} else {
 			throw new Exception("Data is not valid. Aborted storing documents.");
@@ -304,24 +296,34 @@ class Model {
 		}
 
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_bulk_docs";
-		list($status, $headers, $data) = $this->query($url, "POST", json_encode(array("docs" => $documents)));
+		list($status, $headers, $response) = $this->query($url, "POST", json_encode(array("docs" => $documents)));
 
 		if ($status === 201) {
-			return $data;
+			return $response;
 		} else {
-			debug($headers, $data);
-			throw new Exception("Documents could not be deleted (Status $status).");
+			throw new Exception($this->describeError($response));
 		}
 	}
 
 	public function getView($designName, $viewName, $parameters = array(), $data = array()) {
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_design/" . rawurlencode($designName) . "/_view/" . rawurlencode($viewName) . $this->encodeParameters($parameters);
-		list($status, $headers, $data) = $this->query($url, empty($data) ? "GET" : "POST", json_encode($data));
+		list($status, $headers, $response) = $this->query($url, empty($data) ? "GET" : "POST", json_encode($data));
 
 		if ($status === 200) {
-			return $data["rows"];
+			return $response["rows"];
 		} else {
-			throw new Exception($this->describeError($data, $designName, $viewName));
+			throw new Exception($this->describeError($response, $designName, $viewName));
+		}
+	}
+
+	public function getList($designName, $listName, $viewName, $parameters = array(), $data = array()) {
+		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_design/" . rawurlencode($designName) . "/_list/" . rawurlencode($listName) . "/" . rawurlencode($viewName) . $this->encodeParameters($parameters);
+		list($status, $headers, $response) = $this->query($url, empty($data) ? "GET" : "POST", json_encode($data), false);
+
+		if ($status === 200) {
+			return $response;
+		} else {
+			throw new Exception($this->describeError(json_decode($response, true)));
 		}
 	}
 
@@ -339,19 +341,19 @@ class Model {
 		return $parametersAsString;
 	}
 
-	public function describeError($error) {
-		if (isset($error["error"]) && isset($error["reason"])) {
+	public function describeError($response) {
+		if (isset($response["error"]) && isset($response["reason"])) {
 			$arguments = func_get_args();
 
-			switch ($error["error"]) {
+			switch ($response["error"]) {
 				case "conflict":
-					switch ($error["reason"]) {
+					switch ($response["reason"]) {
 						case "Document update conflict.":
 							return "CouchDB: The document could not be updated/deleted.";
 						default: break;
 					}
 				case "not_found":
-					switch ($error["reason"]) {
+					switch ($response["reason"]) {
 						case "missing_named_view":
 							return "CouchDB: View '{$arguments[2]}' does not exist in design '{$arguments[1]}'.";
 						case "no_db_file":
@@ -361,7 +363,7 @@ class Model {
 			}
 		}
 
-		return express($error);
+		return express($response);
 	}
 
 	public function validate($document, $rules) {
