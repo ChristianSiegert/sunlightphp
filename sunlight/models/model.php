@@ -226,7 +226,7 @@ class Model {
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_all_docs" . $this->encodeParameters($parameters);
 		list($status, $headers, $response) = $this->query($url, empty($documentIds) ? "GET" : "POST", json_encode(array("keys" => $documentIds)));
 
-		if ($status === 200) {
+		if ($status === 200 && isset($response["rows"])) {
 			return $response["rows"];
 		} else {
 			throw new Exception($this->describeError($response));
@@ -309,7 +309,7 @@ class Model {
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_design/" . rawurlencode($designName) . "/_view/" . rawurlencode($viewName) . $this->encodeParameters($parameters);
 		list($status, $headers, $response) = $this->query($url, empty($data) ? "GET" : "POST", json_encode($data));
 
-		if ($status === 200) {
+		if ($status === 200 && isset($response["rows"])) {
 			return $response["rows"];
 		} else {
 			throw new Exception($this->describeError($response, $designName, $viewName));
