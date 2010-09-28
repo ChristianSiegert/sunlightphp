@@ -43,7 +43,7 @@ class Controller {
 			}
 		}
 
-		// Initialize() components
+		// Initialize components
 		foreach ($this->components as $component) {
 			if (method_exists($this->$component, "initialize")) {
 				$this->$component->initialize();

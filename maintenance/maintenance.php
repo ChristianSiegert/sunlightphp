@@ -54,6 +54,11 @@ if (preg_match("/[0-9]+\.[0-9]+\.[0-9]+/", phpversion(), $phpVersion) === 1) {
 	$errors[] = "SunlightPHP requires PHP 5.3 or higher. The installed version could not be determined.";
 }
 
+$logsDir = APP_DIR . DS . "tmp" . DS . "logs";
+if (!is_writable($logsDir)) {
+	$errors[] = "$logsDir is not writable.";
+}
+
 $sessionsDir = APP_DIR . DS . "tmp" . DS . "sessions";
 if (!is_writable($sessionsDir)) {
 	$errors[] = "$sessionsDir is not writable.";
@@ -67,6 +72,11 @@ if (!is_writable($ccssDir)) {
 $cjsDir = WEBROOT_DIR . DS . "cjs";
 if (!is_writable($cjsDir)) {
 	$errors[] = "$cjsDir is not writable.";
+}
+
+$console = CORE_DIR . DS . "console" . DS . "start.php";
+if (!is_writable($console)) {
+	$errors[] = "$console is not executable.";
 }
 
 if (!isset($_SERVER["HTTP_HOST"])) {
