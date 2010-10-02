@@ -105,5 +105,12 @@ class HtmlHelper extends Helper {
 			"type" => "text/javascript"
 		), "", false);
 	}
+
+	public function scriptLink($url) {
+		return $this->element("script", array(
+			"src" => $url,
+			"type" => "text/javascript"
+		));
+	}
 }
 ?>
