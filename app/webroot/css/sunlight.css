@@ -1,0 +1,174 @@
+html {
+	background: #FFF;
+	color: #333;
+	direction: ltr;
+	font-family: "Lucida Grande", Tahoma, Verdana, Arial, sans-serif;
+	font-size: 13px;
+	line-height: 18px;
+	padding: 0 0 25px;
+	text-align: left;
+}
+
+a {
+	background: #F4FAFF;
+	color: #337ABC;
+	text-decoration: none;
+}
+
+a:focus,
+a:hover {
+	text-decoration: underline;
+}
+
+h1 {
+	color: #444;
+	font-size: 18px;
+	font-weight: bold;
+	line-height: 23px;
+	margin: 0 0 3px;
+}
+
+h2 {
+	color: #666;
+	font-size: 15px;
+	font-weight: normal;
+	line-height: 26px;
+}
+
+h3 {
+	color: #666;
+	font-size: 16px;
+	font-weight: normal;
+	line-height: 20px;
+}
+
+p {
+	margin: 0 0 13px;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	margin: 0 0 13px;
+}
+
+	caption, th {
+		text-align: left;
+	}
+
+	td, th {
+		padding: 0 10px 0 0;
+	}
+
+	td:last-of-type,
+	th:last-of-type {
+		padding-right: 0;
+	}
+
+:focus {
+	outline: none;
+}
+
+/******************************************************************************/
+/* Grid */
+/******************************************************************************/
+.size1of4,
+.size3of4 {
+	float: left;
+}
+
+.size1of4 {
+	width: 25%;
+}
+
+.size3of4 {
+	width: 75%;
+}
+/******************************************************************************/
+/* Forms */
+/******************************************************************************/
+form {
+	background: #F7F7F7;
+	border: 1px solid #D7D7D7;
+	margin: 0 0 13px;
+	padding: 10px;
+}
+
+	form > table {
+		margin: 3px auto 8px;
+	}
+
+		form td {
+			padding-top: 7px;
+		}
+
+		.label-cell {
+			padding-top: 12px;
+			text-align: right;
+			vertical-align: top;
+			white-space: nowrap;
+		}
+
+		.button-cell {
+			padding-top: 11px;
+			text-align: center;
+		}
+
+label {
+	color: #666;
+	font-weight: bold;
+}
+
+textarea {
+	resize: vertical;
+}
+
+input[type="password"],
+input[type="text"],
+textarea {
+	width: 250px;
+}
+
+input[type="password"],
+input[type="text"],
+select,
+textarea {
+	background: #fff;
+	border: 1px solid #BDC7D8;
+	color: #3A3935;
+	padding: 3px 3px 4px;
+	margin: 0;
+}
+
+/******************************************************************************/
+/* Content */
+/******************************************************************************/
+#content {
+	margin: 20px auto;
+	max-width: 760px;
+}
+
+	#breadcrumbs {
+		margin: 0 auto 13px;
+	}
+
+/******************************************************************************/
+/* Flash messages */
+/******************************************************************************/
+.flash-message {
+	background: #FFF9D7;
+	border: 1px solid #E2C822;
+	font-size: 13px;
+	font-weight: bold;
+	margin: 0 0 13px;
+	padding: 10px;
+}
+
+.flash-error-message {
+	background: #FFEBE8;
+	border: 1px solid #DD3C10;
+	font-size: 13px;
+	font-weight: bold;
+	margin: 0 0 13px;
+	padding: 10px;
+}

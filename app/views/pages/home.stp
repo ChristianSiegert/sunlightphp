@@ -7,8 +7,6 @@ $this->pageTitle = "Welcome to SunlightPHP";
 $html->addCrumb($this->pageTitle);
 ?>
 
-<h1><?php echo $this->pageTitle; ?></h1>
-
 <p>What a beautiful day.</p>
 
 <p><?php echo $html->link("See if your server is set up correctly for SunlightPHP.", "maintenance/maintenance.php"); ?></p>
