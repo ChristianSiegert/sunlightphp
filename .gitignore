@@ -3,3 +3,5 @@
 .settings
 app/tmp/logs
 app/tmp/sessions
+app/webroot/ccss
+app/webroot/cjs
