@@ -74,11 +74,6 @@ if (!is_writable($cjsDir)) {
 	$errors[] = "$cjsDir is not writable.";
 }
 
-$console = CORE_DIR . DS . "console" . DS . "start.php";
-if (!is_writable($console)) {
-	$errors[] = "$console is not executable.";
-}
-
 if (!isset($_SERVER["HTTP_HOST"])) {
 	$errors[] = '$_SERVER["HTTP_HOST"] does not exist.';
 }
