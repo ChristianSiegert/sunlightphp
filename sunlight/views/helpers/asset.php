@@ -150,12 +150,16 @@ class AssetHelper extends Helper {
 				$code = $this->getMergedCode("js");
 			}
 
-			$element = new Element("script", array(
-				"html" => "//<![CDATA[\n$code\n//]]>",
-				"type" => "text/javascript"
-			));
+			if (!empty($code)) {
+				$element = new Element("script", array(
+					"html" => "//<![CDATA[\n$code\n//]]>",
+					"type" => "text/javascript"
+				));
 
-			return $standaloneAssets . $element->toString();
+				return $standaloneAssets . $element->toString();
+			} else {
+				return $standaloneAssets;
+			}
 		}
 	}
 
