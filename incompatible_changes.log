@@ -2,6 +2,8 @@
 INCOMPATIBLE CHANGES
 ====================
 
+2010-10-04	Removed LogComponent. Introduced Log as static core class.
+
 2010-09-05	Removed parameters $method and $jsonDecodeResponse from Model::getView().
 2010-09-05	Changed return values of Model::getView(). Instead of returning array($headers, $data), it now returns only $data["rows"].
 
