@@ -60,7 +60,7 @@ class Dispatcher {
 		// Include custom controller file
 		$customControllerFile = DS . "controllers" . DS . $this->params["controller"] . "_controller.php";
 
-		if (preg_match('/^[a-z]+$/', $this->params["controller"]) === 1
+		if (preg_match('/^[a-z]+$/', $this->params["controller"])
 				&& file_exists(APP_DIR . $customControllerFile)) {
 			include(APP_DIR . $customControllerFile);
 
@@ -70,9 +70,9 @@ class Dispatcher {
 
 			$methodName = str_replace("-", "_", $this->params["action"]);
 
-			if (preg_match('/^[a-z-]+$/', $this->params["action"]) === 0
+			if (!preg_match('/^[a-z-]+$/', $this->params["action"])
 					|| !method_exists($controller, $methodName)) {
-				$errorMessage = "Method $methodName() does not exist in " . $controllerClassName . ".";
+				$errorMessage = "Method $methodName() does not exist in $controllerClassName.";
 			}
 		} else {
 			$errorMessage = "Controller $customControllerFile does not exist.";
@@ -99,13 +99,12 @@ class Dispatcher {
 			}
 		}
 
-		include(CORE_DIR . DS . "inflector.php");
-
 		$controller->loadComponents();
 		$controller->beforeFilter();
 		$controller->startUpComponents();
 
 		if ($controller->loadModel) {
+			include(CORE_DIR . DS . "inflector.php");
 			$controller->loadModel();
 		}
 

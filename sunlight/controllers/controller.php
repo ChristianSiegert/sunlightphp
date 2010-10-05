@@ -20,7 +20,7 @@ class Controller {
 
 	public $validationErrors;
 
-	function __construct(&$params) {
+	public function __construct(&$params) {
 		$this->params = $params;
 
 		if (!empty($_POST)) {

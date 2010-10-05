@@ -2,6 +2,11 @@
 class Model {
 	private $controller;
 
+	/**
+	 * Additional models to be loaded through this model.
+	 *
+	 * @var array
+	 */
 	public $models = array();
 
 	public $modelName;
@@ -13,7 +18,7 @@ class Model {
 
 	public function __construct(&$controller) {
 		$this->controller = $controller;
-		$this->modelName = ucfirst(Inflector::singularize($controller->params["controller"]));
+		$this->modelName = get_class($this);
 	}
 
 	public function query($url, $method = "GET", $data = array(), $jsonDecodeResponse = true, $curlOptions = array()) {
@@ -276,7 +281,7 @@ class Model {
 				throw new Exception($this->describeError($response));
 			}
 		} else {
-			throw new Exception("Data is not valid. Aborted storing documents.");
+			throw new Exception("Data is not valid. Aborted storing documents. \n" . express($this->validationErrors));
 		}
 	}
 
@@ -331,7 +336,7 @@ class Model {
 		$parametersAsString = "?";
 
 		foreach ($parameters as $parameterName => $parameterValue) {
-			if ($parameterName === "rev") {
+			if ($parameterName === "rev" || $parameterName === "startkey_docid" || $parameterName === "endkey_docid") {
 				$parametersAsString .= $parameterName . "=" . rawurlencode($parameterValue) . "&";
 			} else {
 				$parametersAsString .= $parameterName . "=" . rawurlencode(json_encode($parameterValue)) . "&";
@@ -379,7 +384,7 @@ class Model {
 					$validates = $this->$rule($document[$fieldName]);
 
 					if (!$validates) {
-						$validationErrors[$fieldName][] = "Invalid $fieldName.";
+						$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid.";
 					}
 				} elseif (is_array($rule)) {
 					if (isset($rule[0])) {
@@ -391,7 +396,7 @@ class Model {
 						$validates = call_user_func_array($function, $parameters);
 
 						if (!$validates) {
-							$validationErrors[$fieldName][] = "Invalid $fieldName.";
+							$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid.";
 						}
 					} else {
 						$errors = $this->validate($document[$fieldName], $rules[$fieldName]);
