@@ -233,10 +233,17 @@ class AssetHelper extends Helper {
 			$compressedCode = stream_get_contents($pipes[1]);
 			fclose($pipes[1]);
 
+			$errors = stream_get_contents($pipes[2]);
 			fclose($pipes[2]);
+
 			proc_close($process);
 
-			return $compressedCode;
+			if (empty($errors)) {
+				return $compressedCode;
+			} else {
+				Log::write("Compressing $type failed:\n" . $errors);
+				return $code;
+			}
 		}
 	}
 }
