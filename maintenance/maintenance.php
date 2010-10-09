@@ -111,7 +111,7 @@ if (!in_array("memcache", get_loaded_extensions())) {
 	$errors[] = "The memcache module is not installed.";
 }
 
-if (!file_exists("PHPUnit" . DS . "Framework.php")) {
+if (!is_file("PHPUnit" . DS . "Framework.php")) {
 	$errors[] = "PHPUnit is not installed.";
 }
 ?>
