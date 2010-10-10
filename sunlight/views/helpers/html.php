@@ -99,11 +99,11 @@ class HtmlHelper extends Helper {
 		));
 	}
 
-	public function script($code) {
+	public function script($code, $ttl = 0) {
 		return $this->element("script", array(
 			"html" => "//<![CDATA[\n$code\n//]]>",
 			"type" => "text/javascript"
-		), "", false);
+		), "", $ttl);
 	}
 
 	public function scriptLink($url) {
