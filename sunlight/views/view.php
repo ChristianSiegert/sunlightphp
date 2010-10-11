@@ -7,6 +7,7 @@ class View {
 	public $params;
 	public $passedVariables;
 	public $validationErrors;
+	public $view;
 
 	public $helperObjects = array();
 
@@ -20,6 +21,7 @@ class View {
 		$this->params = $controller->params;
 		$this->passedVariables = $controller->passedVariables;
 		$this->validationErrors = $controller->validationErrors;
+		$this->view = $controller->view;
 
 		$this->loadHelpers();
 	}
@@ -54,7 +56,7 @@ class View {
 		extract($this->helperObjects);
 
 		// Filename of the view
-		$viewFile = DS . "views" . DS . $this->params["controller"] . DS . str_replace("-", "_", $this->params["action"]) . ".stp";
+		$viewFile = DS . "views" . DS . $this->params["controller"] . DS . (empty($this->view) ? str_replace("-", "_", $this->params["action"]) : $this->view) . ".stp";
 
 		// Start buffering output
 		ob_start();
@@ -66,7 +68,7 @@ class View {
 			include(CORE_DIR . $viewFile);
 		} else {
 			if (Config::read("debug") > 0) {
-				$this->controller->Session->setFlash("View $view does not exist.", "flash", array("class" => "flash-error-message"));
+				$this->controller->Session->setFlash("View $viewFile does not exist.", "flash", array("class" => "flash-error-message"));
 			}
 		}
 

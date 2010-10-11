@@ -8,6 +8,8 @@ class Controller {
 
 	public $cacheActions = false;
 
+	public $view = "";
+
 	public $autoRender = true;
 
 	public $removeWhitespace = true;
@@ -96,10 +98,10 @@ class Controller {
 	}
 
 	public function render() {
-		// Load view file
+		// Include core view file
 		include(CORE_DIR . DS . "views" . DS . "view.php");
 
-		// Create view object
+		// Load view
 		$view = new View($this);
 		$contentForLayout = $view->renderAction();
 		$document = $view->renderLayout($contentForLayout, $this->removeWhitespace);
