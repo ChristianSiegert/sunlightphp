@@ -2,6 +2,8 @@
 class HtmlHelper extends Helper {
 	protected $crumbs = array();
 
+	protected $meta = array();
+
 	public function element($tag, $options = array(), $format = "", $ttl = 0) {
 		if ($ttl !== false) {
 			$cacheKey = "htmlHelper:element:$tag:" . serialize($options) . ":$format";
@@ -69,8 +71,17 @@ class HtmlHelper extends Helper {
 		return $this->element("img", $options, "emptyTag", $ttl);
 	}
 
+	public function meta($options) {
+		$this->meta[] = $options;
+	}
+
 	public function metaForLayout() {
 		$elements = "";
+
+		foreach ($this->meta as $meta) {
+			$element = new Element("meta", $meta);
+			$elements .= $element->toString();
+		}
 
 		if (!empty($this->view->pageKeywords)) {
 			$element = new Element("meta", array(
