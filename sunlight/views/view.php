@@ -80,7 +80,8 @@ class View {
 	}
 
 	public function renderLayout($contentForLayout, $removeWhitespace) {
-		// Make helpers available to the layout
+		// Make passed variables and helpers available to the layout
+		extract($this->passedVariables);
 		extract($this->helperObjects);
 
 		// Buffer output of the layout file
