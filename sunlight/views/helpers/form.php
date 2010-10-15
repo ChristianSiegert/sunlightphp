@@ -2,140 +2,141 @@
 class FormHelper extends Helper {
 	public $helpers = array("Html");
 
-	public function element($tag, $options = array(), $format = "") {
-		return $this->view->helperObjects["html"]->element($tag, $options, $format, false);
+	public function element($tag, $attributes = array()) {
+		return $this->view->helperObjects["html"]->element($tag, $attributes, false);
 	}
 
-	public function create($options = array()) {
-		$options["accept-charset"] = mb_internal_encoding();
+	public function create($attributes = array()) {
+		$attributes["accept-charset"] = mb_internal_encoding();
 
-		if (!isset($options["method"])) {
-			$options["method"] = "post";
+		if (!isset($attributes["method"])) {
+			$attributes["method"] = "post";
 		}
 
-		if (!isset($options["action"])) {
-			$options["action"] = "";
-		} elseif (is_array($options["action"])) {
-			$options["action"] = Router::url($options["action"]);
+		if (!isset($attributes["action"])) {
+			$attributes["action"] = "";
+		} elseif (is_array($attributes["action"])) {
+			$attributes["action"] = Router::url($attributes["action"]);
 		}
 
-		return $this->element("form", $options, "noEndTag");
+		$form = $this->element("form", $attributes);
+		return preg_replace('#</form>$#', "", $form);
 	}
 
 	public function end() {
 		return "</form>";
 	}
 
-	public function submit($label, $options = array()) {
-		$options["value"] = $label;
-		$options["type"] = "submit";
+	public function submit($label, $attributes = array()) {
+		$attributes["value"] = $label;
+		$attributes["type"] = "submit";
 
-		return $this->element("input", $options, "emptyTag");
+		return $this->element("input", $attributes);
 	}
 
-	public function button($label, $value = null, $options = array()) {
-		$options["html"] = $label;
+	public function button($label, $value = null, $attributes = array()) {
+		$attributes["html"] = $label;
 
-		if (!isset($options["name"])) {
-			$options["name"] =  mb_strtolower($label);
+		if (!isset($attributes["name"])) {
+			$attributes["name"] =  mb_strtolower($label);
 		}
 
 		if ($value !== null) {
-			$options["value"] = $value;
+			$attributes["value"] = $value;
 		}
 
-		return $this->element("button", $options);
+		return $this->element("button", $attributes);
 	}
 
-	public function redirect($label, $redirectUrl = array("action" => "index"), $options = array()) {
-		$options["name"] = "system[redirectUrl]";
+	public function redirect($label, $redirectUrl = array("action" => "index"), $attributes = array()) {
+		$attributes["name"] = "system[redirectUrl]";
 
 		if (is_array($redirectUrl)) {
 			$redirectUrl = Router::url($redirectUrl);
 		}
 
-		return $this->button($label, $redirectUrl, $options);
+		return $this->button($label, $redirectUrl, $attributes);
 	}
 
-	public function input($fieldName, $options = array(), $fieldNameSuffix = "") {
+	public function input($fieldName, $attributes = array(), $fieldNameSuffix = "") {
 		// Set default name if necessary
-		if (!isset($options["name"])) {
+		if (!isset($attributes["name"])) {
 			$fieldAsArray = $fieldNameSuffix !== "" ? "[]" : "";
-			$options["name"] = $fieldName . $fieldAsArray;
+			$attributes["name"] = $fieldName . $fieldAsArray;
 		}
 
 		// Set default id if necessary
-		if (!isset($options["id"])) {
-			$options["id"] = sprintf("%s-input%s", str_replace("_", "-", $fieldName), $fieldNameSuffix);
+		if (!isset($attributes["id"])) {
+			$attributes["id"] = sprintf("%s-input%s", str_replace("_", "-", $fieldName), $fieldNameSuffix);
 		}
 
 		// Set default type to "text" if necessary
-		if (!isset($options["type"])) {
-			$options["type"] = "text";
+		if (!isset($attributes["type"])) {
+			$attributes["type"] = "text";
 		}
 
 		// Auto-populate value attribute if possible
-		if (!isset($options["value"])
+		if (!isset($attributes["value"])
 				&& isset($this->data[$fieldName])) {
-			$options["value"] = $this->data[$fieldName];
+			$attributes["value"] = $this->data[$fieldName];
 		}
 
 		// Create element
-		return $this->element("input", $options, "emptyTag") . $this->errorMessageList($fieldName);
+		return $this->element("input", $attributes) . $this->errorMessageList($fieldName);
 	}
 
-	public function checkbox($fieldName, $value = "on", $options = array(), $fieldNameSuffix = "") {
-		$options["type"] = "checkbox";
-		$options["value"] = $value;
+	public function checkbox($fieldName, $value = "on", $attributes = array(), $fieldNameSuffix = "") {
+		$attributes["type"] = "checkbox";
+		$attributes["value"] = $value;
 
 		if (isset($this->data[$fieldName])
 				&& (empty($fieldNameSuffix) || in_array($value, $this->data[$fieldName]))) {
-			$options["checked"] = "checked";
+			$attributes["checked"] = "checked";
 		}
 
-		return $this->input($fieldName, $options, $fieldNameSuffix);
+		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function hidden($fieldName, $value = "", $options = array(), $fieldNameSuffix = "") {
-		$options["type"] = "hidden";
+	public function hidden($fieldName, $value = "", $attributes = array(), $fieldNameSuffix = "") {
+		$attributes["type"] = "hidden";
 
 		if (!empty($value)) {
-			$options["value"] = $value;
+			$attributes["value"] = $value;
 		}
 
-		return $this->input($fieldName, $options, $fieldNameSuffix);
+		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function password($fieldName = "password", $options = array("type" => "password"), $fieldNameSuffix = "") {
-		return $this->input($fieldName, $options, $fieldNameSuffix);
+	public function password($fieldName = "password", $attributes = array("type" => "password"), $fieldNameSuffix = "") {
+		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function text($fieldName, $options = array(), $fieldNameSuffix = "") {
-		$options["type"] = "text";
-		return $this->input($fieldName, $options, $fieldNameSuffix);
+	public function text($fieldName, $attributes = array(), $fieldNameSuffix = "") {
+		$attributes["type"] = "text";
+		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function label($fieldName, $label = "", $options = array(), $fieldNameSuffix = "") {
+	public function label($fieldName, $label = "", $attributes = array(), $fieldNameSuffix = "") {
 		if (empty($label)) {
 			$label = ucfirst(preg_replace('/_/', " ", $fieldName));
 		}
 
 		$elementId = sprintf("%s-input%s", str_replace("_", "-", $fieldName), $fieldNameSuffix);
 
-		$options["for"] = $elementId;
-		$options["html"] = $label;
+		$attributes["for"] = $elementId;
+		$attributes["html"] = $label;
 
-		return $this->element("label", $options);
+		return $this->element("label", $attributes);
 	}
 
-	public function select($fieldName, $choices = array(), $options = array()) {
-		$options["name"] = $fieldName;
+	public function select($fieldName, $choices = array(), $attributes = array()) {
+		$attributes["name"] = $fieldName;
 
-		if (!isset($options["id"])) {
-			$options["id"] = sprintf("%s-input", str_replace("_", "-", $fieldName));
+		if (!isset($attributes["id"])) {
+			$attributes["id"] = sprintf("%s-input", str_replace("_", "-", $fieldName));
 		}
 
-		$selectElement = new Element("select", $options);
+		$selectElement = new Element("select", $attributes);
 
 		// Fill element with provided choices
 		foreach ($choices as $value => $label) {
@@ -156,17 +157,17 @@ class FormHelper extends Helper {
 		return $selectElement->toString();
 	}
 
-	public function textarea($fieldName, $options = array()) {
-		$options["name"] = $fieldName;
-		$options["id"] = sprintf("%s-input", str_replace("_", "-", $fieldName));
-		$options["rows"] = 3;
-		$options["cols"] = 27;
+	public function textarea($fieldName, $attributes = array()) {
+		$attributes["name"] = $fieldName;
+		$attributes["id"] = sprintf("%s-input", str_replace("_", "-", $fieldName));
+		$attributes["rows"] = 3;
+		$attributes["cols"] = 27;
 
 		if (isset($this->data[$fieldName])) {
-			$options["html"] = $this->data[$fieldName];
+			$attributes["html"] = $this->data[$fieldName];
 		}
 
-		return $this->element("textarea", $options) . $this->errorMessageList($fieldName);
+		return $this->element("textarea", $attributes) . $this->errorMessageList($fieldName);
 	}
 
 	public function errorMessageList($fieldName) {
