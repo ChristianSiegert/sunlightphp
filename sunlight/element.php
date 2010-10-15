@@ -5,17 +5,15 @@ class Element {
 	public $html = "";
 	public $children = array();
 
-	function __construct($tag, $options = array()) {
+	function __construct($tag, $attributes = array()) {
 		$this->tag = $tag;
 
-		foreach ($options as $key => $option) {
-			if ($key === "html") {
-				$this->html = $option;
-			} else {
-				$this->attributes[$key] = $option;
-			}
+		if (isset($attributes["html"])) {
+			$this->html = $attributes["html"];
+			unset($attributes["html"]);
 		}
 
+		$this->attributes = $attributes;
 		return $this;
 	}
 
@@ -33,29 +31,27 @@ class Element {
 	 * @param string $option Empty string, "noEndTag" or "emptyTag"
 	 * @return string Element in string form
 	 */
-	public function toString($option = "") {
+	public function toString() {
 		// Create string for attributes
 		$attributes = "";
-		foreach ($this->attributes as $attribute => $value) {
-			$attributes .= " $attribute=\"$value\"";
+		foreach ($this->attributes as $attributeName => $attributeValue) {
+			$attributes .= " $attributeName=\"$attributeValue\"";
 		}
 
 		// Create string for open-tag
-		$string = "<" . $this->tag . $attributes . ($option === "emptyTag" ? "/>" : ">" . $this->html);
+		$string = "<" . $this->tag . $attributes . ">" . $this->html;
 
-		// Create string for children elements
+		// Create string for child elements
 		foreach ($this->children as $child) {
 			if (is_object($child)) {
-				$string .= $child->toString($option);
+				$string .= $child->toString();
 			} else {
 				$string .= $child;
 			}
 		}
 
 		// Create string for close-tag
-		if (empty($option)) {
-			$string .= "</" . $this->tag . ">";
-		}
+		$string .= "</" . $this->tag . ">";
 
 		return $string;
 	}
