@@ -7,7 +7,7 @@ class Router {
 	/**
 	 * Creates a URL.
 	 *
-	 * @param array|string $url
+	 * @param array $url
 	 * @return string
 	 */
 	public static function url($url, $makeAbsolute = false) {
