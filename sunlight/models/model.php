@@ -429,7 +429,7 @@ class Model {
 	}
 
 	public function isUrl($value) {
-		return is_string($value) && preg_match('#^https?://#', $value);
+		return preg_match('#^https?://#', $value);
 	}
 }
 ?>
