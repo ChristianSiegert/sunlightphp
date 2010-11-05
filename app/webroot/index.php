@@ -12,6 +12,9 @@ if (isset($_POST["system"]["redirectUrl"])) {
 	exit;
 }
 
+// Tell code whether it operates in a shell
+define("IN_SHELL", false);
+
 // Commonly used directory paths and URLs
 define("DS", DIRECTORY_SEPARATOR);
 define("ROOT_DIR", dirname(dirname(dirname(__FILE__))));
@@ -22,7 +25,7 @@ define("WEBROOT_DIR", APP_DIR . DS . "webroot");
 define("CCSS_DIR", WEBROOT_DIR . DS . "ccss");
 define("CJS_DIR", WEBROOT_DIR . DS . "cjs");
 
-define("BASE_URL", dirname(dirname(dirname($_SERVER["SCRIPT_NAME"]))));
+define("BASE_URL", rtrim(dirname(dirname(dirname($_SERVER["SCRIPT_NAME"]))), "/"));
 define("CSS_URL", BASE_URL . "/css");
 define("JS_URL", BASE_URL . "/js");
 define("CCSS_URL", BASE_URL . "/ccss");
@@ -34,6 +37,7 @@ include(CORE_DIR . DS . "cache.php");
 include(CORE_DIR . DS . "config.php");
 include(CORE_DIR . DS . "dispatcher.php");
 include(CORE_DIR . DS . "element.php");
+include(CORE_DIR . DS . "log.php");
 include(CORE_DIR . DS . "router.php");
 
 // Include config file
