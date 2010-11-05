@@ -4,7 +4,7 @@ include(CORE_DIR . DS . "router.php");
 class RouterUrlDataTest1 extends PHPUnit_Framework_TestCase {
 	protected function setUp() {
 		if (!defined("BASE_URL")) {
-			define("BASE_URL", "/");
+			define("BASE_URL", "");
 		}
 	}
 
