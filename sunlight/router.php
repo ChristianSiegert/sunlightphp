@@ -26,10 +26,8 @@ class Router {
 		}
 
 		// Set action if necessary
-		if (isset($url["controller"]) && !isset($url["action"])) {
-			$url["action"] = "index";
-		} elseif (!isset($url["controller"]) && !isset($url["action"])) {
-			$url["action"] = Router::$params["action"];
+		if (!isset($url["action"])) {
+			$url["action"] = isset($url["controller"]) ? "index" : Router::$params["action"];
 		}
 
 		$string = "";
@@ -49,7 +47,7 @@ class Router {
 		}
 
 		// Create first part of URL
-		$string = ($makeAbsolute ? "http://" . $_SERVER["HTTP_HOST"] : "") . BASE_URL . "/" . $url["controller"] . $string;
+		$string = ($makeAbsolute ? "http://" . $_SERVER["HTTP_HOST"] : "") . (BASE_URL !== "/" ? BASE_URL : "") . "/" . $url["controller"] . $string;
 
 		return $string;
 	}
