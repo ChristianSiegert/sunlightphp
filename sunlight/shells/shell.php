@@ -21,7 +21,7 @@ class Shell {
 		// Include app model file
 		$appModelFile = DS . "models" . DS . "app_model.php";
 
-		if (file_exists(APP_DIR . $appModelFile)) {
+		if (is_file(APP_DIR . $appModelFile)) {
 			include(APP_DIR . $appModelFile);
 		} else {
 			include(CORE_DIR . $appModelFile);

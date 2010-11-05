@@ -7,6 +7,7 @@ class View {
 	public $params;
 	public $passedVariables;
 	public $validationErrors;
+	public $view;
 
 	public $helperObjects = array();
 
@@ -20,6 +21,7 @@ class View {
 		$this->params = $controller->params;
 		$this->passedVariables = $controller->passedVariables;
 		$this->validationErrors = $controller->validationErrors;
+		$this->view = $controller->view;
 
 		$this->loadHelpers();
 	}
@@ -54,19 +56,19 @@ class View {
 		extract($this->helperObjects);
 
 		// Filename of the view
-		$view = DS . "views" . DS . $this->params["controller"] . DS . str_replace("-", "_", $this->params["action"]) . ".stp";
+		$viewFile = DS . "views" . DS . $this->params["controller"] . DS . (empty($this->view) ? str_replace("-", "_", $this->params["action"]) : $this->view) . ".stp";
 
 		// Start buffering output
 		ob_start();
 
 		// Load view file
-		if (file_exists(APP_DIR . $view)) {
-			include(APP_DIR . $view);
-		} elseif (file_exists(CORE_DIR . $view)) {
-			include(CORE_DIR . $view);
+		if (is_file(APP_DIR . $viewFile)) {
+			include(APP_DIR . $viewFile);
+		} elseif (is_file(CORE_DIR . $viewFile)) {
+			include(CORE_DIR . $viewFile);
 		} else {
 			if (Config::read("debug") > 0) {
-				$this->controller->Session->setFlash("View $view does not exist.", "flash", array("class" => "flash-error-message"));
+				$this->controller->Session->setFlash("View $viewFile does not exist.", "flash", array("class" => "flash-error-message"));
 			}
 		}
 
@@ -78,7 +80,8 @@ class View {
 	}
 
 	public function renderLayout($contentForLayout, $removeWhitespace) {
-		// Make helpers available to the layout
+		// Make passed variables and helpers available to the layout
+		extract($this->passedVariables);
 		extract($this->helperObjects);
 
 		// Buffer output of the layout file

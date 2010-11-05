@@ -44,123 +44,144 @@ class AssetHelper extends Helper {
 	}
 
 	/**
-	 * Returns HTML linking to or inlining CSS (depending on CSS cache setting).
+	 * Returns HTML code inlining CSS code and/or linking to CSS files (depending on CSS cache setting).
 	 *
-	 * @return string <link> or <style> tag
+	 * @return string <style> and/or <link> tags
 	 */
 	public function cssForLayout() {
-		if (CACHE_CSS) {
-			$cacheKey = "asset:cssForLayout:" . serialize($this->assetsTop["css"]) . ":" . serialize($this->assets["css"]);
-			$element = Cache::fetch($cacheKey, "apcOnly");
+		if (!Config::read("debug")) {
+			$cacheKey = "assetHelper:cssForLayout:" . serialize($this->standaloneAssets["css"]) . ":" .serialize($this->assetsTop["css"]) . ":" . serialize($this->assets["css"]);
+			$cssForLayout = Cache::fetch($cacheKey, "apcOnly");
 
-			if ($element !== false) {
-				return $element;
+			if ($cssForLayout !== false) {
+				return $cssForLayout;
 			}
+		}
 
-			$cacheFilename = md5(serialize($this->assetsTop["css"]) . "_" . serialize($this->assets["css"])) . "_" . URL_SALT . ".css";
-			$file = CCSS_DIR . DS . $cacheFilename;
+		$cssForLayout = "";
 
-			if (!file_exists($file)) {
-				if (COMPRESS_CSS) {
-					$code = $this->compress($this->getMergedCode("css"), "css");
-				} else {
-					$code = $this->getMergedCode("css");
-				}
-
-				file_put_contents($file, $code);
-			}
-
+		foreach ($this->standaloneAssets["css"] as $filename) {
 			$element = new Element("link", array(
-				"href" => CCSS_URL . "/$cacheFilename",
+				"href" => BASE_URL . "/css/$filename",
 				"rel" => "stylesheet",
 				"type" => "text/css"
 			));
-			$element = $element->toString();
 
-			Cache::store($cacheKey, $element, 0, "apcOnly");
-			return $element;
-		} else {
-			if (COMPRESS_CSS) {
-				$code = $this->compress($this->getMergedCode("css"), "css");
+			$cssForLayout .= $element->toString();
+		}
+
+		if (!empty($this->assetsTop["css"]) || !empty($this->assets["css"])) {
+			if (CACHE_CSS) {
+				$cacheFilename = md5(serialize($this->assetsTop["css"]) . ":" . serialize($this->assets["css"])) . "_" . URL_SALT . ".css";
+				$file = CCSS_DIR . DS . $cacheFilename;
+
+				if (!file_exists($file)) {
+					$code = $this->getMergedCode("css");
+
+					if (COMPRESS_CSS) {
+						$code = $this->compress($code, "css");
+					}
+
+					file_put_contents($file, $code);
+				}
+
+				$element = new Element("link", array(
+					"href" => CCSS_URL . "/$cacheFilename",
+					"rel" => "stylesheet",
+					"type" => "text/css"
+				));
 			} else {
 				$code = $this->getMergedCode("css");
+
+				if (COMPRESS_CSS) {
+					$code = $this->compress($code, "css");
+				}
+
+				// Fix relative paths in stylesheets
+				$code = preg_replace('%url(?:\s*)\(\.\./%i', "url(" . BASE_URL . "/", $code);
+
+				$element = new Element("style", array(
+					"html" => $code,
+					"type" => "text/css"
+				));
 			}
 
-			// Fix relative paths in stylesheets
-			$code = preg_replace('%url(?:\s*)\(\.\./%i', "url(" . BASE_URL . "/", $code);
-
-			$element = new Element("style", array(
-				"html" => $code,
-				"type" => "text/css"
-			));
-
-			return $element->toString();
+			$cssForLayout .= $element->toString();
 		}
+
+		if (!Config::read("debug")) {
+			Cache::store($cacheKey, $cssForLayout, 0, "apcOnly");
+		}
+
+		return $cssForLayout;
 	}
 
 	/**
-	 * Returns HTML linking to or inlining JS (depending on JS cache setting).
+	 * Returns HTML code inlining JS code and/or linking to JS files (depending on JS cache setting).
 	 *
-	 * @return string <script> tag
+	 * @return string <script> tags
 	 */
 	public function jsForLayout() {
-		$standaloneAssets = "";
+		if (!Config::read("debug")) {
+			$cacheKey = "assetHelper:jsForLayout:" . serialize($this->standaloneAssets["js"]) . ":" .serialize($this->assetsTop["js"]) . ":" . serialize($this->assets["js"]);
+			$jsForLayout = Cache::fetch($cacheKey, "apcOnly");
+
+			if ($jsForLayout !== false) {
+				return $jsForLayout;
+			}
+		}
+
+		$jsForLayout = "";
 
 		foreach ($this->standaloneAssets["js"] as $filename) {
 			$element = new Element("script", array(
 				"src" => BASE_URL . "/js/$filename",
 				"type" => "text/javascript"
 			));
-			$standaloneAssets .= $element->toString();
+
+			$jsForLayout .= $element->toString();
 		}
 
-		if (CACHE_JS) {
-			$cacheKey = "asset:jsForLayout:" . serialize($this->assetsTop["js"]) . ":" . serialize($this->assets["js"]);
-			$element = Cache::fetch($cacheKey, "apcOnly");
+		if (!empty($this->assetsTop["js"]) || !empty($this->assets["js"])) {
+			if (CACHE_JS) {
+				$cacheFilename = md5(serialize($this->assetsTop["js"]) . ":" . serialize($this->assets["js"])) . "_" . URL_SALT . ".js";
+				$file = CJS_DIR . DS . $cacheFilename;
 
-			if ($element !== false) {
-				return $element;
-			}
-
-			$cacheFilename = md5(serialize($this->assetsTop["js"]) . "_" . serialize($this->assets["js"])) . "_" . URL_SALT . ".js";
-			$file = CJS_DIR . DS . $cacheFilename;
-
-			if (!file_exists($file)) {
-				if (COMPRESS_JS) {
-					$code = $this->compress($this->getMergedCode("js"), "js");
-				} else {
+				if (!file_exists($file)) {
 					$code = $this->getMergedCode("js");
+
+					if (COMPRESS_JS) {
+						$code = $this->compress($code, "js");
+					}
+
+					file_put_contents($file, $code);
 				}
 
-				file_put_contents($file, $code);
-			}
-
-			$element = new Element("script", array(
-				"src" => CJS_URL . "/$cacheFilename",
-				"type" => "text/javascript"
-			));
-			$element = $standaloneAssets . $element->toString();
-
-			Cache::store($cacheKey, $element, 0, "apcOnly");
-			return $element;
-		} else {
-			if (COMPRESS_JS) {
-				$code = $this->compress($this->getMergedCode("js"), "js");
+				$element = new Element("script", array(
+					"src" => CJS_URL . "/$cacheFilename",
+					"type" => "text/javascript"
+				));
 			} else {
 				$code = $this->getMergedCode("js");
-			}
 
-			if (!empty($code)) {
+				if (COMPRESS_JS) {
+					$code = $this->compress($code, "js");
+				}
+
 				$element = new Element("script", array(
 					"html" => "//<![CDATA[\n$code\n//]]>",
 					"type" => "text/javascript"
 				));
-
-				return $standaloneAssets . $element->toString();
-			} else {
-				return $standaloneAssets;
 			}
+
+			$jsForLayout .= $element->toString();
 		}
+
+		if (!Config::read("debug")) {
+			Cache::store($cacheKey, $jsForLayout, 0, "apcOnly");
+		}
+
+		return $jsForLayout;
 	}
 
 	protected function getMergedCode($type) {
@@ -169,7 +190,7 @@ class AssetHelper extends Helper {
 		foreach ($this->assetsTop[$type] as $filename) {
 			$filepath = WEBROOT_DIR . DS . $type . DS . $filename;
 
-			if (file_exists($filepath)) {
+			if (is_file($filepath)) {
 				$mergedCode .= file_get_contents($filepath);
 			}
 		}
@@ -177,7 +198,7 @@ class AssetHelper extends Helper {
 		foreach ($this->assets[$type] as $filename) {
 			$filepath = WEBROOT_DIR . DS . $type . DS . $filename;
 
-			if (file_exists($filepath)) {
+			if (is_file($filepath)) {
 				$mergedCode .= file_get_contents($filepath);
 			}
 		}
@@ -212,10 +233,17 @@ class AssetHelper extends Helper {
 			$compressedCode = stream_get_contents($pipes[1]);
 			fclose($pipes[1]);
 
+			$errors = stream_get_contents($pipes[2]);
 			fclose($pipes[2]);
+
 			proc_close($process);
 
-			return $compressedCode;
+			if (empty($errors)) {
+				return $compressedCode;
+			} else {
+				Log::write("Compressing $type failed:\n" . $errors);
+				return $code;
+			}
 		}
 	}
 }

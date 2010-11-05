@@ -2,9 +2,11 @@
 class HtmlHelper extends Helper {
 	protected $crumbs = array();
 
-	public function element($tag, $options = array(), $format = "", $ttl = 0) {
+	protected $meta = array();
+
+	public function element($tag, $attributes = array(), $ttl = 0) {
 		if ($ttl !== false) {
-			$cacheKey = "htmlHelper:element:$tag:" . serialize($options) . ":$format";
+			$cacheKey = "htmlHelper:element:$tag:" . serialize($attributes);
 			$element = Cache::fetch($cacheKey, "apcOnly");
 
 			if ($element !== false) {
@@ -12,8 +14,8 @@ class HtmlHelper extends Helper {
 			}
 		}
 
-		$element = new Element($tag, $options);
-		$element = $element->toString($format);
+		$element = new Element($tag, $attributes);
+		$element = $element->toString();
 
 		if ($ttl !== false) {
 			Cache::store($cacheKey, $element, $ttl, "apcOnly");
@@ -54,23 +56,32 @@ class HtmlHelper extends Helper {
 		}
 	}
 
-	public function link($title, $url = "", $options = array(), $ttl = 0) {
-		$options["html"] = $title;
-		$options["href"] = is_array($url) ? Router::url($url) : $url;
+	public function link($title, $url = "", $attributes = array(), $ttl = 0) {
+		$attributes["html"] = $title;
+		$attributes["href"] = is_array($url) ? Router::url($url) : $url;
 
-		return $this->element("a", $options, "", $ttl);
+		return $this->element("a", $attributes, $ttl);
 	}
 
-	public function image($url, $title = "", $options = array(), $ttl = 0) {
-		$options["src"] = preg_match('#^https?://#', $url) ? $url : BASE_URL . "/img/$url";
-		$options["title"] = $title;
-		$options["alt"] = $title;
+	public function image($url, $title = "", $attributes = array(), $ttl = 0) {
+		$attributes["src"] = preg_match('#^https?://#', $url) ? $url : BASE_URL . "/img/$url";
+		$attributes["title"] = $title;
+		$attributes["alt"] = $title;
 
-		return $this->element("img", $options, "emptyTag", $ttl);
+		return $this->element("img", $attributes, $ttl);
+	}
+
+	public function meta($attributes) {
+		$this->meta[] = $attributes;
 	}
 
 	public function metaForLayout() {
 		$elements = "";
+
+		foreach ($this->meta as $meta) {
+			$element = new Element("meta", $meta);
+			$elements .= $element->toString();
+		}
 
 		if (!empty($this->view->pageKeywords)) {
 			$element = new Element("meta", array(
@@ -89,7 +100,6 @@ class HtmlHelper extends Helper {
 	 * the webroot directory.
 	 *
 	 * @param string $filename Name of the icon file
-	 * @param array $options Attributes of the element
 	 */
 	public function icon($filename) {
 		return $this->element("link", array(
@@ -99,17 +109,26 @@ class HtmlHelper extends Helper {
 		));
 	}
 
-	public function script($code) {
+	public function script($code, $ttl = 0) {
 		return $this->element("script", array(
 			"html" => "//<![CDATA[\n$code\n//]]>",
 			"type" => "text/javascript"
-		), "", false);
+		), $ttl);
 	}
 
 	public function scriptLink($url) {
 		return $this->element("script", array(
 			"src" => $url,
 			"type" => "text/javascript"
+		));
+	}
+
+	public function atom($title, $url) {
+		return $this->element("link", array(
+			"href" => Router::url($url),
+			"rel" => "alternate",
+			"title" => $title,
+			"type" => "application/atom+xml"
 		));
 	}
 }

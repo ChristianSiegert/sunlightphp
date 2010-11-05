@@ -384,7 +384,11 @@ class Model {
 					$validates = $this->$rule($document[$fieldName]);
 
 					if (!$validates) {
-						$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid.";
+						if (!Config::read("debug")) {
+							$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid.";
+						} else {
+							$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid: " . express($document[$fieldName]);
+						}
 					}
 				} elseif (is_array($rule)) {
 					if (isset($rule[0])) {
@@ -396,7 +400,11 @@ class Model {
 						$validates = call_user_func_array($function, $parameters);
 
 						if (!$validates) {
-							$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid.";
+							if (!Config::read("debug")) {
+								$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid.";
+							} else {
+								$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid: " . express($document[$fieldName]);
+							}
 						}
 					} else {
 						$errors = $this->validate($document[$fieldName], $rules[$fieldName]);
@@ -429,7 +437,7 @@ class Model {
 	}
 
 	public function isUrl($value) {
-		return is_string($value) && preg_match('#^https?://#', $value);
+		return preg_match('#^https?://#', $value);
 	}
 }
 ?>

@@ -51,7 +51,7 @@ class Dispatcher {
 		// Include app controller file
 		$appControllerFile = DS . "controllers" . DS . "app_controller.php";
 
-		if (file_exists(APP_DIR . $appControllerFile)) {
+		if (is_file(APP_DIR . $appControllerFile)) {
 			include(APP_DIR . $appControllerFile);
 		} else {
 			include(CORE_DIR . $appControllerFile);
@@ -61,7 +61,7 @@ class Dispatcher {
 		$customControllerFile = DS . "controllers" . DS . $this->params["controller"] . "_controller.php";
 
 		if (preg_match('/^[a-z]+$/', $this->params["controller"])
-				&& file_exists(APP_DIR . $customControllerFile)) {
+				&& is_file(APP_DIR . $customControllerFile)) {
 			include(APP_DIR . $customControllerFile);
 
 			// Create controller object

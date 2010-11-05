@@ -7,7 +7,7 @@ class Router {
 	/**
 	 * Creates a URL.
 	 *
-	 * @param array|string $url
+	 * @param array $url
 	 * @return string
 	 */
 	public static function url($url, $makeAbsolute = false) {
@@ -26,10 +26,8 @@ class Router {
 		}
 
 		// Set action if necessary
-		if (isset($url["controller"]) && !isset($url["action"])) {
-			$url["action"] = "index";
-		} elseif (!isset($url["controller"]) && !isset($url["action"])) {
-			$url["action"] = Router::$params["action"];
+		if (!isset($url["action"])) {
+			$url["action"] = isset($url["controller"]) ? "index" : Router::$params["action"];
 		}
 
 		$string = "";

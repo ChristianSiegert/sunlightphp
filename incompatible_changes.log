@@ -2,6 +2,10 @@
 INCOMPATIBLE CHANGES
 ====================
 
+2010-10-13	Removed parameter $option from Element->toString().
+
+2010-10-10	Added parameter $ttl to HtmlHelper->script() which reverses the default caching behavior from "Don't cache" to "Do cache".
+
 2010-10-04	Removed LogComponent. Introduced Log as static core class.
 
 2010-09-05	Removed parameters $method and $jsonDecodeResponse from Model::getView().

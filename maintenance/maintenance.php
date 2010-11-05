@@ -18,7 +18,7 @@ define("WEBROOT_DIR", APP_DIR . DS . "webroot");
 define("CCSS_DIR", WEBROOT_DIR . DS . "ccss");
 define("CJS_DIR", WEBROOT_DIR . DS . "cjs");
 
-define("BASE_URL", dirname(dirname(dirname($_SERVER["SCRIPT_NAME"]))));
+define("BASE_URL", rtrim(dirname(dirname(dirname($_SERVER["SCRIPT_NAME"]))), "/"));
 define("CSS_URL", BASE_URL . "/css");
 define("JS_URL", BASE_URL . "/js");
 define("CCSS_URL", BASE_URL . "/ccss");
@@ -111,7 +111,7 @@ if (!in_array("memcache", get_loaded_extensions())) {
 	$errors[] = "The memcache module is not installed.";
 }
 
-if (!file_exists("PHPUnit" . DS . "Framework.php")) {
+if (!is_file("PHPUnit" . DS . "Framework.php")) {
 	$errors[] = "PHPUnit is not installed.";
 }
 ?>
