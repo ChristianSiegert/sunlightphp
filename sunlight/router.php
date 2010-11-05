@@ -47,7 +47,7 @@ class Router {
 		}
 
 		// Create first part of URL
-		$string = ($makeAbsolute ? "http://" . $_SERVER["HTTP_HOST"] : "") . (BASE_URL !== "/" ? BASE_URL : "") . "/" . $url["controller"] . $string;
+		$string = ($makeAbsolute ? "http://" . $_SERVER["HTTP_HOST"] : "") . BASE_URL . "/" . $url["controller"] . $string;
 
 		return $string;
 	}
