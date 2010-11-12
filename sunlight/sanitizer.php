@@ -51,5 +51,18 @@ class Sanitizer {
 		$string = mb_strtolower($string);
 		return $string;
 	}
+
+	/**
+	 * Encodes non-ASCII characters.
+	 *
+	 * @param string $url
+	 */
+	public static function encodeUrl($url) {
+		$encodedUrl = preg_replace_callback('/([^ !"#$%&\'()*+,\-.\/0-9:;<=>?@A-Z[\\]^_`a-z{|}~])/u', function($match) {
+			return rawurlencode($match[1]);
+		}, $url);
+
+		return $encodedUrl;
+	}
 }
 ?>
