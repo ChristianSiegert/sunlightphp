@@ -336,7 +336,10 @@ class Model {
 		$parametersAsString = "?";
 
 		foreach ($parameters as $parameterName => $parameterValue) {
-			if ($parameterName === "rev" || $parameterName === "startkey_docid" || $parameterName === "endkey_docid") {
+			if ($parameterName === "rev"
+					|| $parameterName === "startkey_docid"
+					|| $parameterName === "endkey_docid"
+					|| $parameterName === "stale") {
 				$parametersAsString .= $parameterName . "=" . rawurlencode($parameterValue) . "&";
 			} else {
 				$parametersAsString .= $parameterName . "=" . rawurlencode(json_encode($parameterValue)) . "&";
