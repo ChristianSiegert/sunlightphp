@@ -423,6 +423,10 @@ class Model {
 		return $validationErrors;
 	}
 
+	public function isBoolean($value) {
+		return is_bool($value);
+	}
+
 	public function isNotEmpty($field) {
 		return !empty($field);
 	}
