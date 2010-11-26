@@ -33,12 +33,7 @@ class ShellDispatcher {
 
 		// Include app shell file
 		$appShellFile = DS . "shells" . DS . "app_shell.php";
-
-		if (is_file(APP_DIR . $appShellFile)) {
-			include(APP_DIR . $appShellFile);
-		} else {
-			include(CORE_DIR . $appShellFile);
-		}
+		include(is_file(APP_DIR . $appShellFile) ? APP_DIR . $appShellFile : CORE_DIR . $appShellFile);
 
 		// Include custom shell file
 		$customShellFile = APP_DIR . DS . "shells" . DS . $this->params["shell"] . "_shell.php";
@@ -55,11 +50,7 @@ class ShellDispatcher {
 			if (preg_match('/^[a-z-]+$/', $this->params["action"])
 					&& method_exists($shell, $methodName)) {
 				$shell->beforeFilter();
-
-				if ($shell->loadModel) {
-					include(CORE_DIR . DS . "inflector.php");
-					$shell->loadModel();
-				}
+				$shell->loadModels();
 
 				// Execute action
 				call_user_func_array(array($shell, $methodName),  $this->params["pass"]);
