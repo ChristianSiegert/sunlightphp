@@ -2,6 +2,8 @@
 INCOMPATIBLE CHANGES
 ====================
 
+2010-11-26	Removed Inflector.
+
 2010-10-13	Removed parameter $option from Element->toString().
 
 2010-10-10	Added parameter $ttl to HtmlHelper->script() which reverses the default caching behavior from "Don't cache" to "Do cache".
