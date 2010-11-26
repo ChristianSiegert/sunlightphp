@@ -111,12 +111,12 @@ class Controller {
 		$this->passedVariables = array_merge($this->passedVariables, $variable);
 	}
 
-	public function redirect($url) {
+	public function redirect($url, $replaceHeader = true, $httpStatusCode = 302) {
 		if (is_array($url)) {
 			$url = Router::url($url);
 		}
 
-		header("Location: $url");
+		header("Location: $url", $replaceHeader, $httpStatusCode);
 		exit;
 	}
 }
