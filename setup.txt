@@ -4,35 +4,35 @@ INTRODUCTION
 
 Hello there,
 
-thanks for downloading SunlightPHP. I put many weeks of work into this small and
-fast PHP framework. I specifically created it for my needs, it is not an
+thanks for downloading SunlightPHP. I put many months of work into this small
+and fast PHP framework. I created it specifically for my needs, it is not an
 all-rounder and might not be suited for your purposes. Try it and find out.
 
 
 REQUIREMENTS
 ============
 	
+	* Apache 2
+		$ sudo apt-get install apache2
+		
+		* Add directive "AllowEncodedSlashes On" to Apache server configuration
+		or VirtualHost configuration file.
+
 	* PHP 5.3
 		* curl module
 			$ sudo apt-get install php5-curl
 		* intl module
 			$ sudo apt-get install php5-intl
 	
-	* PHPUnit
-		$ sudo apt-get install phpunit
-			
-	* Apache 2
-		$ sudo apt-get install apache2
-		
-		* Add directive "AllowEncodedSlashes On" to Apache server config or
-		virtual host file.
-	
 	* CouchDB 0.10
 		$ sudo apt-get install couchdb
 		
+	* PHPUnit
+		$ sudo apt-get install phpunit
+		
 
-STEP 1
-======
+INSTALLATION STEP 1
+===================
 
 After copying SunlightPHP to the location of your choice, make sure your server
 is set up correctly. You can do this by browsing to
@@ -42,13 +42,14 @@ is set up correctly. You can do this by browsing to
 Replace "example.com" with your server's address.
 	
 
-STEP 2
-======
+INSTALLATION STEP 2
+===================
 
 Open the file app/config/core.php and adjust the settings to suit your needs.
 
-	STEP 2.1 (OPTIONAL)
-	-------------------
+
+	(OPTIONAL) ASSET COMPRESSION
+	----------------------------
 	
 	If you enable JS and/or CSS compression, you need to download the
 	YUICompressor from http://developer.yahoo.com/yui/compressor/ and place it
@@ -58,8 +59,8 @@ Open the file app/config/core.php and adjust the settings to suit your needs.
 		$ sudo apt-get install default-jre
 	
 
-	STEP 2.2 (OPTIONAL)
-	-------------------
+	(OPTIONAL) CACHING WITH APC
+	---------------------------
 	
 	If you enable caching with APC, you need to have APC installed as a PHP
 	module.
@@ -67,20 +68,46 @@ Open the file app/config/core.php and adjust the settings to suit your needs.
 	$ sudo apt-get install php-apc
 	
 	
-	STEP 2.3 (OPTIONAL)
-	-------------------
+	(OPTIONAL) CACHING WITH MEMCACHED
+	---------------------------------
 	
-	If you enable caching with Memcached, you need to have the Memcache module
-	installed for PHP.
+	If you enable caching with Memcached, you need to have memcached and the
+	memcache module for PHP installed.
 
 	$ sudo apt-get install memcached php5-memcache
 
 
 TIPS
 ====
+	
+	TUNING APACHE
+	-------------
+	
+	In the default configuration, Apache tries to appeal to everyone. This means
+	lax settings and performance penalties.
+	
+	1.	Apache looks in each directory for an .htaccess file. Disable this
+		behavior by editing your VirtualHost configuration file and change
+		"AllowOverride All" to "AllowOverride None".
+		
+		Make sure to copy your rules from your .htaccess files into the
+		VirtualHost configuration file. You need to reload Apache afterwards.
+	
+	2.	High traffic websites are choked to death by Apache's default handling
+		of connections. Remove this bottleneck by setting the KeepAliveTimeout
+		to "KeepAliveTimeout 2".
+		
+		This setting is usually found in /etc/apache2/apache2.conf .
+		
+	3.	Give attackers as little information as possible about your system. Turn
+		off Apache's detailed response about its version and installed modules
+		by changing "ServerTokens Full" to "ServerTokens Prod".
+		
+		This setting is usually found in /etc/apache2/conf.d/security.conf .
 
-	TIP ONE
-	-------
+
+	REMOTELY ACCESSING COUCHDB
+	--------------------------
 
 	If you want to access CouchDB on a remote server, e.g. for administration
 	with the pretty front-end Futon, you can make it accessible with:
@@ -101,8 +128,8 @@ TIPS
 	browsing to http://localhost:5985/ .
 	
 	
-	TIP TWO
-	-------
+	REMOTELY ACCESSING SUNLIGHTPHP'S MAINTENANCE PANEL
+	--------------------------------------------------
 	
 	If you want to access SunlightPHP's maintenance panel on a remote server,
 	follow these steps:
@@ -121,7 +148,7 @@ TIPS
 				
 		Continuing with the example from above, I edited /etc/apache2/sites-
 		available/christian-siegert.com and updated the list of server aliases
-		to "ServerAlias www.christian-siegert.com cs"
+		to "ServerAlias www.christian-siegert.com cs".
 		
 	3.	You can now access the SunlightPHP maintenance panel on your remote
 		server from your localhost with something like:
