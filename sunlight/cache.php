@@ -14,6 +14,7 @@ class Cache {
 
 	public static function clear() {
 		if (APC_IS_ENABLED) {
+			apc_clear_cache();
 			apc_clear_cache("user");
 		}
 
