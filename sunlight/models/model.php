@@ -273,7 +273,7 @@ class Model {
 
 		if (empty($this->validationErrors)) {
 			$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_bulk_docs";
-			list($status, $headers, $response) = $this->query($url, "POST", json_encode(array("docs" => $documents)));
+			list($status, $headers, $response) = $this->query($url, "POST", json_encode(array("docs" => $documents)), true, array(CURLOPT_HTTPHEADER => array("Content-Type: application/json")));
 
 			if ($status === 201) {
 				return $response;
@@ -312,7 +312,7 @@ class Model {
 
 	public function getView($designName, $viewName, $parameters = array(), $data = array()) {
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_design/" . rawurlencode($designName) . "/_view/" . rawurlencode($viewName) . $this->encodeParameters($parameters);
-		list($status, $headers, $response) = $this->query($url, empty($data) ? "GET" : "POST", json_encode($data));
+		list($status, $headers, $response) = $this->query($url, empty($data) ? "GET" : "POST", json_encode($data), true, array(CURLOPT_HTTPHEADER => array("Content-Type: application/json")));
 
 		if ($status === 200 && isset($response["rows"])) {
 			return $response["rows"];
