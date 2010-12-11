@@ -11,74 +11,104 @@ all-rounder and might not be suited for your purposes. Try it and find out.
 
 REQUIREMENTS
 ============
-	
-	* Apache 2
-		$ sudo apt-get install apache2
-		
-		* Add directive "AllowEncodedSlashes On" to Apache server configuration
-		or VirtualHost configuration file.
 
+To run SunlightPHP you need:
+	* Apache 2
+	* CouchDB
 	* PHP 5.3
+		* cli module
 		* curl module
-			$ sudo apt-get install php5-curl
-		* intl module
-			$ sudo apt-get install php5-intl
+
+You can install them in one go with this command:
+
+	$ sudo apt-get install apache2 couchdb php5 php5-cli php5-curl
 	
-	* CouchDB 0.10
-		$ sudo apt-get install couchdb
-		
+	
+	(
+	Not sure about this:
+	* Add directive "AllowEncodedSlashes On" to Apache server configuration
+		or VirtualHost configuration file.
+	
 	* PHPUnit
 		$ sudo apt-get install phpunit
+	
+	* intl module
+			$ sudo apt-get install php5-intl
+	)
+	
+
+INSTALLATION
+============
+
+	STEP 1
+	------
+	
+	SunlightPHP needs some Apache modules to be enabled. Issue this command:
+	
+		$ sudo a2enmod deflate dir expires headers rewrite
 		
 
-INSTALLATION STEP 1
-===================
+	STEP 2
+	------
 
-After copying SunlightPHP to the location of your choice, make sure your server
-is set up correctly. You can do this by browsing to
+	Copy SunlightPHP to the location of your choice. Make sure it is within the
+	document root (so Apache can access it). Now check if the server is set up
+	correctly by browsing to:
 
-	http://example.com/sunlightphp/maintenance/maintenance.php
+		http://example.com/sunlightphp/maintenance/maintenance.php
 	
-Replace "example.com" with your server's address.
+	Replace "example.com" with your server's address. If you changed the folder
+	name or nested SunlightPHP differently, adjust the path accordingly.
 	
 
-INSTALLATION STEP 2
-===================
+	STEP 3
+	------
 
-Open the file app/config/core.php and adjust the settings to suit your needs.
+	Open the file app/config/core.php and adjust the settings to suit your
+	needs.
 
 
 	(OPTIONAL) ASSET COMPRESSION
 	----------------------------
 	
-	If you enable JS and/or CSS compression, you need to download the
+	If you enable CSS and/or JS compression, you need to download the
 	YUICompressor from http://developer.yahoo.com/yui/compressor/ and place it
 	in app/vendors/yuicompressor/yuicompressor-2.4.2.jar
 	
-	You will also need Java.
+	You will also need Java for this:
+	
 		$ sudo apt-get install default-jre
 	
 
 	(OPTIONAL) CACHING WITH APC
 	---------------------------
 	
-	If you enable caching with APC, you need to have APC installed as a PHP
-	module.
+	If you enable caching with APC, you need to have the APC module for PHP
+	installed:
 	
-	$ sudo apt-get install php-apc
+		$ sudo apt-get install php-apc
 	
 	
 	(OPTIONAL) CACHING WITH MEMCACHED
 	---------------------------------
 	
 	If you enable caching with Memcached, you need to have memcached and the
-	memcache module for PHP installed.
+	memcache module for PHP installed:
 
-	$ sudo apt-get install memcached php5-memcache
+		$ sudo apt-get install memcached php5-memcache
 
 
 TIPS
 ====
+
+	SECURING PHP
+	------------
+	
+	It is not a magic solution that makes PHP completely bomb-proof but it makes
+	it at least harder for attackers:
+	
+		$ sudo apt-get install php5-suhosin
+		
 	
 	TUNING APACHE
 	-------------
@@ -90,20 +120,21 @@ TIPS
 		behavior by editing your VirtualHost configuration file and change
 		"AllowOverride All" to "AllowOverride None".
 		
-		Make sure to copy your rules from your .htaccess files into the
-		VirtualHost configuration file. You need to reload Apache afterwards.
+		Make sure to copy SunlightPHP's rules from the three .htaccess files
+		into the VirtualHost configuration file. You need to reload Apache
+		afterwards.
 	
 	2.	High traffic websites are choked to death by Apache's default handling
 		of connections. Remove this bottleneck by setting the KeepAliveTimeout
 		to "KeepAliveTimeout 2".
 		
-		This setting is usually found in /etc/apache2/apache2.conf .
+		This setting can be found in /etc/apache2/apache2.conf .
 		
 	3.	Give attackers as little information as possible about your system. Turn
 		off Apache's detailed response about its version and installed modules
 		by changing "ServerTokens Full" to "ServerTokens Prod".
 		
-		This setting is usually found in /etc/apache2/conf.d/security.conf .
+		This setting can be found in /etc/apache2/conf.d/security.conf .
 
 
 	TUNING APC
@@ -112,15 +143,26 @@ TIPS
 	Not configured correctly, APC will slow your server down horribly. For a
 	huge big performance boost, change the APC settings to this:
 	
-		# Size of the cache in MB
-		apc.shm_size=250
+		; Size of the cache in MB. Give APC as much RAM as you can spare but not
+		; too much or else you cause swapping. Swapping means hard-disk access
+		; which is very slow and defies the purpose using a RAM-based cache.
+		apc.shm_size = 1200
 		
-		# Disable checking for updated script files
-		apc.stat=0
+		; Check on each request if script files have been updated. Enable in
+		; development environment, disable in production environment. Possible
+		; values: 0 (disable), 1 (enable)
+		apc.stat = 0
 		
-		# If cache is full, try to remove only entries older than this
-		apc.ttl=7200
-		apc.user_ttl=7200
+		; If cache is full, only remove entries that have been stored longer in
+		; it than the values given. Values are in seconds.
+		;
+		; Clearing the complete cache is better or else you will continue with a
+		; heavily fragmented cache.
+		;
+		; apc.ttl affects the system cache which contains cached script files.
+		; apc.user_ttl affects the user cache which contains user-stored values.
+		apc.ttl = 0
+		apc.user_ttl = 0
 		
 	The APC configuration file is located at /etc/php5/conf.d/apc.ini .
 	
@@ -173,5 +215,5 @@ TIPS
 		server from your localhost with something like:
 			$ ssh -L 8080:christian-siegert.com:80 root@109.74.204.144
 			
-		Browse to http://cs:8080/sunlightphp/maintenance/maintenance.php on your
-		localhost to see it.
+		Browse to http://{name}:8080/sunlightphp/maintenance/maintenance.php on
+		your localhost to see it.
