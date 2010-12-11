@@ -91,6 +91,7 @@ class FormHelper extends Helper {
 		$attributes["value"] = $value;
 
 		if (isset($this->data[$fieldName])
+				&& $this->data[$fieldName] === true
 				&& (empty($fieldNameSuffix) || in_array($value, $this->data[$fieldName]))) {
 			$attributes["checked"] = "checked";
 		}
