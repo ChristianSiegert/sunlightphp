@@ -109,7 +109,8 @@ class FormHelper extends Helper {
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function password($fieldName = "password", $attributes = array("type" => "password"), $fieldNameSuffix = "") {
+	public function password($fieldName = "password", $attributes = array(), $fieldNameSuffix = "") {
+		$attributes["type"] = "password";
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
