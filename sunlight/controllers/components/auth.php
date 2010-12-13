@@ -29,13 +29,10 @@ class AuthComponent {
 	}
 
 	public function isAuthorized() {
-		if ($this->controller->Session->read("User.id") !== null
-				|| in_array($this->params["action"], $this->allowedActions)
-				|| ($this->params["controller"] === "users" && $this->params["action"] === "sign-in")) {
-			return true;
-		}
-
-		return false;
+		// User is authorized if one of these conditions is true
+		return $this->controller->Session->read("User.id") !== null
+				|| in_array(str_replace("-", "_", $this->params["action"]), $this->allowedActions)
+				|| ($this->params["controller"] === "users" && $this->params["action"] === "sign-in");
 	}
 }
 ?>
