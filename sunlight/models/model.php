@@ -137,7 +137,7 @@ class Model {
 		}
 	}
 
-	public function storeDocument($documentId, $document, $options) {
+	public function storeDocument($documentId, $document, $options = array()) {
 		if (empty($options["fieldList"])) {
 			throw new Exception("Please whitelist fields. Aborted storing document.");
 		}
@@ -437,6 +437,10 @@ class Model {
 
 	public function isInRange($value, $min, $max) {
 		return $this->isNumeric($value) && $value >= $min && $value <= $max;
+	}
+
+	public function isSha1Hash($value) {
+		return preg_match('#^[0-9a-z]{40}$#', $value);
 	}
 
 	public function isTimestamp($value) {
