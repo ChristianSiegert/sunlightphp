@@ -431,20 +431,20 @@ class Model {
 		return !empty($field);
 	}
 
-	public function isNumeric($value) {
-		return (is_string($value) || is_integer($value)) && preg_match('/^[0-9]+$/', $value);
+	public function isNumeric($value, $strict = true) {
+		return (is_integer($value) || (!$strict && is_string($value))) && preg_match('/^[0-9]+$/', $value);
 	}
 
-	public function isInRange($value, $min, $max) {
-		return $this->isNumeric($value) && $value >= $min && $value <= $max;
+	public function isInRange($value, $min, $max, $strict = true) {
+		return $this->isNumeric($value, $strict) && $value >= $min && $value <= $max;
 	}
 
 	public function isSha1Hash($value) {
 		return preg_match('#^[0-9a-z]{40}$#', $value);
 	}
 
-	public function isTimestamp($value) {
-		return $this->isNumeric($value) && $value >= 0 && $value <= time();
+	public function isTimestamp($value, $strict = true) {
+		return $this->isInRange($value, 0, time(), $strict);
 	}
 
 	public function isUrl($value) {
