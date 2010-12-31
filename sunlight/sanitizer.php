@@ -9,8 +9,8 @@ class Sanitizer {
 	}
 
 	public static function normalize($string) {
-		// Map characters with diacritics on their base-character followed by
-		// the diacritical mark, i.e.  Ú => U´ and á => a`.
+		// Map characters with diacritics to their base-character followed by
+		// the diacritical mark, i.e.  Ú => U´ and á => a`
 		$string = Normalizer::normalize($string, Normalizer::FORM_D);
 
 		// Remove diacritics
