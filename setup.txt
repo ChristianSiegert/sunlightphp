@@ -18,10 +18,11 @@ To run SunlightPHP you need:
 	* PHP 5.3
 		* cli module
 		* curl module
+		* intl module
 
 You can install them in one go with this command:
 
-	$ sudo apt-get install apache2 couchdb php5 php5-cli php5-curl
+	$ sudo apt-get install apache2 couchdb php5 php5-cli php5-curl php5-intl
 	
 	
 	(
@@ -31,9 +32,6 @@ You can install them in one go with this command:
 	
 	* PHPUnit
 		$ sudo apt-get install phpunit
-	
-	* intl module
-			$ sudo apt-get install php5-intl
 	)
 	
 
