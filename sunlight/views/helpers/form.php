@@ -1,7 +1,5 @@
 <?php
 class FormHelper extends Helper {
-	public $helpers = array("Html");
-
 	public function create($attributes = array()) {
 		$attributes["accept-charset"] = mb_internal_encoding();
 
@@ -97,6 +95,11 @@ class FormHelper extends Helper {
 		}
 
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
+	}
+
+	public function radio($fieldName, $attributes = array()) {
+		$attributes["type"] = "radio";
+		return $this->input($fieldName, $attributes);
 	}
 
 	public function hidden($fieldName, $value = "", $attributes = array(), $fieldNameSuffix = "") {
