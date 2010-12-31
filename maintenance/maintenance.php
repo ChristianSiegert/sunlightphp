@@ -98,9 +98,8 @@ if (!in_array("curl", get_loaded_extensions())) {
 	$errors[] = "The curl module is not installed.";
 }
 
-if (!in_array("intl", get_loaded_extensions())
-		|| !class_exists("Normalizer", false)) {
-	$errors[] = "The intl module is not installed (Normalizer class is missing).";
+if (!in_array("intl", get_loaded_extensions())) {
+	$errors[] = "The intl module is not installed.";
 }
 
 if (!in_array("apc", get_loaded_extensions())) {
