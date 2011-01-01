@@ -71,17 +71,16 @@ class HtmlHelper extends Helper {
 
 	/**
 	 * Creates a link element pointing to the favicon. The icon must reside in
-	 * the webroot directory.
+	 * the webroot directory if $url is only a filename.
 	 *
-	 * @param string $filename Name of the icon file
+	 * @param string $url URL or filename of the icon.
 	 */
-	public function icon($filename) {
-		$element = new Element("link", array(
-			"href" => BASE_URL . "/$filename",
-			"rel" => "shortcut icon",
-			"type" => "image/x-icon"
-		));
+	public function icon($url, $attributes = array()) {
+		$attributes["href"] = preg_match('#^https?://#', $url) ? $url : BASE_URL . "/$url";
+		$attributes["rel"] = "shortcut icon";
+		$attributes["type"] = "image/x-icon";
 
+		$element = new Element("link", $attributes);
 		return $element->toString();
 	}
 
