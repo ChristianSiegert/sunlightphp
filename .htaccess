@@ -51,6 +51,10 @@ AddCharset UTF-8 .js
 	
 	RewriteEngine On
 	
+	# Block bad user agents
+	RewriteCond %{HTTP_USER_AGENT} HTTrack
+	RewriteRule .* - [forbidden,last]
+	
 	# Remove www prefix
 	RewriteCond %{HTTP_HOST} ^www\. [nocase]
 	RewriteRule (.*) http\://example\.com/sunlightphp/$1 [redirect=301,last]
