@@ -36,10 +36,9 @@ class HtmlHelper extends Helper {
 		return $element->toString();
 	}
 
-	public function image($url, $title = "", $attributes = array()) {
+	public function image($url, $description = "", $attributes = array()) {
 		$attributes["src"] = preg_match('#^https?://#', $url) ? $url : BASE_URL . "/img/$url";
-		$attributes["title"] = $title;
-		$attributes["alt"] = $title;
+		$attributes["alt"] = $description;
 
 		$element = new Element("img", $attributes);
 		return $element->toString();
