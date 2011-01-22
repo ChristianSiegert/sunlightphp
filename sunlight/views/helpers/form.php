@@ -57,6 +57,11 @@ class FormHelper extends Helper {
 	}
 
 	public function input($fieldName, $attributes = array(), $fieldNameSuffix = "") {
+		// Set default type to "text" if necessary
+		if (!isset($attributes["type"])) {
+			$attributes["type"] = "text";
+		}
+
 		// Set default name if necessary
 		if (!isset($attributes["name"])) {
 			$fieldAsArray = $fieldNameSuffix !== "" ? "[]" : "";
@@ -65,12 +70,14 @@ class FormHelper extends Helper {
 
 		// Set default id if necessary
 		if (!isset($attributes["id"])) {
-			$attributes["id"] = sprintf("%s-input%s", str_replace("_", "-", $fieldName), $fieldNameSuffix);
+			$attributes["id"] = str_replace("_", "-", $fieldName) . "-input" . $fieldNameSuffix;
 		}
 
-		// Set default type to "text" if necessary
-		if (!isset($attributes["type"])) {
-			$attributes["type"] = "text";
+		// Set maxlength attribute if possible
+		if ($attributes["name"] === "e_mail_address"
+				&& !isset($attributes["maxlength"])
+				&& $attributes["type"] === "text") {
+			$attributes["maxlength"] = 254;
 		}
 
 		// Auto-populate value attribute if possible
