@@ -104,9 +104,9 @@ class FormHelper extends Helper {
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function radio($fieldName, $attributes = array()) {
+	public function radio($fieldName, $value = "on", $attributes = array(), $fieldNameSuffix = "") {
 		$attributes["type"] = "radio";
-		return $this->input($fieldName, $attributes);
+		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
 	public function hidden($fieldName, $value = "", $attributes = array(), $fieldNameSuffix = "") {
