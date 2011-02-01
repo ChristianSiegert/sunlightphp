@@ -57,5 +57,9 @@ if (Config::read("debug") > 0) {
 	$queryCount = class_exists("Model") ? (Model::$queryCount === 1 ? "1 query" : Model::$queryCount . " queries" ) : "0 queries";
 	printf('<pre style="clear: both; color: #444; margin: 2em 0 0;">Memory: %s (Peak: %s)<br />%sms (%s)<br />', $memoryUsage, $memoryPeakUsage, $executionTime, $queryCount);
 	printf('Cache hits:   %d<br />Cache misses: %d</pre>', Cache::$writeCount <= Cache::$readCount ? Cache::$readCount - Cache::$writeCount : 0, Cache::$writeCount);
+
+	if (Config::read("debug") > 1) {
+		debug(get_included_files());
+	}
 }
 ?>
