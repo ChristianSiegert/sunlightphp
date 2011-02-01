@@ -7,11 +7,6 @@
 // 0: Disable debugging, 1: Enable debugging
 Config::write("debug", 1);
 
-// Used to look up what model belongs to what controller. Everytime you add a
-// controller that makes use of its model, you must add this model here, i.e.
-// "users" => "user".
-Config::write("inflections", array());
-
 // Connect URLs to a specific controller and/or action.
 Router::connect("/", array("controller" => "pages", "action" => "home"));
 
@@ -52,4 +47,7 @@ define("SESSION_MAX_LIFETIME", 1209600);
 
 // The user agent used in an HTTP request
 define("USERAGENT", "");
+
+// Your app's constants (if any)
+// ...
 ?>
