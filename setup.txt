@@ -143,12 +143,13 @@ TIPS
 	
 		; Size of the cache in MB. Give APC as much RAM as you can spare but not
 		; too much or else you cause swapping. Swapping means hard-disk access
-		; which is very slow and defies the purpose using a RAM-based cache.
+		; which is very slow and defies the purpose of using a RAM-based cache.
 		apc.shm_size = 1200
 		
-		; Check on each request if script files have been updated. Enable in
-		; development environment, disable in production environment. Possible
-		; values: 0 (disable), 1 (enable)
+		; Check on each request if script files have been updated. Possible
+		; values:
+		;	0 (disable, recommended for production environment)
+		;	1 (enable, recommended for development environment)
 		apc.stat = 0
 		
 		; If cache is full, only remove entries that have been stored longer in
