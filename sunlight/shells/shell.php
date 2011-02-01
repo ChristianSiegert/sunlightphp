@@ -1,6 +1,6 @@
 <?php
 class Shell {
-	public $loadModel = true;
+	public $models = array();
 
 	public $params;
 
@@ -14,34 +14,32 @@ class Shell {
 
 	}
 
-	public function loadModel() {
-		// Include model file
-		include(CORE_DIR . DS . "models" . DS . "model.php");
+	public function loadModels() {
+		if (!empty($this->models)) {
+			// Include model file
+			include(CORE_DIR . DS . "models" . DS . "model.php");
 
-		// Include app model file
-		$appModelFile = DS . "models" . DS . "app_model.php";
+			// Include app model file
+			$appModelFile = DS . "models" . DS . "app_model.php";
+			include(is_file(APP_DIR . $appModelFile) ? APP_DIR . $appModelFile : CORE_DIR . $appModelFile);
 
-		if (is_file(APP_DIR . $appModelFile)) {
-			include(APP_DIR . $appModelFile);
-		} else {
-			include(CORE_DIR . $appModelFile);
-		}
+			foreach ($this->models as $modelName) {
+				// Include custom model file
+				include(APP_DIR . DS . "models" . DS . strtolower($modelName) . ".php");
 
-		// Include custom model file
-		include(APP_DIR . DS . "models" . DS . Inflector::singularize($this->params["shell"]) . ".php");
+				// Load model
+				$model = $this->$modelName = new $modelName($this);
 
-		// Load model
-		$modelClassName = ucfirst(Inflector::singularize($this->params["shell"]));
-		$model = $this->$modelClassName = new $modelClassName($this);
+				// Load models required by this model
+				for ($i = 0; $i < count($model->models); $i++) {
+					include(APP_DIR . DS . "models" . DS . strtolower($model->models[$i]) . ".php");
 
-		// Load models required by this model
-		for ($i = 0; $i < count($model->models); $i++) {
-			include(APP_DIR . DS . "models" . DS . strtolower($model->models[$i]) . ".php");
+					$requiredModel = $model->{$model->models[$i]} = new $model->models[$i]($this);
 
-			$requiredModel = $model->{$model->models[$i]} = new $model->models[$i]($this);
-
-			if (!empty($requiredModel->models)) {
-				$this->models = array_unique(array_merge($model->models, $requiredModel->models));
+					if (!empty($requiredModel->models)) {
+						$this->models = array_unique(array_merge($model->models, $requiredModel->models));
+					}
+				}
 			}
 		}
 	}

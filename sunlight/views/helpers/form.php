@@ -1,11 +1,5 @@
 <?php
 class FormHelper extends Helper {
-	public $helpers = array("Html");
-
-	public function element($tag, $attributes = array()) {
-		return $this->view->helperObjects["html"]->element($tag, $attributes, false);
-	}
-
 	public function create($attributes = array()) {
 		$attributes["accept-charset"] = mb_internal_encoding();
 
@@ -19,7 +13,9 @@ class FormHelper extends Helper {
 			$attributes["action"] = Router::url($attributes["action"]);
 		}
 
-		$form = $this->element("form", $attributes);
+		$form = new Element("form", $attributes);
+		$form = $form->toString();
+
 		return preg_replace('#</form>$#', "", $form);
 	}
 
@@ -31,7 +27,8 @@ class FormHelper extends Helper {
 		$attributes["value"] = $label;
 		$attributes["type"] = "submit";
 
-		return $this->element("input", $attributes);
+		$element = new Element("input", $attributes);
+		return $element->toString();
 	}
 
 	public function button($label, $value = null, $attributes = array()) {
@@ -45,7 +42,8 @@ class FormHelper extends Helper {
 			$attributes["value"] = $value;
 		}
 
-		return $this->element("button", $attributes);
+		$element = new Element("button", $attributes);
+		return $element->toString();
 	}
 
 	public function redirect($label, $redirectUrl = array("action" => "index"), $attributes = array()) {
@@ -82,7 +80,8 @@ class FormHelper extends Helper {
 		}
 
 		// Create element
-		return $this->element("input", $attributes) . $this->errorMessageList($fieldName);
+		$element = new Element("input", $attributes);
+		return $element->toString() . $this->errorMessageList($fieldName);
 	}
 
 	public function checkbox($fieldName, $value = "on", $attributes = array(), $fieldNameSuffix = "") {
@@ -90,11 +89,17 @@ class FormHelper extends Helper {
 		$attributes["value"] = $value;
 
 		if (isset($this->data[$fieldName])
+				&& $this->data[$fieldName] === true
 				&& (empty($fieldNameSuffix) || in_array($value, $this->data[$fieldName]))) {
 			$attributes["checked"] = "checked";
 		}
 
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
+	}
+
+	public function radio($fieldName, $attributes = array()) {
+		$attributes["type"] = "radio";
+		return $this->input($fieldName, $attributes);
 	}
 
 	public function hidden($fieldName, $value = "", $attributes = array(), $fieldNameSuffix = "") {
@@ -107,7 +112,8 @@ class FormHelper extends Helper {
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function password($fieldName = "password", $attributes = array("type" => "password"), $fieldNameSuffix = "") {
+	public function password($fieldName = "password", $attributes = array(), $fieldNameSuffix = "") {
+		$attributes["type"] = "password";
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
@@ -126,7 +132,8 @@ class FormHelper extends Helper {
 		$attributes["for"] = $elementId;
 		$attributes["html"] = $label;
 
-		return $this->element("label", $attributes);
+		$element = new Element("label", $attributes);
+		return $element->toString();
 	}
 
 	public function select($fieldName, $choices = array(), $attributes = array()) {
@@ -167,7 +174,8 @@ class FormHelper extends Helper {
 			$attributes["html"] = $this->data[$fieldName];
 		}
 
-		return $this->element("textarea", $attributes) . $this->errorMessageList($fieldName);
+		$element = new Element("textarea", $attributes);
+		return $element->toString() . $this->errorMessageList($fieldName);
 	}
 
 	public function errorMessageList($fieldName) {

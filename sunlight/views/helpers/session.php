@@ -1,13 +1,19 @@
 <?php
-if (!class_exists("Session")) {
-	include(CORE_DIR . DS . "session.php");
-}
+class SessionHelper {
+	/**
+	 * Contains the session data.
+	 * @var array
+	 */
+	public $data = array();
 
-class SessionHelper extends Session {
+	public function __construct() {
+		$this->data =& $_SESSION;
+	}
+
 	public function flash($key = "flash") {
-		if ($this->read("Message." . $key) !== null) {
-			echo $this->read("Message." . $key);
-			$this->delete("Message." . $key);
+		if (isset($this->data["messages"][$key])) {
+			echo $this->data["messages"][$key];
+			unset($this->data["messages"][$key]);
 		}
 	}
 }

@@ -242,9 +242,10 @@ class AssetHelper extends Helper {
 				return $compressedCode;
 			} else {
 				Log::write("Compressing $type failed:\n" . $errors);
-				return $code;
 			}
 		}
+
+		return $code;
 	}
 }
 ?>

@@ -137,7 +137,7 @@ class Model {
 		}
 	}
 
-	public function storeDocument($documentId, $document, $options) {
+	public function storeDocument($documentId, $document, $options = array()) {
 		if (empty($options["fieldList"])) {
 			throw new Exception("Please whitelist fields. Aborted storing document.");
 		}
@@ -273,7 +273,7 @@ class Model {
 
 		if (empty($this->validationErrors)) {
 			$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_bulk_docs";
-			list($status, $headers, $response) = $this->query($url, "POST", json_encode(array("docs" => $documents)));
+			list($status, $headers, $response) = $this->query($url, "POST", json_encode(array("docs" => $documents)), true, array(CURLOPT_HTTPHEADER => array("Content-Type: application/json")));
 
 			if ($status === 201) {
 				return $response;
@@ -312,7 +312,7 @@ class Model {
 
 	public function getView($designName, $viewName, $parameters = array(), $data = array()) {
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_design/" . rawurlencode($designName) . "/_view/" . rawurlencode($viewName) . $this->encodeParameters($parameters);
-		list($status, $headers, $response) = $this->query($url, empty($data) ? "GET" : "POST", json_encode($data));
+		list($status, $headers, $response) = $this->query($url, empty($data) ? "GET" : "POST", json_encode($data), true, array(CURLOPT_HTTPHEADER => array("Content-Type: application/json")));
 
 		if ($status === 200 && isset($response["rows"])) {
 			return $response["rows"];
@@ -336,7 +336,10 @@ class Model {
 		$parametersAsString = "?";
 
 		foreach ($parameters as $parameterName => $parameterValue) {
-			if ($parameterName === "rev" || $parameterName === "startkey_docid" || $parameterName === "endkey_docid") {
+			if ($parameterName === "rev"
+					|| $parameterName === "startkey_docid"
+					|| $parameterName === "endkey_docid"
+					|| $parameterName === "stale") {
 				$parametersAsString .= $parameterName . "=" . rawurlencode($parameterValue) . "&";
 			} else {
 				$parametersAsString .= $parameterName . "=" . rawurlencode(json_encode($parameterValue)) . "&";
@@ -420,20 +423,28 @@ class Model {
 		return $validationErrors;
 	}
 
+	public function isBoolean($value) {
+		return is_bool($value);
+	}
+
 	public function isNotEmpty($field) {
 		return !empty($field);
 	}
 
-	public function isNumeric($value) {
-		return (is_string($value) || is_integer($value)) && preg_match('/^[0-9]+$/', $value);
+	public function isNumeric($value, $strict = true) {
+		return (is_integer($value) || (!$strict && is_string($value))) && preg_match('/^[0-9]+$/', $value);
 	}
 
-	public function isInRange($value, $min, $max) {
-		return $this->isNumeric($value) && $value >= $min && $value <= $max;
+	public function isInRange($value, $min, $max, $strict = true) {
+		return $this->isNumeric($value, $strict) && $value >= $min && $value <= $max;
 	}
 
-	public function isTimestamp($value) {
-		return $this->isNumeric($value) && $value >= 0 && $value <= time();
+	public function isSha1Hash($value) {
+		return preg_match('#^[0-9a-z]{40}$#', $value);
+	}
+
+	public function isTimestamp($value, $strict = true) {
+		return $this->isInRange($value, 0, time(), $strict);
 	}
 
 	public function isUrl($value) {

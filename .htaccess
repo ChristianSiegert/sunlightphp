@@ -1,11 +1,12 @@
 # Do not show footer line under Apache-generated documents
 ServerSignature Off
 
-# Do not list directory contents
-Options -Indexes
+Options FollowSymLinks
 
-# Make UTF-8 the default charset
+# Set charset for text/html and text/plain
 AddDefaultCharset UTF-8
+
+# Set charset by file extenion
 AddCharset UTF-8 .css
 AddCharset UTF-8 .js
 
@@ -49,6 +50,10 @@ AddCharset UTF-8 .js
 	# Replace "127.0.0.1" with your server's ip address.
 	
 	RewriteEngine On
+	
+	# Block bad user agents
+	RewriteCond %{HTTP_USER_AGENT} HTTrack
+	RewriteRule .* - [forbidden,last]
 	
 	# Remove www prefix
 	RewriteCond %{HTTP_HOST} ^www\. [nocase]

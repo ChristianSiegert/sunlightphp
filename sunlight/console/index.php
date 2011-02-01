@@ -39,7 +39,7 @@ if (Config::read("debug") > 0) {
 	$memoryPeakUsage = ceil(memory_get_peak_usage() / 1024) . " KiB";
 	$executionTime = round((microtime(true) - $startTime) * 1000, 1);
 	$queryCount = class_exists("Model") ? (Model::$queryCount === 1 ? "1 query" : Model::$queryCount . " queries" ) : "0 queries";
-	printf("Memory: %s (Peak: %s)\n%sms (%s)\n", $memoryUsage, $memoryPeakUsage, $executionTime, $queryCount);
-	printf("Cache hits:   %d\nCache misses: %d\n", Cache::$writeCount <= Cache::$readCount ? Cache::$readCount - Cache::$writeCount : 0, Cache::$writeCount);
+	printf("\n\nMemory: %s (Peak: %s)\n%sms (%s)\n", $memoryUsage, $memoryPeakUsage, $executionTime, $queryCount);
+	printf("Cache hits:   %d\nCache misses: %d\n\n", Cache::$writeCount <= Cache::$readCount ? Cache::$readCount - Cache::$writeCount : 0, Cache::$writeCount);
 }
 ?>

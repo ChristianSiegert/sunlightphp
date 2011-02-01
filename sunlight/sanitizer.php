@@ -9,8 +9,8 @@ class Sanitizer {
 	}
 
 	public static function normalize($string) {
-		// Map characters with diacritics on their base-character followed by
-		// the diacritical mark, i.e.  Ú => U´ and á => a`.
+		// Map characters with diacritics to their base-character followed by
+		// the diacritical mark, i.e.  Ú => U´ and á => a`
 		$string = Normalizer::normalize($string, Normalizer::FORM_D);
 
 		// Remove diacritics
@@ -50,6 +50,19 @@ class Sanitizer {
 
 		$string = mb_strtolower($string);
 		return $string;
+	}
+
+	/**
+	 * Encodes non-ASCII characters.
+	 *
+	 * @param string $url
+	 */
+	public static function encodeUrl($url) {
+		$encodedUrl = preg_replace_callback('/([^ !"#$%&\'()*+,\-.\/0-9:;<=>?@A-Z[\\]^_`a-z{|}~])/u', function($match) {
+			return rawurlencode($match[1]);
+		}, $url);
+
+		return $encodedUrl;
 	}
 }
 ?>

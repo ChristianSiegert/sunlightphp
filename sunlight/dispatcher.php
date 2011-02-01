@@ -50,12 +50,7 @@ class Dispatcher {
 
 		// Include app controller file
 		$appControllerFile = DS . "controllers" . DS . "app_controller.php";
-
-		if (is_file(APP_DIR . $appControllerFile)) {
-			include(APP_DIR . $appControllerFile);
-		} else {
-			include(CORE_DIR . $appControllerFile);
-		}
+		include(is_file(APP_DIR . $appControllerFile) ? APP_DIR . $appControllerFile : CORE_DIR . $appControllerFile);
 
 		// Include custom controller file
 		$customControllerFile = DS . "controllers" . DS . $this->params["controller"] . "_controller.php";
@@ -102,11 +97,7 @@ class Dispatcher {
 		$controller->loadComponents();
 		$controller->beforeFilter();
 		$controller->startUpComponents();
-
-		if ($controller->loadModel) {
-			include(CORE_DIR . DS . "inflector.php");
-			$controller->loadModel();
-		}
+		$controller->loadModels();
 
 		// Execute action
 		call_user_func_array(array($controller, $methodName), $this->params["pass"]);

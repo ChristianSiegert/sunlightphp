@@ -1,9 +1,9 @@
 <?php
 class Element {
-	public $tag;
-	public $attributes = array();
-	public $html = "";
-	public $children = array();
+	protected $tag;
+	protected $attributes = array();
+	protected $html = "";
+	protected $children = array();
 
 	function __construct($tag, $attributes = array()) {
 		$this->tag = $tag;
@@ -27,8 +27,6 @@ class Element {
 
 	/**
 	 * Returns element as string.
-	 *
-	 * @param string $option Empty string, "noEndTag" or "emptyTag"
 	 * @return string Element in string form
 	 */
 	public function toString() {
@@ -39,7 +37,7 @@ class Element {
 		}
 
 		// Create string for open-tag
-		$string = "<" . $this->tag . $attributes . ">" . $this->html;
+		$string = "<{$this->tag}$attributes>{$this->html}";
 
 		// Create string for child elements
 		foreach ($this->children as $child) {
@@ -51,7 +49,7 @@ class Element {
 		}
 
 		// Create string for close-tag
-		$string .= "</" . $this->tag . ">";
+		$string .= "</{$this->tag}>";
 
 		return $string;
 	}

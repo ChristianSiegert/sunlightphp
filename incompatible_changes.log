@@ -2,6 +2,15 @@
 INCOMPATIBLE CHANGES
 ====================
 
+2011-01-15	Removed SessionComponent->read() and ->write(), and added ->data[].
+
+2010-12-13	Controller->Auth->allow() now requires arguments to be named like the controller's methods, not like the action (e.g. "load_more" instead of "load-more").
+
+2010-12-02	Removed caching from HtmlHelper and FormHelper.
+2010-12-02	Removed HtmlHelper->element() and FormHelper->element().
+
+2010-11-26	Removed Inflector.
+
 2010-10-13	Removed parameter $option from Element->toString().
 
 2010-10-10	Added parameter $ttl to HtmlHelper->script() which reverses the default caching behavior from "Don't cache" to "Do cache".
