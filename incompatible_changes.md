@@ -2,10 +2,15 @@
 
 This log documents changes made to SunlightPHP that break previous installations:
 
+## 2011
+
 * **2011-02-10** Changed $params["url"] from array to string.
 * **2011-02-10** Changed app/webroot/.htaccess to make Apache pass URL to $_GET["sunlightphp_url"] instead of $_GET["url"].
 * **2011-02-09** Renamed $params["pass"] to $params["passed"].
 * **2011-01-15** Removed SessionComponent->read() and ->write(), and added ->data[].
+
+## 2010
+
 * **2010-12-13** Controller->Auth->allow() now requires arguments to be named like the controller's methods, not like the action (e.g. "load_more" instead of "load-more").
 * **2010-12-02** Removed caching from HtmlHelper and FormHelper.
 * **2010-12-02** Removed HtmlHelper->element() and FormHelper->element().
