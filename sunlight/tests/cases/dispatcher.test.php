@@ -29,9 +29,7 @@ class DispatcherDataTest extends PHPUnit_Framework_TestCase {
 			array(
 				array(),
 				array(
-					"url" => array(
-						"url" => "/"
-					),
+					"url" => "/",
 					"controller" => "",
 					"action" => "index",
 					"passed" => array(),
@@ -40,12 +38,10 @@ class DispatcherDataTest extends PHPUnit_Framework_TestCase {
 			),
 			array(
 				array(
-					"url" => "foo"
+					"sunlightphp_url" => "foo"
 				),
 				array(
-					"url" => array(
-						"url" => "/foo"
-					),
+					"url" => "/foo",
 					"controller" => "foo",
 					"action" => "index",
 					"passed" => array(),
@@ -54,12 +50,10 @@ class DispatcherDataTest extends PHPUnit_Framework_TestCase {
 			),
 			array(
 				array(
-					"url" => "foo/bar"
+					"sunlightphp_url" => "foo/bar"
 				),
 				array(
-					"url" => array(
-						"url" => "/foo/bar"
-					),
+					"url" => "/foo/bar",
 					"controller" => "foo",
 					"action" => "bar",
 					"passed" => array(),
@@ -68,12 +62,10 @@ class DispatcherDataTest extends PHPUnit_Framework_TestCase {
 			),
 			array(
 				array(
-					"url" => "foo/bar/peng"
+					"sunlightphp_url" => "foo/bar/peng"
 				),
 				array(
-					"url" => array(
-						"url" => "/foo/bar/peng"
-					),
+					"url" => "/foo/bar/peng",
 					"controller" => "foo",
 					"action" => "bar",
 					"passed" => array("peng"),
@@ -82,12 +74,10 @@ class DispatcherDataTest extends PHPUnit_Framework_TestCase {
 			),
 			array(
 				array(
-					"url" => "foo/bar/cow:moo"
+					"sunlightphp_url" => "foo/bar/cow:moo"
 				),
 				array(
-					"url" => array(
-						"url" => "/foo/bar/cow:moo"
-					),
+					"url" => "/foo/bar/cow:moo",
 					"controller" => "foo",
 					"action" => "bar",
 					"passed" => array(),
@@ -96,12 +86,10 @@ class DispatcherDataTest extends PHPUnit_Framework_TestCase {
 			),
 			array(
 				array(
-					"url" => "foo/bar/cow:moo/ouch/bird:cheep/count:3/peng"
+					"sunlightphp_url" => "foo/bar/cow:moo/ouch/bird:cheep/count:3/peng"
 				),
 				array(
-					"url" => array(
-						"url" => "/foo/bar/cow:moo/ouch/bird:cheep/count:3/peng"
-					),
+					"url" => "/foo/bar/cow:moo/ouch/bird:cheep/count:3/peng",
 					"controller" => "foo",
 					"action" => "bar",
 					"passed" => array("ouch", "peng"),

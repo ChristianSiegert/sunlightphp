@@ -10,5 +10,5 @@
 
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteRule (.*) index.php?url=$1 [qsappend,last]
+	RewriteRule (.*) index.php?sunlightphp_url=$1 [qsappend,last]
 </IfModule>

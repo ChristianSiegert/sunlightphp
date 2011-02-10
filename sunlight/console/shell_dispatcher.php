@@ -1,7 +1,6 @@
 <?php
 class ShellDispatcher {
 	public $params = array(
-		"url" => array(),
 		"controller" => "",
 		"action" => "",
 		"passed" => array(),

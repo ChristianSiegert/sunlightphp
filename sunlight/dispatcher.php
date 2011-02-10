@@ -1,28 +1,23 @@
 <?php
 class Dispatcher {
 	public $params = array(
-		"url" => array(),
+		"url" => "",
 		"controller" => "",
 		"action" => "",
 		"passed" => array(),
-		"named" => array()
+		"named" => array(),
 	);
 
 	/**
-	 * Parses URL passed in $_GET["url"].
-	 *
-	 * Does not evaluate the hash tag since browsers never send it to servers.
+	 * Fills $this->params.
 	 */
 	public function parseParams() {
-		if (!isset($_GET["url"])) {
-			$_GET["url"] = "";
-		}
-
-		// Dump all $_GET content into $this->params["url"]
-		$this->params["url"] = $_GET;
+		// Grab the URL Apache passed to SunlightPHP
+		$url = isset($_GET["sunlightphp_url"]) ? $_GET["sunlightphp_url"] : "";
+		unset($_GET["sunlightphp_url"]);
 
 		// Prepend slash to URL
-		$url = $this->params["url"]["url"] = "/" . $this->params["url"]["url"];
+		$url = $this->params["url"] = "/$url";
 
 		// Get route for current URL
 		$route = Router::getRoute($url);
@@ -47,8 +42,6 @@ class Dispatcher {
 		if (empty($this->params["action"])) {
 			$this->params["action"] = isset($route["action"]) ? $route["action"] : "index";
 		}
-
-		unset($_GET["url"]);
 	}
 
 	public function dispatch() {
