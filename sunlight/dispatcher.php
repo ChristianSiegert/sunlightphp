@@ -1,7 +1,18 @@
 <?php
 class Dispatcher {
-	public $params;
+	public $params = array(
+		"url" => array(),
+		"controller" => "",
+		"action" => "",
+		"passed" => array(),
+		"named" => array()
+	);
 
+	/**
+	 * Parses URL passed in $_GET["url"].
+	 *
+	 * Does not evaluate the hash tag since browsers never send it to servers.
+	 */
 	public function parseParams() {
 		if (!isset($_GET["url"])) {
 			$_GET["url"] = "";
@@ -11,17 +22,13 @@ class Dispatcher {
 		$this->params["url"] = $_GET;
 
 		// Prepend slash to URL
-		$this->params["url"]["url"] = "/" . $this->params["url"]["url"];
-
-		// Initialize "pass" and "named" field
-		$this->params["pass"] = array();
-		$this->params["named"] = array();
+		$url = $this->params["url"]["url"] = "/" . $this->params["url"]["url"];
 
 		// Get route for current URL
-		$route = Router::getRoute($this->params["url"]["url"]);
+		$route = Router::getRoute($url);
 
 		// Extract controller and action from URL if possible
-		$params = explode("/", trim($this->params["url"]["url"], "/"));
+		$params = explode("/", trim($url, "/"));
 
 		foreach ($params as $i => $param) {
 			if ($i === 0) {
@@ -32,7 +39,7 @@ class Dispatcher {
 				if (preg_match("/^([^:]+):(.*)$/", $param, $match)) {
 					$this->params["named"][$match[1]] = $match[2];
 				} else {
-					$this->params["pass"][] = $param;
+					$this->params["passed"][] = $param;
 				}
 			}
 		}
@@ -85,7 +92,7 @@ class Dispatcher {
 		}
 
 		if ($controller->cacheActions && $controller->autoRender && Config::read("debug") === 0) {
-			$cacheKey = "dispatcher:dispatch:" . $this->params["controller"] . ":" . $this->params["action"] . ":" . serialize($this->params["pass"]);
+			$cacheKey = "dispatcher:dispatch:" . $this->params["controller"] . ":" . $this->params["action"] . ":" . serialize($this->params["passed"]);
 			$page = Cache::fetch($cacheKey);
 
 			if ($page !== false) {
@@ -100,7 +107,7 @@ class Dispatcher {
 		$controller->loadModels();
 
 		// Execute action
-		call_user_func_array(array($controller, $methodName), $this->params["pass"]);
+		call_user_func_array(array($controller, $methodName), $this->params["passed"]);
 
 		if (Config::read("debug") > 0 && isset($errorMessage)) {
 			$controller->Session->setFlash($errorMessage, "flash", array("class" => "flash-error-message"));

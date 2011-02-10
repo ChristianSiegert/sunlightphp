@@ -1,12 +1,14 @@
 <?php
 class ShellDispatcher {
-	public $params;
+	public $params = array(
+		"url" => array(),
+		"controller" => "",
+		"action" => "",
+		"passed" => array(),
+		"named" => array()
+	);
 
 	public function parseParams() {
-		// Initialize "pass" and "named" field
-		$this->params["pass"] = array();
-		$this->params["named"] = array();
-
 		// Extract shell and action from arguments if possible
 		foreach ($_SERVER["argv"] as $i => $param) {
 			if ($i === 1) {
@@ -17,7 +19,7 @@ class ShellDispatcher {
 				if (preg_match("/^([^:]+):(.*)$/", $param, $match)) {
 					$this->params["named"][$match[1]] = $match[2];
 				} else {
-					$this->params["pass"][] = $param;
+					$this->params["passed"][] = $param;
 				}
 			}
 		}
@@ -53,7 +55,7 @@ class ShellDispatcher {
 				$shell->loadModels();
 
 				// Execute action
-				call_user_func_array(array($shell, $methodName),  $this->params["pass"]);
+				call_user_func_array(array($shell, $methodName),  $this->params["passed"]);
 			} else {
 				print("Method $methodName() does not exist in $shellClassName.\n");
 			}
