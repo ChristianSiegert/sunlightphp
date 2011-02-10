@@ -1,6 +1,6 @@
 # INCOMPATIBLE CHANGES
 
-This log documents changes made to SunlightPHP that break previous installations:
+This log documents changes made to SunlightPHP that break previous installations.
 
 ## 2011
 
