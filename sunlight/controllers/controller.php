@@ -1,6 +1,6 @@
 <?php
 class Controller {
-	public $components = array();
+	public $components = array("Session");
 
 	public $models = array();
 
