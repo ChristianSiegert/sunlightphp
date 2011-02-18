@@ -1,0 +1,133 @@
+form {
+	background: #F7F7F7;
+	border: 1px solid #D7D7D7;
+	margin: 0 0 13px;
+	padding: 10px;
+}
+
+	.buttons {
+		margin: 5px 0;
+		text-align: center;
+	}
+
+.centered-form {
+	margin: 0 auto;
+	max-width: 600px;
+}
+
+.slim-form {
+	padding-top: 0;
+}
+
+button,
+input[type="submit"] {
+	-moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+	cursor: pointer;
+	font-weight: bold;
+	line-height: 18px;
+	margin: 10px 10px 0 0;
+	min-width: 68px;
+	padding: 4px 9px;
+	white-space: nowrap;
+}
+
+button:last-child,
+input[type="submit"]:last-child {
+	margin-right: 0;
+}
+
+button {
+	background: url(../img/buttons_201012230.png) repeat-x 0 -41px #EEE; /* Gradient for IE and Opera */
+	background: -moz-linear-gradient(#FFF 5%, #F5F6F6 0, #DBDBDB);
+	background: -webkit-gradient(linear, left top, left bottom, from(#FFF), color-stop(5%, #F5F6F6), to(#DBDBDB));
+	border-color: #999 #999 #888;
+	border-style: solid;
+	border-width: 1px;
+	color: #333;
+}
+
+button:active {
+	background: #DBDBDB;
+}
+
+input[type="submit"] {
+	background: url(../img/buttons_201012230.png) repeat-x #537FB4; /* Gradient for IE and Opera */
+	background: -moz-linear-gradient(#89A4DE 5%, #5F87BF 0pt, #426C9D);
+	background: -webkit-gradient(linear, left top, left bottom, from(#89A4DE), color-stop(5%, #5F87BF), to(#426C9D));
+	border-color: #1E3C7B;
+	border-style: solid;
+	border-width: 1px;
+	color: #FFF;
+}
+
+input[type="submit"]:active {
+	background: #426C9D;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+	margin: 0 10px 0 0;
+	vertical-align: middle;
+}
+
+label {
+	color: #666;
+	display: block;
+	font-weight: bold;
+	margin: 10px 0 0;
+	vertical-align: middle;
+}
+
+.inline-label {
+	display: inline;
+	margin: 0;
+}
+
+textarea {
+	resize: vertical;
+}
+
+input[type="password"],
+input[type="text"],
+textarea {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	width: 100%;
+}
+
+input[type="password"],
+input[type="text"],
+select,
+textarea {
+	background: #FFF;
+	border: 1px solid #BDC7D8;
+	color: #3A3935;
+	padding: 3px 3px 4px;
+	margin: 0;
+}
+
+input[disabled="disabled"],
+textarea[disabled="disabled"] {
+	background: #F2F2F2;
+	border-color: #D7D7D7;
+}
+
+/* Hide bot honeypot from humans */
+#panoptikos-emp-input {
+	display: none;
+}
+
+fieldset {
+	border-color: #D7D7D7;
+	border-style: solid;
+	border-width: 1px 0 0;
+}
+
+	legend {
+		color: #666;
+		font-weight: bold;
+		padding: 0 10px 0 0;
+	}
