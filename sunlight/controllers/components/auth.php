@@ -19,7 +19,7 @@ class AuthComponent {
 	public function startUp() {
 		if (!$this->isAuthorized()) {
 			$this->controller->Session->setFlash($this->authError, "auth");
-			$this->controller->Session->data["auth"]["redirect"] = BASE_URL . $this->params["url"]["url"];
+			$this->controller->Session->data["auth"]["redirect"] = BASE_URL . $this->params["url"];
 			$this->controller->redirect(array("controller" => "users", "action" => "sign-in"));
 		}
 	}
