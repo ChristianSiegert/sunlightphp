@@ -19,8 +19,6 @@ class DispatcherDataTest extends PHPUnit_Framework_TestCase {
 		$dispatcher->parseParams();
 		$result = $dispatcher->params;
 
-		#print_r($dispatcher->params);
-
 		$this->assertEquals($expected, $result);
 	}
 
