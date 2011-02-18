@@ -8,7 +8,7 @@ class HtmlHelper extends Helper {
 		$this->crumbs[] = array($title, $url);
 	}
 
-	public function getCrumbs($glue = " &rsaquo; ", $prefix = "Home") {
+	public function getCrumbs($prefix = "Home", $glue = " &rsaquo; ") {
 		$numberOfCrumbs = count($this->crumbs);
 
 		$string = $numberOfCrumbs > 0 ? $this->link($prefix, BASE_URL . "/") : $prefix;
