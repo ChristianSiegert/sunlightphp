@@ -5,9 +5,10 @@ class Router {
 	public static $routes = array();
 
 	/**
-	 * Creates a URL.
+	 * Returns a URL as string after assembling it from a passed array.
 	 *
 	 * @param array $url
+	 * @param boolean $makeAbsolute Set to true to create an absolute URL, starting with http://
 	 * @return string
 	 */
 	public static function url($url, $makeAbsolute = false) {
