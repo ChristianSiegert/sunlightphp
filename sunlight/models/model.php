@@ -162,7 +162,7 @@ class Model {
 			$this->validationErrors = $this->validate($document, $this->validationRules[$document["type"]]);
 			$this->controller->validationErrors = $this->validationErrors;
 		} else {
-			throw new Exception("Please define validation rules. Not validating data is a security risk. Aborted storing document.");
+			throw new Exception("Please define validation rules for document type '{$document["type"]}'. Aborted storing documents.");
 		}
 
 		if (empty($this->validationErrors)) {
@@ -301,7 +301,7 @@ class Model {
 		}
 
 		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/_bulk_docs";
-		list($status, $headers, $response) = $this->query($url, "POST", json_encode(array("docs" => $documents)));
+		list($status, $headers, $response) = $this->query($url, "POST", json_encode(array("docs" => $documents)), true, array(CURLOPT_HTTPHEADER => array("Content-Type: application/json")));
 
 		if ($status === 201) {
 			return $response;
@@ -427,16 +427,16 @@ class Model {
 		return is_bool($value);
 	}
 
+	public function isInRange($value, $min, $max, $strict = true) {
+		return $this->isNumeric($value, $strict) && $value >= $min && $value <= $max;
+	}
+
 	public function isNotEmpty($field) {
 		return !empty($field);
 	}
 
 	public function isNumeric($value, $strict = true) {
 		return (is_integer($value) || (!$strict && is_string($value))) && preg_match('/^[0-9]+$/', $value);
-	}
-
-	public function isInRange($value, $min, $max, $strict = true) {
-		return $this->isNumeric($value, $strict) && $value >= $min && $value <= $max;
 	}
 
 	public function isSha1Hash($value) {
