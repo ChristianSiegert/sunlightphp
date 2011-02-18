@@ -12,8 +12,6 @@
 	</head>
 	<body>
 		<div id="content">
-			<h1><?php echo $this->pageTitle; ?></h1>
-
 			<?php if ($this->params["url"] !== "/") { ?>
 				<div id="breadcrumbs">You are here: <?php echo $html->getCrumbs(); ?></div>
 			<?php } else { ?>
