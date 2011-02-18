@@ -1,5 +1,9 @@
 <?php
 class FormHelper extends Helper {
+	protected function sanitizeFieldName($fieldName) {
+		return trim(preg_replace('#[^a-z0-9\-]#', "-", mb_convert_case($fieldName, MB_CASE_LOWER)), "-");
+	}
+
 	public function create($attributes = array()) {
 		$attributes["accept-charset"] = mb_internal_encoding();
 
@@ -70,7 +74,7 @@ class FormHelper extends Helper {
 
 		// Set default id if necessary
 		if (!isset($attributes["id"])) {
-			$attributes["id"] = str_replace("_", "-", $fieldName) . "-input" . $fieldNameSuffix;
+			$attributes["id"] = $this->sanitizeFieldName($fieldName) . "-input" . $fieldNameSuffix;
 		}
 
 		// Set maxlength attribute if possible
@@ -134,9 +138,7 @@ class FormHelper extends Helper {
 			$label = ucfirst(preg_replace('/_/', " ", $fieldName));
 		}
 
-		$elementId = sprintf("%s-input%s", str_replace("_", "-", $fieldName), $fieldNameSuffix);
-
-		$attributes["for"] = $elementId;
+		$attributes["for"] = $this->sanitizeFieldName($fieldName) . "-input" . $fieldNameSuffix;
 		$attributes["html"] = $label;
 
 		$element = new Element("label", $attributes);
@@ -147,7 +149,7 @@ class FormHelper extends Helper {
 		$attributes["name"] = $fieldName;
 
 		if (!isset($attributes["id"])) {
-			$attributes["id"] = sprintf("%s-input", str_replace("_", "-", $fieldName));
+			$attributes["id"] = $this->sanitizeFieldName($fieldName) . "-input";
 		}
 
 		$selectElement = new Element("select", $attributes);
@@ -173,7 +175,7 @@ class FormHelper extends Helper {
 
 	public function textarea($fieldName, $attributes = array()) {
 		$attributes["name"] = $fieldName;
-		$attributes["id"] = sprintf("%s-input", str_replace("_", "-", $fieldName));
+		$attributes["id"] = $this->sanitizeFieldName($fieldName) . "-input";
 		$attributes["rows"] = 3;
 		$attributes["cols"] = 27;
 
