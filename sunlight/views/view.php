@@ -56,7 +56,7 @@ class View {
 		extract($this->helperObjects);
 
 		// Filename of the view
-		$viewFile = DS . "views" . DS . $this->params["controller"] . DS . (empty($this->view) ? str_replace("-", "_", $this->params["action"]) : $this->view) . ".stp";
+		$viewFile = DS . "views" . DS . str_replace("-", "_", mb_convert_case($this->params["controller"], MB_CASE_LOWER)) . DS . (empty($this->view) ? str_replace("-", "_", $this->params["action"]) : $this->view) . ".stp";
 
 		// Start buffering output
 		ob_start();

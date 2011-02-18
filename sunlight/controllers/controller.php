@@ -71,14 +71,14 @@ class Controller {
 
 			foreach ($this->models as $modelName) {
 				// Include custom model file
-				include(APP_DIR . DS . "models" . DS . strtolower($modelName) . ".php");
+				include(APP_DIR . DS . "models" . DS . strtolower(preg_replace('#^_#', "", preg_replace('#([A-Z])#', "_$1", $modelName))) . ".php");
 
 				// Load model
 				$model = $this->$modelName = new $modelName($this);
 
 				// Load models required by this model
 				for ($i = 0; $i < count($model->models); $i++) {
-					include(APP_DIR . DS . "models" . DS . strtolower($model->models[$i]) . ".php");
+					include(APP_DIR . DS . "models" . DS . strtolower(preg_replace('#^_#', "", preg_replace('#([A-Z])#', "_$1", $model->models[$i]))) . ".php");
 
 					$requiredModel = $model->{$model->models[$i]} = new $model->models[$i]($this);
 

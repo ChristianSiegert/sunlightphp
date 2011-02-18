@@ -53,14 +53,14 @@ class Dispatcher {
 		include(is_file(APP_DIR . $appControllerFile) ? APP_DIR . $appControllerFile : CORE_DIR . $appControllerFile);
 
 		// Include custom controller file
-		$customControllerFile = DS . "controllers" . DS . $this->params["controller"] . "_controller.php";
+		$customControllerFile = DS . "controllers" . DS . str_replace("-", "_", $this->params["controller"]) . "_controller.php";
 
-		if (preg_match('/^[a-z]+$/', $this->params["controller"])
+		if (preg_match('/^[a-z\-]+$/', $this->params["controller"])
 				&& is_file(APP_DIR . $customControllerFile)) {
 			include(APP_DIR . $customControllerFile);
 
 			// Create controller object
-			$controllerClassName = ucfirst($this->params["controller"]) . "Controller";
+			$controllerClassName = str_replace("-", "", mb_convert_case($this->params["controller"], MB_CASE_TITLE)) . "Controller";
 			$controller = new $controllerClassName($this->params);
 
 			$methodName = str_replace("-", "_", $this->params["action"]);
