@@ -123,6 +123,11 @@ class FormHelper extends Helper {
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
+	public function file($fieldName = "file", $attributes = array(), $fieldNameSuffix = "") {
+		$attributes["type"] = "file";
+		return $this->input($fieldName, $attributes, $fieldNameSuffix);
+	}
+
 	public function password($fieldName = "password", $attributes = array(), $fieldNameSuffix = "") {
 		$attributes["type"] = "password";
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
