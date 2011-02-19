@@ -5,7 +5,7 @@ class View {
 	public $data;
 	public $helpers;
 	public $params;
-	public $passedVariables;
+	public $assignedVariables;
 	public $validationErrors;
 	public $view;
 
@@ -19,7 +19,7 @@ class View {
 		$this->data = $controller->data;
 		$this->helpers = $controller->helpers;
 		$this->params = $controller->params;
-		$this->passedVariables = $controller->passedVariables;
+		$this->assignedVariables = $controller->assignedVariables;
 		$this->validationErrors = $controller->validationErrors;
 		$this->view = $controller->view;
 
@@ -51,8 +51,8 @@ class View {
 	}
 
 	public function renderAction() {
-		// Make passed variables and helpers available to the view
-		extract($this->passedVariables);
+		// Make assigned variables and helpers available to the view
+		extract($this->assignedVariables);
 		extract($this->helperObjects);
 
 		// Filename of the view
@@ -80,8 +80,8 @@ class View {
 	}
 
 	public function renderLayout($contentForLayout, $removeWhitespace) {
-		// Make passed variables and helpers available to the layout
-		extract($this->passedVariables);
+		// Make assigned variables and helpers available to the layout
+		extract($this->assignedVariables);
 		extract($this->helperObjects);
 
 		// Buffer output of the layout file

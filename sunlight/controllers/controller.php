@@ -14,7 +14,12 @@ class Controller {
 
 	public $removeWhitespace = true;
 
-	public $passedVariables = array();
+	/**
+	 * Associative array containing the variables assigned to the view. The key
+	 * is the name of the variable, the value is the value of the variable.
+	 * @var array
+	 */
+	public $assignedVariables = array();
 
 	public $params;
 
@@ -103,12 +108,12 @@ class Controller {
 	}
 
 	/**
-	 * Sets the variables that can be accessed in a view.
-	 *
-	 * @param array Associative array
+	 * Assigns a variable to the view.
+	 * @param string $variableName
+	 * @param mixed $variableValue
 	 */
-	public function set($variable) {
-		$this->passedVariables = array_merge($this->passedVariables, $variable);
+	public function set($variableName, $variableValue) {
+		$this->assignedVariables[$variableName] = $variableValue;
 	}
 
 	public function redirect($url, $replaceHeader = true, $httpStatusCode = 302) {
