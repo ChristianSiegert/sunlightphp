@@ -64,5 +64,18 @@ class Sanitizer {
 
 		return $encodedUrl;
 	}
+
+	/**
+	 * Returns an excerpt of a text. Successive whitespace characters are
+	 * combined into one. Leading and trailing whitespace is removed.
+	 *
+	 * @param string $text
+	 * @param integer $length Number of characters until the text gets cut off
+	 * @param string $ellipsis String to append if text had to be cut off. Defaults to "...".
+	 */
+	public static function excerpt($text, $length, $ellipsis = "...") {
+		$text = trim(preg_replace('#\s+#', " ", $text));
+		return mb_strlen($text) > $length ? mb_strcut($text, 0, $length) . $ellipsis : $text;
+	}
 }
 ?>
