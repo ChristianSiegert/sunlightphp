@@ -54,7 +54,7 @@ table {
 
 	td:last-child,
 	th:last-child {
-		padding: 0;
+		padding-right: 0;
 	}
 
 :focus {
