@@ -210,20 +210,29 @@ class Model {
 	}
 
 	/**
-	 * Checks if document exists.
+	 * Checks if a document exists.
 	 *
 	 * @param string $documentId
-	 * @return bool
+	 * @param string $revision
+	 * @return bool True if the document exists, otherwise false
 	 */
 	public function documentExists($documentId, $revision = "") {
 		$parameters = !empty($revision) ? array("rev" => $revision) : array();
 
-		try {
-			$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId) . $this->encodeParameters($parameters);
-			list($status) = $this->query($url, "HEAD");
-			return $status === 200;
-		} catch (Exception $exception) {
+		$url = DATABASE_HOST . "/" . rawurlencode(DATABASE_NAME) . "/" . rawurlencode($documentId) . $this->encodeParameters($parameters);
+		list($status, $headers, $response) = $this->query($url);
+
+		if ($status === 200) {
+			return true;
+		} elseif ($status === 404
+				&& is_array($response)
+				&& isset($response["error"])
+				&& $response["error"] === "not_found"
+				&& isset($response["reason"])
+				&& $response["reason"] === "missing") {
 			return false;
+		} else {
+			throw new Exception($this->describeError($response, $documentId, $revision));
 		}
 	}
 

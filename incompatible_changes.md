@@ -4,6 +4,7 @@ This log documents changes made to SunlightPHP that break previous installations
 
 ## 2011
 
+* **2011-03-05** Model::documentExists() can now throw an exception. Wrap it in a try-catch-block if you use it.
 * **2011-02-19** Added second, required, parameter to `Controller->set()`. Changed type of first parameter from `array` to `string`.
 * **2011-02-18** Reversed parameter order of HtmlHelper->getCrumbs().
 * **2011-02-10** Changed $params["url"] from array to string.
