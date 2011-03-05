@@ -118,7 +118,7 @@ class Model {
 		if ($status === 200) {
 			return $response;
 		} else {
-			throw new Exception($this->describeError($response));
+			throw new Exception($this->describeError($response, $documentId, $revision));
 		}
 	}
 
@@ -362,6 +362,8 @@ class Model {
 					}
 				case "not_found":
 					switch ($response["reason"]) {
+						case "missing":
+							return empty($arguments[2]) ? "CouchDB: Document '{$arguments[1]}' does not exist." : "CouchDB: Document '{$arguments[1]}' with revision '{$arguments[2]}' does not exist.";
 						case "missing_named_view":
 							return "CouchDB: View '{$arguments[2]}' does not exist in design '{$arguments[1]}'.";
 						case "no_db_file":
