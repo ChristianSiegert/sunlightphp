@@ -85,9 +85,10 @@ class FormHelper extends Helper {
 		}
 
 		// Auto-populate value attribute if possible
-		if (!isset($attributes["value"])
-				&& isset($this->data[$fieldName])) {
-			$attributes["value"] = $this->data[$fieldName];
+		if (!isset($attributes["value"])) {
+			try {
+				$attributes["value"] = $this->getValueByFieldName($fieldName);
+			} catch (Exception $exception) {}
 		}
 
 		// Create element
@@ -184,8 +185,10 @@ class FormHelper extends Helper {
 		$attributes["rows"] = 3;
 		$attributes["cols"] = 27;
 
-		if (isset($this->data[$fieldName])) {
-			$attributes["html"] = $this->data[$fieldName];
+		if (!isset($attributes["html"])) {
+			try {
+				$attributes["html"] = $this->getValueByFieldName($fieldName);
+			} catch (Exception $exception) {}
 		}
 
 		$element = new Element("textarea", $attributes);
@@ -209,6 +212,52 @@ class FormHelper extends Helper {
 
 			return $errorList->toString();
 		}
+	}
+
+	/**
+	 * Returns the value for an HTML element by searching in $this->data.
+	 * @param string $fieldName The HTML element's name, e.g. "description" or "address[foo][bar]"
+	 * @return mixed The found value
+	 * @throws Exception if $this->data does not contain the field
+	 */
+	protected function getValueByFieldName($fieldName) {
+		$value = "";
+		$data = $this->data;
+
+		// Convert HTML field name like "address[foo][bar]" into associative array
+		parse_str($fieldName, $fieldNames);
+
+		$fieldNames = $this->getFieldNameList($fieldNames);
+
+		foreach ($fieldNames as $fieldName) {
+			if (isset($data[$fieldName])) {
+				$value = $data = $data[$fieldName];
+			} else {
+				throw new Exception('$this->data cannot provide any data for this field.');
+			}
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Returns an indexed array containing the keys of a multidimensional
+	 * associative array.
+	 * @param array $array (Multidimensional) associative array
+	 * @return array The keys of the (multidimensional) associative array
+	 */
+	protected function getFieldNameList($array) {
+		$keys = array();
+
+		foreach ($array as $key => $value) {
+			$keys[] = $key;
+
+			if (is_array($value)) {
+				$keys = array_merge($keys, $this->getFieldNameList($value));
+			}
+		}
+
+		return $keys;
 	}
 }
 ?>
