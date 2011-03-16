@@ -389,45 +389,38 @@ class Model {
 		$validationErrors = array();
 
 		foreach ($rules as $fieldName => $rule) {
-			if (!empty($rule)) {
-				if (!isset($document[$fieldName])) {
-					$document[$fieldName] = null;
+			if (isset($rule["rule"])) {
+				if (!array_key_exists($fieldName, $document)) {
+					$document[$fieldName] = "";
 				}
 
-				if (is_string($rule)) {
-					$validates = $this->$rule($document[$fieldName]);
+				// The name of the function used to validate the field is passed as string
+				if (is_string($rule["rule"])) {
+					$validates = $this->{$rule["rule"]}($document[$fieldName]);
+				// The name of the function used to validate the field is passed in an array (as first argument)
+				} elseif (is_array($rule["rule"])) {
+					$arguments = $rule["rule"];
+					$arguments[0] = $document[$fieldName];
 
-					if (!$validates) {
-						if (!Config::read("debug")) {
-							$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid.";
-						} else {
-							$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid: " . express($document[$fieldName]);
-						}
-					}
-				} elseif (is_array($rule)) {
-					if (isset($rule[0])) {
-						$function = array($this, $rule[0]);
-
-						$parameters = $rule;
-						$parameters[0] = $document[$fieldName];
-
-						$validates = call_user_func_array($function, $parameters);
-
-						if (!$validates) {
-							if (!Config::read("debug")) {
-								$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid.";
-							} else {
-								$validationErrors[$fieldName][] = "Value for field '$fieldName' is not valid: " . express($document[$fieldName]);
-							}
-						}
-					} else {
-						$errors = $this->validate($document[$fieldName], $rules[$fieldName]);
-
-						if (!empty($errors)) {
-							$validationErrors[$fieldName][] = $errors;
-						}
-					}
+					$validates = call_user_func_array(array($this, $rule["rule"][0]), $arguments);
+				} else {
+					throw new UnexpectedValueException("Rule for field '$fieldName' must either be a string or array (" . gettype($rule["rule"]) . " given).");
 				}
+
+				if (!$validates) {
+					$validationErrors[$fieldName][] = array(
+						"message" => !empty($rule["message"]) ? $rule["message"] : "Value for field '$fieldName' is not valid.",
+						"value" => $document[$fieldName],
+					);
+				}
+			} elseif (isset($rule["contains"])) {
+				$errors = $this->validate($document[$fieldName], $rule["contains"]);
+
+				if (!empty($errors)) {
+					$validationErrors[$fieldName] = $errors;
+				}
+			} else {
+				throw new InvalidArgumentException("Validation rule for field '$fieldName' is not formed properly. Please add 'rule' or 'contains'.");
 			}
 		}
 
