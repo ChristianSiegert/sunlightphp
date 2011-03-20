@@ -4,6 +4,7 @@
 .size1of10,
 .size3of4 {
 	display: inline-block;
+	vertical-align: top;
 }
 
 .size1of2 {
