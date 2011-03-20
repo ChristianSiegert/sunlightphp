@@ -91,9 +91,17 @@ class FormHelper extends Helper {
 			} catch (Exception $exception) {}
 		}
 
+		// Get HTML list with all validation errors for this field
+		$errorMessageList = $this->errorMessageList($fieldName);
+
+		// Highlight field if it has any validation errors
+		if (!empty($errorMessageList)) {
+			$attributes["class"] = isset($attributes["class"]) ? $attributes["class"] . " has-validation-errors" : "has-validation-errors";
+		}
+
 		// Create element
 		$element = new Element("input", $attributes);
-		return $element->toString() . $this->errorMessageList($fieldName);
+		return $element->toString() . $errorMessageList;
 	}
 
 	public function checkbox($fieldName, $value = "on", $attributes = array(), $fieldNameSuffix = "") {
@@ -191,20 +199,35 @@ class FormHelper extends Helper {
 			} catch (Exception $exception) {}
 		}
 
+		// Get HTML list with all validation errors for this field
+		$errorMessageList = $this->errorMessageList($fieldName);
+
+		// Highlight field if it has any validation errors
+		if (!empty($errorMessageList)) {
+			$attributes["class"] = isset($attributes["class"]) ? $attributes["class"] . " has-validation-errors" : "has-validation-errors";
+		}
+
 		$element = new Element("textarea", $attributes);
-		return $element->toString() . $this->errorMessageList($fieldName);
+		return $element->toString() . $errorMessageList;
 	}
 
+	/**
+	 * Returns an HTML list that contains a field's validation error messages.
+	 * @param string $fieldName
+	 * @return string|null HTML list if field has any validation errors, otherwise null
+	 */
 	public function errorMessageList($fieldName) {
-		if (isset($this->validationErrors[$fieldName])) {
+		$validationErrors = $this->getValidationErrorsByFieldName($fieldName);
+
+		if (!empty($validationErrors)) {
 			$errorList = new Element("ul", array(
 				"class" => "form-error-list"
 			));
 
-			foreach ($this->validationErrors[$fieldName] as $errorMessage) {
+			foreach ($this->getValidationErrorsByFieldName($fieldName) as $error) {
 				$listItem = new Element("li", array(
 					"class" => "form-error-list-item",
-					"html" => $errorMessage
+					"html" => $error["message"]
 				));
 
 				$listItem->inject($errorList);
@@ -212,6 +235,31 @@ class FormHelper extends Helper {
 
 			return $errorList->toString();
 		}
+	}
+
+	/**
+	 * Returns an array that contains a field's validation errors.
+	 * @param string $fieldName
+	 * @return array A field's validation errors
+	 */
+	protected function getValidationErrorsByFieldName($fieldName) {
+		$validationErrors = array();
+		$allValidationErrors = $this->validationErrors;
+
+		// Convert HTML field name like "address[foo][bar]" into associative array
+		parse_str($fieldName, $fieldNames);
+
+		$fieldNames = $this->getFieldNameList($fieldNames);
+
+		foreach ($fieldNames as $fieldName) {
+			if (isset($allValidationErrors[$fieldName])) {
+				$validationErrors = $allValidationErrors = $allValidationErrors[$fieldName];
+			} else {
+				return array();
+			}
+		}
+
+		return $validationErrors;
 	}
 
 	/**
