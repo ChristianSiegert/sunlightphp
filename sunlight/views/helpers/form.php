@@ -87,7 +87,7 @@ class FormHelper extends Helper {
 		// Auto-populate value attribute if possible
 		if (!isset($attributes["value"])) {
 			try {
-				$attributes["value"] = $this->getValueByFieldName($fieldName);
+				$attributes["value"] = Sanitizer::encodeHtml($this->getValueByFieldName($fieldName));
 			} catch (Exception $exception) {}
 		}
 
@@ -195,7 +195,7 @@ class FormHelper extends Helper {
 
 		if (!isset($attributes["html"])) {
 			try {
-				$attributes["html"] = $this->getValueByFieldName($fieldName);
+				$attributes["html"] = Sanitizer::encodeHtml($this->getValueByFieldName($fieldName));
 			} catch (Exception $exception) {}
 		}
 
