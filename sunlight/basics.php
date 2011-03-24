@@ -63,4 +63,12 @@ function express($expression, $nestingLevel = 0) {
 			return "($type) $expression";
 	}
 }
+
+/**
+ * Includes core classes as needed.
+ * @param string $className
+ */
+function __autoload($className) {
+	include CORE_DIR . DS . strtolower($className) . ".php";
+}
 ?>
