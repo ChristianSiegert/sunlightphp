@@ -97,8 +97,8 @@ class AssetHelper extends Helper {
 					$code = $this->compress($code, "css");
 				}
 
-				// Fix relative paths in stylesheets
-				$code = preg_replace('%url(?:\s*)\(\.\./%i', "url(" . BASE_URL . "/", $code);
+				// Replace relative paths like `url("../bar.png")` with relative-absolute ones like `url("/foo/bar.png")`
+				$code = preg_replace('#(url(?:\s*)\((?:|\'|"))\.\./#i', "$1" . BASE_URL . "/", $code);
 
 				$element = new Element("style", array(
 					"html" => $code,
