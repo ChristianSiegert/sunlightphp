@@ -137,10 +137,40 @@ class Model {
 		}
 	}
 
+	/**
+	 * Returns true if all fields in the document are whitelisted, otherwise it
+	 * returns the name of the first field that is not whitelisted.
+	 *
+	 * @param array $document
+	 * @param array $fieldList
+	 * @return mixed true if all fields are whitelisted, otherwise string with name of first non-whitelisted field
+	 */
+	public static function onlyContainsWhitelistedFields($document, $fieldList) {
+		foreach ($document as $fieldName => $fieldValue) {
+			if (is_array($fieldValue)) {
+				if (isset($fieldList[$fieldName]) && ($fieldName = self::onlyContainsWhitelistedFields($fieldValue, $fieldList[$fieldName])) === true) {
+					continue;
+				}
+			} elseif (in_array($fieldName, $fieldList)) {
+				continue;
+			}
+
+			return $fieldName;
+		}
+
+		return true;
+	}
+
 	public function storeDocument($documentId, $document, $options = array()) {
 		if (empty($options["fieldList"])) {
 			throw new Exception("Please whitelist fields. Aborted storing document.");
 		}
+
+		/* TODO: Fix onlyContainsWhitelistedFields() (see model.test.php)
+		if (!self::onlyContainsWhitelistedFields($document, $options["fieldList"])) {
+			throw new Exception("Non-whitelisted field '$fieldName' is present. Aborted storing document.");
+		}
+		*/
 
 		// Abort if non-whitelisted fields are present
 		foreach ($document as $fieldName => $value) {
