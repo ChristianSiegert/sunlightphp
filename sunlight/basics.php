@@ -58,7 +58,16 @@ function express($expression, $nestingLevel = 0) {
 			$output .= ")";
 			return $output;
 		case "object":
-			return "(... object ...)";
+			$output = get_class($expression) . " object (";
+
+			foreach ($expression as $key => $value) {
+				$output .= "\n" . str_repeat("    ", $nestingLevel + 1) . express($key) . " => " . express($value, $nestingLevel + 1) . ",";
+			}
+
+			$output = preg_replace("/,$/", "\n" . str_repeat("    ", $nestingLevel), $output);
+
+			$output .= ")";
+			return $output;
 		default:
 			return "($type) $expression";
 	}
