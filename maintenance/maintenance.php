@@ -24,14 +24,11 @@ define("JS_URL", BASE_URL . "/js");
 define("CCSS_URL", BASE_URL . "/ccss");
 define("CJS_URL", BASE_URL . "/cjs");
 
-// Include some core files
-include(CORE_DIR . DS . "basics.php");
-include(CORE_DIR . DS . "cache.php");
-include(CORE_DIR . DS . "config.php");
-include(CORE_DIR . DS . "router.php");
+// Include the core file that contains our autoloader
+include CORE_DIR . DS . "libraries" . DS . "basics.php";
 
 // Include config file
-include(APP_DIR . DS . "config" . DS . "core.php");
+include APP_DIR . DS . "config" . DS . "core.php";
 
 $errors = array();
 
