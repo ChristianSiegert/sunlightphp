@@ -97,7 +97,6 @@ class Dispatcher {
 		$controller->loadComponents();
 		$controller->beforeFilter();
 		$controller->startUpComponents();
-		$controller->loadModels();
 
 		// Execute action
 		call_user_func_array(array($controller, $methodName), $this->params["passed"]);

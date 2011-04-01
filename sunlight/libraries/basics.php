@@ -74,10 +74,48 @@ function express($expression, $nestingLevel = 0) {
 }
 
 /**
- * Includes core classes as needed.
+ * Includes a PHP file that matches the $className. A match in APP_DIR takes
+ * precedence over a match in CORE_DIR. That means you can soft-replace a file
+ * from CORE_DIR by putting a similar named file into APP_DIR.
+ *
+ * Only certain directories are checked for a matching file. See list in
+ * function.
+ *
+ * $className is converted from camelCase to lower-case underscore notation,
+ * e.g. from "CouchDbDocument" to "couch_db_document.php".
+ *
  * @param string $className
  */
 function __autoload($className) {
-	include CORE_DIR . DS . strtolower($className) . ".php";
+	$filename = ltrim(strtolower(preg_replace('#([A-Z])#', "_$1", $className)), "_") . ".php";
+
+	$possiblePaths = array(
+		APP_DIR . DS . "console",
+		APP_DIR . DS . "controllers",
+		APP_DIR . DS . "controllers" . DS . "components",
+		APP_DIR . DS . "libraries",
+		APP_DIR . DS . "models",
+		APP_DIR . DS . "models" . DS . "couchdb",
+		APP_DIR . DS . "shells",
+		APP_DIR . DS . "views",
+		APP_DIR . DS . "views" . DS . "helpers",
+		CORE_DIR . DS . "console",
+		CORE_DIR . DS . "controllers",
+		CORE_DIR . DS . "controllers" . DS . "components",
+		CORE_DIR . DS . "libraries",
+		CORE_DIR . DS . "models",
+		CORE_DIR . DS . "models" . DS . "couchdb",
+		CORE_DIR . DS . "shells",
+		CORE_DIR . DS . "views",
+		CORE_DIR . DS . "views" . DS . "helpers",
+	);
+
+	foreach ($possiblePaths as $possiblePath) {
+		$possiblePath .= DS . $filename;
+
+		if (is_file($possiblePath)) {
+			return include $possiblePath;
+		}
+	}
 }
 ?>

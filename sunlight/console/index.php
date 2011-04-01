@@ -15,18 +15,11 @@ define("CORE_DIR", ROOT_DIR . DS . "sunlight");
 define("VENDOR_DIR", APP_DIR . DS . "vendors");
 define("WEBROOT_DIR", APP_DIR . DS . "webroot");
 
-// Include some core files
-include(CORE_DIR . DS . "basics.php");
-include(CORE_DIR . DS . "cache.php");
-include(CORE_DIR . DS . "config.php");
-include(CORE_DIR . DS . "log.php");
-include(CORE_DIR . DS . "router.php");
-
-// Include some console files
-include(CORE_DIR . DS . "console" . DS . "shell_dispatcher.php");
+// Include the core file that contains our autoloader
+include CORE_DIR . DS . "libraries" . DS . "basics.php";
 
 // Include config file
-include(APP_DIR . DS . "config" . DS . "core.php");
+include APP_DIR . DS . "config" . DS . "core.php";
 
 // Start a beautiful day of work
 $dispatcher = new ShellDispatcher();
