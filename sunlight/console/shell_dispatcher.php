@@ -51,7 +51,6 @@ class ShellDispatcher {
 			if (preg_match('/^[a-z-]+$/', $this->params["action"])
 					&& method_exists($shell, $methodName)) {
 				$shell->beforeFilter();
-				$shell->loadModels();
 
 				// Execute action
 				call_user_func_array(array($shell, $methodName),  $this->params["passed"]);
