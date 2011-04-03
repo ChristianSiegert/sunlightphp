@@ -87,7 +87,7 @@ class CouchDbDocument extends CouchDb {
 	/**
 	 * Fetches the document from the database. (Fetches the most recent one if
 	 * _rev is not set.)
- 	 * @return $this. (This method is chainable.)
+ 	 * @return CouchDbDocument
 	 * @throws Exception
 	 */
 	public function fetch() {
@@ -124,10 +124,14 @@ class CouchDbDocument extends CouchDb {
 	 * Automatically adds a field "type" if it does not exist already. Its value
 	 * is the document classname.
 	 *
-	 * @return $this. (This method is chainable.)
+	 * @return boolean True if preSave, save and postSave completed successfully, otherwise false
 	 * @throws Exception
 	 */
 	public function save() {
+		if (!$this->preSave()) {
+			return false;
+		}
+
 		$this->requireDatabase();
 		$this->requireId();
 
@@ -146,18 +150,41 @@ class CouchDbDocument extends CouchDb {
 		if ($request->status === 201) {
 			$this->document->_id = $request->response->id;
 			$this->document->_rev = $request->response->rev;
-			return $this;
+
+			return $this->postSave();
 		} else {
 			throw new Exception(self::describeError($request->response));
 		}
 	}
 
 	/**
+	 *  Is fired at the beginning of CouchDbDocument::save() and determines
+	 *  whether it continues or is aborted.
+	 *  @return boolean
+	 */
+	protected function preSave() {
+		return true;
+	}
+
+	/**
+	 * Is fired at the end of CouchDbDocument::save() and determines its
+	 * return value.
+	 * @return boolean
+	 */
+	protected function postSave() {
+		return true;
+	}
+
+	/**
 	 * Deletes the document from the database.
-	 * @return $this. (This method is chainable.)
+	 * @return boolean True if preDelete, delete and postDelete completed successfully, otherwise false
 	 * @throws Exception
 	 */
 	public function delete() {
+		if (!$this->preDelete()) {
+			return false;
+		}
+
 		$this->requireDatabase();
 		$this->requireId();
 		$this->requireRev();
@@ -174,17 +201,36 @@ class CouchDbDocument extends CouchDb {
 		if ($request->status === 200) {
 			$this->document->_id = $request->response->id;
 			$this->document->_rev = $request->response->rev;
-			return $this;
+
+			return $this->postDelete();
 		} else {
 			throw new Exception(self::describeError($request->response));
 		}
 	}
 
 	/**
+	 *  Is fired at the beginning of CouchDbDocument::delete() and determines
+	 *  whether it continues or is aborted.
+	 *  @return boolean
+	 */
+	protected function preDelete() {
+		return true;
+	}
+
+	/**
+	 * Is fired at the end of CouchDbDocument::delete() and determines its
+	 * return value.
+	 * @return boolean
+	 */
+	protected function postDelete() {
+		return true;
+	}
+
+	/**
 	 * Tells the database to include the document's meta field $fieldName in
 	 * the response.
 	 * @param string $fieldName Name of the meta field
-	 * @return $this. (This method is chainable.)
+	 * @return CouchDbDocument
 	 */
 	public function includeMetaField($fieldName) {
 		$fieldName = ltrim($fieldName, "_");
