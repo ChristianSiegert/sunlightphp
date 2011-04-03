@@ -105,7 +105,7 @@ class CouchDbView extends CouchDb {
 
 	/**
 	 * Fetches the view from the database.
-	 * @return $this. (This method is chainable.)
+	 * @return CouchDbView
 	 * @throws Exception
 	 */
 	public function fetch() {
@@ -137,7 +137,7 @@ class CouchDbView extends CouchDb {
 
 	/**
 	 * Fetches the specialized view "_all_docs" from the database.
-	 * @return $this. (This method is chainable.)
+	 * @return CouchDbView
 	 * @throws Exception
 	 */
 	public function fetchAllDocs() {
@@ -162,7 +162,7 @@ class CouchDbView extends CouchDb {
 	/**
 	 * Fills the current object with data from stdClass object.
 	 * @param stdClass $object
-	 * @return $this. (This method is chainable.)
+	 * @return CouchDbView
 	 */
 	protected function createFromObject(stdClass $object) {
 		foreach ($object as $fieldName => $fieldValue) {
@@ -187,7 +187,7 @@ class CouchDbView extends CouchDb {
 	 * Sets querying options that are used for querying the CouchDB view.
 	 * @param string $option Any querying option supported by the CouchDB view
 	 * @param mixed $value
-	 * @return $this. (This method is chainable.)
+	 * @return CouchDbView
 	 */
 	public function setOption($option, $value) {
 		$this->options[$option] = $value;
@@ -197,7 +197,7 @@ class CouchDbView extends CouchDb {
 	/**
 	 * Tells the CouchDB view to only return items that match one of the keys.
 	 * @param array $keys
-	 * @return $this. (This method is chainable.)
+	 * @return CouchDbView
 	 */
 	public function filterByKeys($keys) {
 		$this->keys = $keys;
