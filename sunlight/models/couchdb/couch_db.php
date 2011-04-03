@@ -1,5 +1,23 @@
 <?php
 class CouchDb {
+	protected $databaseHost = "";
+	protected $databaseName = "";
+
+	public function setDatabase($databaseHost, $databaseName) {
+		$this->databaseHost = $databaseHost;
+		$this->databaseName = $databaseName;
+	}
+
+	protected function requireDatabase() {
+		if (empty($this->databaseHost)) {
+			throw new Exception("CouchDB: Please provide the database host.");
+		}
+
+		if (empty($this->databaseName)) {
+			throw new Exception("CouchDB: Please provide the database name.");
+		}
+	}
+
 	protected static function encodeOptions($options) {
 		$encodedOptions = "?";
 
@@ -25,11 +43,13 @@ class CouchDb {
 				case "conflict":
 					switch ($response->reason) {
 						case "Document update conflict.":
-							return "CouchDB: The document could not be updated/deleted.";
+							return "CouchDB: The document could not be updated/deleted due to a conflict.";
 						default: break;
 					}
 				case "not_found":
 					switch ($response->reason) {
+						case "deleted":
+							return "CouchDB: Document '{$arguments[1]}' does not exist anymore.";
 						case "missing":
 							return empty($arguments[2]) ? "CouchDB: Document '{$arguments[1]}' does not exist." : "CouchDB: Document '{$arguments[1]}' with revision '{$arguments[2]}' does not exist.";
 						case "missing_named_view":
