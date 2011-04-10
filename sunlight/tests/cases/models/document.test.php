@@ -3,9 +3,6 @@ include CORE_DIR . DS . "models" . DS . "couchdb" . DS . "couch_db.php";
 include CORE_DIR . DS . "models" . DS . "couchdb" . DS . "couch_db_document.php";
 include CORE_DIR . DS . "models" . DS . "document.php";
 
-// Our mock controller
-#class Controller {}
-
 // Our fake database info
 define("DATABASE_HOST", "empty");
 define("DATABASE_NAME", "empty");

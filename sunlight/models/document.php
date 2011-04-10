@@ -10,21 +10,26 @@ class Document extends CouchDbDocument {
 	/**
 	 * The controller of the document. Can be any object, usually it is an
 	 * instance of "Controller" or "Shell".
-	 * @var stdClass
+	 * @var object
 	 */
 	protected $controller;
 
 	/**
-	 * Constructs the object and sets the database.
+	 * Constructs the Document object and sets the database.
+	 * @param object $controller
 	 * @param string $id Document _id
 	 * @param string $revision Document _rev
 	 */
-	public function __construct(stdClass &$controller, $id, $revision = "") {
+	public function __construct(&$controller, $id, $revision = "") {
 		parent::__construct($id, $revision);
 		$this->setDatabase(DATABASE_HOST, DATABASE_NAME);
 		$this->controller = $controller;
 	}
 
+	/**
+	 * Validates the document and, if it is valid, saves it.
+	 * @see CouchDbDocument::save()
+	 */
 	// TODO: Check whitelist
 	public function save() {
 		if (empty($this->document->type)) {
@@ -41,9 +46,16 @@ class Document extends CouchDbDocument {
 			throw new Exception("Data is not valid.");
 		}
 
-		parent::save();
+		return parent::save();
 	}
 
+	/**
+	 * Validates an object/array based on the provided validation rules.
+	 * @param object|array $document
+	 * @param array $rules Validation rules
+	 * @return array Validation errors
+	 * @throws InvalidArgumentException
+	 */
 	public function validate($document, $rules) {
 		$validationErrors = array();
 
