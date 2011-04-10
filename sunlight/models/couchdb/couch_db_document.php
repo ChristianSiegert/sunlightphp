@@ -39,6 +39,13 @@ class CouchDbDocument extends CouchDb {
 	}
 
 	/**
+	 * Copies referenced objects to avoid sharing them.
+	 */
+	public function __clone() {
+		$this->document = clone $this->document;
+	}
+
+	/**
 	 * Returns a document field (only if the read request comes from outside the
 	 * class).
 	 * @param string $fieldName
@@ -49,12 +56,13 @@ class CouchDbDocument extends CouchDb {
 
 	/**
 	 * Writes to a document field (only if the write request comes from outside
-	 * class).
+	 * class). If $fieldValue is an associative array, it is converted to a
+	 * stdClass object.
 	 * @param string $fieldName
 	 * @param mixed $fieldValue
 	 */
 	public function __set($fieldName, $fieldValue) {
-		$this->document->$fieldName = $fieldValue;
+		$this->document->$fieldName = json_decode(json_encode($fieldValue));
 	}
 
 	/**
@@ -258,6 +266,29 @@ class CouchDbDocument extends CouchDb {
 		}
 	}
 
+	public function merge($thing) {
+		$this->document = self::mergeRecursively($this->document, $thing);
+	}
+
+	protected static function mergeRecursively($thing1, $thing2) {
+		$thing1 = json_decode(json_encode($thing1));
+		$thing2 = json_decode(json_encode($thing2));
+
+		foreach ($thing2 as $fieldName => $fieldValue) {
+			if (isset($thing1->$fieldName) && is_object($fieldValue)) {
+				$thing1->$fieldName = self::mergeRecursively($thing1->$fieldName, $thing2->$fieldName);
+			} else {
+				$thing1->$fieldName = $fieldValue;
+			}
+		}
+
+		return $thing1;
+	}
+
+	public function toArray() {
+		return json_decode(json_encode($this->document), true);
+	}
+
 	/**
 	 * Creates a CouchDbDocument object, fills it with data from $array and
 	 * returns it.
@@ -297,20 +328,5 @@ class CouchDbDocument extends CouchDb {
 
 		return $document;
 	}
-
-
-	/*
-	public function fieldExists($name) {
-
-	}
-
-	public function whitelist() {
-
-	}
-
-	public function validate($validationRules) {
-
-	}
-	*/
 }
 ?>
