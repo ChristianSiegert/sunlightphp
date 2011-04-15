@@ -48,8 +48,8 @@ if (Config::read("debug") > 0) {
 	$memoryUsage = ceil(memory_get_usage() / 1024) . " KiB";
 	$memoryPeakUsage = ceil(memory_get_peak_usage() / 1024) . " KiB";
 	$executionTime = round((microtime(true) - $startTime) * 1000, 1);
-	$queryCount = class_exists("Model", false) ? (Model::$queryCount === 1 ? "1 query" : Model::$queryCount . " queries" ) : "0 queries";
-	printf('<pre style="clear: both; color: #444; margin: 2em 0 0;">Memory: %s (Peak: %s)<br />%sms (%s)<br />', $memoryUsage, $memoryPeakUsage, $executionTime, $queryCount);
+	$requestCount = class_exists("HttpRequest", false) ? (HttpRequest::getCount() === 1 ? "1 query" : HttpRequest::getCount() . " queries" ) : "0 queries";
+	printf('<pre style="clear: both; color: #444; margin: 2em 0 0;">Memory: %s (Peak: %s)<br />%sms (%s)<br />', $memoryUsage, $memoryPeakUsage, $executionTime, $requestCount);
 	printf('Cache hits:   %d<br />Cache misses: %d</pre>', Cache::$writeCount <= Cache::$readCount ? Cache::$readCount - Cache::$writeCount : 0, Cache::$writeCount);
 
 	if (Config::read("debug") > 1) {
