@@ -266,17 +266,28 @@ class CouchDbDocument extends CouchDb {
 		}
 	}
 
+	/**
+	 * Merges $thing recursively with the document. Fields in $thing supersede
+	 * similarly named fields in the document.
+	 * @param array|object $thing
+	 */
 	public function merge($thing) {
-		$this->document = self::mergeRecursively($this->document, $thing);
+		$this->document = self::_merge($this->document, $thing);
 	}
 
-	protected static function mergeRecursively($thing1, $thing2) {
+	/**
+	 * Merges two things recursively. Fields in $thing2 supersede similarly
+	 * named fields in $thing1.
+	 * @param array|object $thing1
+	 * @param array|object $thing2
+	 */
+	protected static function _merge($thing1, $thing2) {
 		$thing1 = json_decode(json_encode($thing1));
 		$thing2 = json_decode(json_encode($thing2));
 
 		foreach ($thing2 as $fieldName => $fieldValue) {
 			if (isset($thing1->$fieldName) && is_object($fieldValue)) {
-				$thing1->$fieldName = self::mergeRecursively($thing1->$fieldName, $thing2->$fieldName);
+				$thing1->$fieldName = self::_merge($thing1->$fieldName, $thing2->$fieldName);
 			} else {
 				$thing1->$fieldName = $fieldValue;
 			}
