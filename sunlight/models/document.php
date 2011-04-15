@@ -5,7 +5,15 @@ class Document extends CouchDbDocument {
 	 * the document.
 	 * @var array
 	 */
-	public $validationRules = array();
+	protected $validationRules = array();
+
+	/**
+	 * Contains a list of fields that are allowed to be present when saving the
+	 * document. Fields that are in the document but not in this list are
+	 * regarded as hostile. Saving the document will then be prohibited.
+	 * @var array
+	 */
+	protected $whitelist = array();
 
 	/**
 	 * The controller of the document. Can be any object, usually it is an
@@ -13,6 +21,15 @@ class Document extends CouchDbDocument {
 	 * @var object
 	 */
 	protected $controller;
+
+	/**
+	 * Exception codes.
+	 * @var integer
+	 */
+	const EXCEPTION_INVALID_DATA = 1;
+	const EXCEPTION_MISSING_WHITELIST = 2;
+	const EXCEPTION_MISSING_VALIDATION_RULES = 3;
+	const EXCEPTION_NON_WHITELISTED_FIELD_PRESENT = 4;
 
 	/**
 	 * Constructs the Document object and sets the database.
@@ -30,23 +47,85 @@ class Document extends CouchDbDocument {
 	 * Validates the document and, if it is valid, saves it.
 	 * @see CouchDbDocument::save()
 	 */
-	// TODO: Check whitelist
 	public function save() {
 		if (empty($this->document->type)) {
 			$this->document->type = get_class($this);
 		}
 
 		if (empty($this->validationRules)) {
-			throw new Exception("Please define validation rules for document type '{$this->document->type}'.");
+			throw new Exception("Please define validation rules for document type '{$this->document->type}'.", self::EXCEPTION_MISSING_VALIDATION_RULES);
 		}
 
 		$this->controller->validationErrors = $this->validate($this, $this->validationRules);
 
 		if (!empty($this->controller->validationErrors)) {
-			throw new Exception("Data is not valid.");
+			throw new Exception("Data did not validate successfully.", self::EXCEPTION_INVALID_DATA);
 		}
 
 		return parent::save();
+	}
+
+	/**
+	 * Sets the whitelist.
+	 * @param array $whitelist
+	 */
+	public function setWhitelist($whitelist) {
+		$this->whitelist = $whitelist;
+	}
+
+	/**
+	 * Merges $thing recursively with the document. Fields in $thing supersede
+	 * similarly named fields in the document.
+	 * @param array|object $thing
+	 */
+
+	/**
+	 * Merges $thing recursively with the document. Fields in $thing supersede
+	 * similarly named fields in the document. The fields in $thing must be
+	 * whitelisted.
+	 * @see CouchDbDocument::merge()
+	 * @throws Exception
+	 */
+	public function merge($thing) {
+		if (empty($this->whitelist)) {
+			throw new Exception("Please set a whitelist before the merge.", self::EXCEPTION_MISSING_WHITELIST);
+		}
+
+		$thing = json_decode(json_encode($thing));
+
+		$result = self::checkAgainstWhitelist($thing, $this->whitelist);
+
+		if ($result !== true) {
+			throw new Exception("Data contains non-whitelisted field '$result'", self::EXCEPTION_NON_WHITELISTED_FIELD_PRESENT);
+		}
+
+		parent::merge($thing);
+	}
+
+	/**
+	 * Returns true if all fields in the document are whitelisted, otherwise it
+	 * returns the name of the first field that is not whitelisted.
+	 *
+	 * @param mixed $thing
+	 * @param array $whitelist
+	 * @return mixed
+	 */
+	protected static function checkAgainstWhitelist($document, $whitelist) {
+		$document = json_decode(json_encode($document));
+
+		foreach ($document as $fieldName => $fieldValue) {
+			if (is_object($fieldValue)) {
+				if (isset($whitelist[$fieldName]) && ($fieldName = self::checkAgainstWhitelist($fieldValue, $whitelist[$fieldName])) === true) {
+					continue;
+				}
+			} elseif (in_array($fieldName, $whitelist)) {
+				continue;
+			}
+
+			return $fieldName;
+		}
+
+		return true;
 	}
 
 	/**
