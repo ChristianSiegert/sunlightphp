@@ -5,10 +5,10 @@
  */
 
 // 0: Disable debugging, 1: Enable debugging
-Config::write("debug", 1);
+Libraries\Config::write("debug", 1);
 
 // Connect URLs to a specific controller and/or action.
-Router::connect("/", array("controller" => "pages", "action" => "home"));
+Libraries\Router::connect("/", array("controller" => "pages", "action" => "home"));
 
 // Database settings
 define("DATABASE_HOST", "http://localhost:5984");

@@ -1,12 +1,14 @@
 <?php
-include(CORE_DIR . DS . "controllers" . DS . "components" . DS . "email.php");
+use Controllers\Components\Email as Email;
+
+require CORE_DIR . DS . "controllers" . DS . "components" . DS . "email.php";
 
 class EmailComponentDataTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider isValidAddressDataProvider
 	 */
 	public function testIsValidAddress($address, $expected) {
-		$email = new EmailComponent();
+		$email = new Email();
 		$result = $email->isValidAddress($address);
 		$this->assertSame($expected, $result);
 	}

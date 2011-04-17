@@ -4,6 +4,9 @@ This log documents changes made to SunlightPHP that break previous installations
 
 ## 2011
 
+* **2011-04-17** Added namespaces.
+* **2011-04-10** Removed class AppModel in favor of AppDocument and AppView.
+* **2011-04-01** Moved core files from core/ to core/libraries/.
 * **2011-03-16** Model::validationRules has a new structure. 
 * **2011-03-05** Model::documentExists() can now throw an exception. Wrap it in a try-catch-block if you use it.
 * **2011-02-19** Added second, required, parameter to `Controller->set()`. Changed type of first parameter from `array` to `string`.

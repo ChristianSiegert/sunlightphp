@@ -1,5 +1,7 @@
 <?php
-include(CORE_DIR . DS . "element.php");
+use Libraries\Element as Element;
+
+require CORE_DIR . DS . "libraries" . DS . "element.php";
 
 class ElementDataTest extends PHPUnit_Framework_TestCase {
 	/**

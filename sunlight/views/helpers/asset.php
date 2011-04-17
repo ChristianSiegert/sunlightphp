@@ -1,5 +1,12 @@
 <?php
-class AssetHelper extends Helper {
+namespace Views\Helpers;
+
+use Libraries\Cache as Cache;
+use Libraries\Config as Config;
+use Libraries\Element as Element;
+use Libraries\Log as Log;
+
+class Asset extends Helper {
 	protected $assets = array(
 		"css" => array(),
 		"js" => array()

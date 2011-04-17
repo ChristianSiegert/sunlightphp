@@ -1,4 +1,6 @@
 <?php
+namespace Libraries;
+
 class Dispatcher {
 	public $params = array(
 		"url" => "",
@@ -45,13 +47,6 @@ class Dispatcher {
 	}
 
 	public function dispatch() {
-		// Include controller file
-		include(CORE_DIR . DS . "controllers" . DS . "controller.php");
-
-		// Include app controller file
-		$appControllerFile = DS . "controllers" . DS . "app_controller.php";
-		include(is_file(APP_DIR . $appControllerFile) ? APP_DIR . $appControllerFile : CORE_DIR . $appControllerFile);
-
 		// Include custom controller file
 		$customControllerFile = DS . "controllers" . DS . str_replace("-", "_", $this->params["controller"]) . "_controller.php";
 
@@ -60,7 +55,7 @@ class Dispatcher {
 			include(APP_DIR . $customControllerFile);
 
 			// Create controller object
-			$controllerClassName = str_replace("-", "", mb_convert_case($this->params["controller"], MB_CASE_TITLE)) . "Controller";
+			$controllerClassName = "Controllers\\" . str_replace("-", "", mb_convert_case($this->params["controller"], MB_CASE_TITLE)) . "Controller";
 			$controller = new $controllerClassName($this->params);
 
 			$methodName = str_replace("-", "_", $this->params["action"]);
@@ -80,7 +75,7 @@ class Dispatcher {
 			$this->params["controller"] = "errors";
 			$this->params["action"] = "error-404";
 
-			$controller = new ErrorsController($this->params);
+			$controller = new \Controllers\ErrorsController($this->params);
 			$methodName = str_replace("-", "_", $this->params["action"]);
 		}
 
@@ -97,7 +92,6 @@ class Dispatcher {
 		$controller->loadComponents();
 		$controller->beforeFilter();
 		$controller->startUpComponents();
-		$controller->loadModels();
 
 		// Execute action
 		call_user_func_array(array($controller, $methodName), $this->params["passed"]);

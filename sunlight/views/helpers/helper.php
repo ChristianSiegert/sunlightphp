@@ -1,4 +1,6 @@
 <?php
+namespace Views\Helpers;
+
 class Helper {
 	public $data;
 	public $helpers = array();

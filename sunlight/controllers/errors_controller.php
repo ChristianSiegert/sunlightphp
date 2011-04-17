@@ -1,4 +1,6 @@
 <?php
+namespace Controllers;
+
 class ErrorsController extends AppController {
 	public $components = array("Session");
 

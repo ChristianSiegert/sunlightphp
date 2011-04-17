@@ -1,4 +1,6 @@
 <?php
+namespace Libraries;
+
 class Router {
 	public static $params;
 

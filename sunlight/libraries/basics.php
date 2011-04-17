@@ -58,17 +58,59 @@ function express($expression, $nestingLevel = 0) {
 			$output .= ")";
 			return $output;
 		case "object":
-			return "(... object ...)";
+			$output = get_class($expression) . " object (";
+
+			foreach ($expression as $key => $value) {
+				$output .= "\n" . str_repeat("    ", $nestingLevel + 1) . express($key) . " => " . express($value, $nestingLevel + 1) . ",";
+			}
+
+			$output = preg_replace("/,$/", "\n" . str_repeat("    ", $nestingLevel), $output);
+
+			$output .= ")";
+			return $output;
 		default:
 			return "($type) $expression";
 	}
 }
 
 /**
- * Includes core classes as needed.
+ * Includes a PHP file that matches the $className. A match in APP_DIR takes
+ * precedence over a match in CORE_DIR. That means you can soft-replace a file
+ * from CORE_DIR by putting a similarly named file into APP_DIR.
+ *
+ * The location of the file is derived from its namespace, e.g. the file for
+ * class "Models\CouchDb\CouchDbDocument" is expected to be "models/couch_db/couch_db_document.php".
+ *
+ * Please note that the filename is $className converted from camelCase to
+ * lower-case underscore notation.
+ *
+ * We use this rigid naming scheme to make autoloading efficient. If you prefer
+ * another naming scheme, soft-replace basics.php and use your custom
+ * __autoload() function. You could also simply include files by hand so the
+ * autoloader is not triggered.
+ *
  * @param string $className
  */
 function __autoload($className) {
-	include CORE_DIR . DS . strtolower($className) . ".php";
+	$pieces = explode("\\", $className);
+
+	foreach ($pieces as &$piece) {
+		$piece = ltrim(strtolower(preg_replace('#([A-Z])#', "_$1", $piece)), "_");
+	}
+
+	$partialFilename = implode(DS, $pieces) . ".php";
+
+	$possiblePaths = array(
+		APP_DIR,
+		CORE_DIR,
+	);
+
+	foreach ($possiblePaths as $possiblePath) {
+		$filename = $possiblePath . DS . $partialFilename;
+
+		if (is_file($filename)) {
+			return require $filename;
+		}
+	}
 }
 ?>

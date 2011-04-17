@@ -1,5 +1,7 @@
 <?php
-include(CORE_DIR . DS . "sanitizer.php");
+use Libraries\Sanitizer as Sanitizer;
+
+require CORE_DIR . DS . "libraries" . DS . "sanitizer.php";
 
 class SanitizerDataTest extends PHPUnit_Framework_TestCase {
 	/**

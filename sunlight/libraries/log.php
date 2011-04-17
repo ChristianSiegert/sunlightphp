@@ -1,4 +1,6 @@
 <?php
+namespace Libraries;
+
 class Log {
 	/**
 	 * Writes a message to the specified log file.

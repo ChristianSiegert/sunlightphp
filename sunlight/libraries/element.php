@@ -1,4 +1,6 @@
 <?php
+namespace Libraries;
+
 class Element {
 	protected $tag;
 	protected $attributes = array();

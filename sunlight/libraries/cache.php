@@ -1,11 +1,15 @@
 <?php
+namespace Libraries;
+
+use \Memcache as Memcache;
+
 class Cache {
-	private static $memcache = null;
+	protected static $memcache = null;
 
 	public static $readCount = 0;
 	public static $writeCount = 0;
 
-	private static function readyMemcache() {
+	protected static function readyMemcache() {
 		if (self::$memcache === null) {
 			self::$memcache = new Memcache();
 			self::$memcache->connect("localhost", 11211);

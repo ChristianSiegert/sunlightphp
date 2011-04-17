@@ -1,4 +1,8 @@
 <?php
+namespace Views;
+
+use Libraries\Config as Config;
+
 class View {
 	private $controller;
 
@@ -28,14 +32,14 @@ class View {
 
 	private function loadHelpers() {
 		// Include core helper file
-		include(CORE_DIR . DS . "views" . DS . "helper.php");
+		include(CORE_DIR . DS . "views" . DS . "helpers" . DS . "helper.php");
 
 		for ($i = 0; $i < count($this->helpers); $i++) {
 			// Include helper file
 			include(CORE_DIR . DS . "views" . DS . "helpers" . DS . strtolower($this->helpers[$i]) . ".php");
 
 			// Instantiate helper
-			$helperClassName = $this->helpers[$i] . "Helper";
+			$helperClassName = "Views\\Helpers\\" . $this->helpers[$i];
 			$helperObject = ${strtolower($this->helpers[$i])} = new $helperClassName($this);
 
 			// Queue all helpers that this helper requires for loading

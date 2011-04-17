@@ -1,5 +1,7 @@
 <?php
-class TimeHelper extends Helper {
+namespace Views\Helpers;
+
+class Time extends Helper {
 	public function timeAgoInWords($timestamp) {
 		$delta = time() - $timestamp;
 
