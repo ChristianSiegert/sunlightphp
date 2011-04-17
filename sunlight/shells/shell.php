@@ -1,4 +1,6 @@
 <?php
+namespace Shells;
+
 class Shell {
 	public $models = array();
 

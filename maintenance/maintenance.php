@@ -34,7 +34,7 @@ $errors = array();
 
 if (defined("APC_IS_ENABLED") && defined("MEMCACHE_IS_ENABLED")) {
 	if (isset($_GET["cache"]) && $_GET["cache"] === "clear") {
-		Cache::clear();
+		Libraries\Cache::clear();
 		header("Location: ?cache=cleared");
 		exit;
 	}

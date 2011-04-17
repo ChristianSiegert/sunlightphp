@@ -1,4 +1,6 @@
 <?php
+namespace Libraries;
+
 class Sanitizer {
 	public static function encodeHtml($string, $doubleEncode = false) {
 		return htmlentities($string, ENT_QUOTES, mb_internal_encoding(), $doubleEncode);
@@ -11,7 +13,7 @@ class Sanitizer {
 	public static function normalize($string) {
 		// Map characters with diacritics to their base-character followed by
 		// the diacritical mark, i.e.  Ú => U´ and á => a`
-		$string = Normalizer::normalize($string, Normalizer::FORM_D);
+		$string = \Normalizer::normalize($string, \Normalizer::FORM_D);
 
 		// Remove diacritics
 		$string = preg_replace('/\pM/u', "", $string);

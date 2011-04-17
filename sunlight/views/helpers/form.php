@@ -1,5 +1,12 @@
 <?php
-class FormHelper extends Helper {
+namespace Views\Helpers;
+
+use \Exception as Exception;
+use \Libraries\Element as Element;
+use \Libraries\Router as Router;
+use \Libraries\Sanitizer as Sanitizer;
+
+class Form extends Helper {
 	protected function sanitizeFieldName($fieldName) {
 		return trim(preg_replace('#[^a-z0-9\-]#', "-", mb_convert_case($fieldName, MB_CASE_LOWER)), "-");
 	}

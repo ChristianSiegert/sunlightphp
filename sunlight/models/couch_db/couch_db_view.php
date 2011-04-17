@@ -1,4 +1,9 @@
 <?php
+namespace Models\CouchDb;
+
+use \Exception as Exception;
+use Libraries\HttpRequest as HttpRequest;
+
 class CouchDbView extends CouchDb {
 	/**
 	 * Name of the CouchDB design.
@@ -58,7 +63,7 @@ class CouchDbView extends CouchDb {
 	public function __construct($designName = "", $viewName = "") {
 		$this->designName = $designName;
 		$this->viewName = $viewName;
-		$this->view = new stdClass();
+		$this->view = new \stdClass();
 	}
 
 	/**
@@ -164,7 +169,7 @@ class CouchDbView extends CouchDb {
 	 * @param stdClass $object
 	 * @return CouchDbView
 	 */
-	protected function createFromObject(stdClass $object) {
+	protected function createFromObject(\stdClass $object) {
 		foreach ($object as $fieldName => $fieldValue) {
 			$this->view->$fieldName = $fieldValue;
 		}

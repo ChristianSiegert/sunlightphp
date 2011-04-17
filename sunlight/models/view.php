@@ -1,5 +1,7 @@
 <?php
-class View extends CouchDbView {
+namespace Models;
+
+class View extends CouchDb\CouchDbView {
 	/**
 	 * Constructs the object and sets the database.
 	 * @param string $designName

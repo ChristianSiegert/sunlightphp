@@ -1,5 +1,9 @@
 <?php
-class SessionComponent {
+namespace Controllers\Components;
+
+use Libraries\Element as Element;
+
+class Session {
 	/**
 	 * Contains the session data.
 	 * @var array

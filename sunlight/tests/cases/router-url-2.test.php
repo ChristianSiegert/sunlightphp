@@ -1,5 +1,7 @@
 <?php
-include(CORE_DIR . DS . "router.php");
+use Libraries\Router as Router;
+
+require CORE_DIR . DS . "libraries" . DS . "router.php";
 
 class RouterUrlDataTest1 extends PHPUnit_Framework_TestCase {
 	protected function setUp() {

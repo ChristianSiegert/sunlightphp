@@ -1,4 +1,6 @@
 <?php
+namespace Console;
+
 class ShellDispatcher {
 	public $params = array(
 		"controller" => "",
@@ -29,13 +31,6 @@ class ShellDispatcher {
 	}
 
 	public function dispatch() {
-		// Include shell file
-		include(CORE_DIR . DS . "shells" . DS . "shell.php");
-
-		// Include app shell file
-		$appShellFile = DS . "shells" . DS . "app_shell.php";
-		include(is_file(APP_DIR . $appShellFile) ? APP_DIR . $appShellFile : CORE_DIR . $appShellFile);
-
 		// Include custom shell file
 		$customShellFile = APP_DIR . DS . "shells" . DS . $this->params["shell"] . "_shell.php";
 
@@ -43,7 +38,7 @@ class ShellDispatcher {
 				&& is_file($customShellFile)) {
 			include($customShellFile);
 
-			$shellClassName = ucfirst($this->params["shell"]) . "Shell";
+			$shellClassName = "Shells\\" . ucfirst($this->params["shell"]) . "Shell";
 			$shell = new $shellClassName($this->params);
 
 			$methodName = str_replace("-", "_", $this->params["action"]);

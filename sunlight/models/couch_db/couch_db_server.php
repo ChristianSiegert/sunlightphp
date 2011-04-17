@@ -1,4 +1,9 @@
 <?php
+namespace Models\CouchDb;
+
+use \Exception as Exception;
+use Libraries\HttpRequest as HttpRequest;
+
 class CouchDbServer extends CouchDb {
 	public function compactDatabase() {
 		$this->requireDatabase();

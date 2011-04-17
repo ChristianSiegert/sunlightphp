@@ -1,4 +1,8 @@
 <?php
+namespace Libraries;
+
+use \Exception as Exception;
+
 class Feed {
 	public function atom($feedElements, $posts) {
 		if (!isset($feedElements["id"])) {

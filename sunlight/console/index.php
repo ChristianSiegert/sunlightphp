@@ -22,20 +22,20 @@ include CORE_DIR . DS . "libraries" . DS . "basics.php";
 include APP_DIR . DS . "config" . DS . "core.php";
 
 // Start a beautiful day of work
-$dispatcher = new ShellDispatcher();
+$dispatcher = new Console\ShellDispatcher();
 $dispatcher->parseParams();
 $dispatcher->dispatch();
 
 // Append statistics when debugging
-if (Config::read("debug") > 0) {
+if (Libraries\Config::read("debug") > 0) {
 	$memoryUsage = ceil(memory_get_usage() / 1024) . " KiB";
 	$memoryPeakUsage = ceil(memory_get_peak_usage() / 1024) . " KiB";
 	$executionTime = round((microtime(true) - $startTime) * 1000, 1);
-	$requestCount = class_exists("HttpRequest", false) ? (HttpRequest::getCount() === 1 ? "1 query" : HttpRequest::getCount() . " queries" ) : "0 queries";
+	$requestCount = class_exists("HttpRequest", false) ? (Libraries\HttpRequest::getCount() === 1 ? "1 query" : Libraries\HttpRequest::getCount() . " queries" ) : "0 queries";
 	printf("\n\nMemory: %s (Peak: %s)\n%sms (%s)\n", $memoryUsage, $memoryPeakUsage, $executionTime, $requestCount);
-	printf("Cache hits:   %d\nCache misses: %d\n\n", Cache::$writeCount <= Cache::$readCount ? Cache::$readCount - Cache::$writeCount : 0, Cache::$writeCount);
+	printf("Cache hits:   %d\nCache misses: %d\n\n", Libraries\Cache::$writeCount <= Libraries\Cache::$readCount ? Libraries\Cache::$readCount - Libraries\Cache::$writeCount : 0, Libraries\Cache::$writeCount);
 
-	if (Config::read("debug") > 1) {
+	if (Libraries\Config::read("debug") > 1) {
 		debug(get_included_files());
 	}
 }

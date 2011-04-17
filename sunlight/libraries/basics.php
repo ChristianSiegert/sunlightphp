@@ -76,45 +76,40 @@ function express($expression, $nestingLevel = 0) {
 /**
  * Includes a PHP file that matches the $className. A match in APP_DIR takes
  * precedence over a match in CORE_DIR. That means you can soft-replace a file
- * from CORE_DIR by putting a similar named file into APP_DIR.
+ * from CORE_DIR by putting a similarly named file into APP_DIR.
  *
- * Only certain directories are checked for a matching file. See list in
- * function.
+ * The location of the file is derived from its namespace, e.g. the file for
+ * class "Models\CouchDb\CouchDbDocument" is expected to be "models/couch_db/couch_db_document.php".
  *
- * $className is converted from camelCase to lower-case underscore notation,
- * e.g. from "CouchDbDocument" to "couch_db_document.php".
+ * Please note that the filename is $className converted from camelCase to
+ * lower-case underscore notation.
+ *
+ * We use this rigid naming scheme to make autoloading efficient. If you prefer
+ * another naming scheme, soft-replace basics.php and use your custom
+ * __autoload() function. You could also simply include files by hand so the
+ * autoloader is not triggered.
  *
  * @param string $className
  */
 function __autoload($className) {
-	$filename = ltrim(strtolower(preg_replace('#([A-Z])#', "_$1", $className)), "_") . ".php";
+	$pieces = explode("\\", $className);
+
+	foreach ($pieces as &$piece) {
+		$piece = ltrim(strtolower(preg_replace('#([A-Z])#', "_$1", $piece)), "_");
+	}
+
+	$partialFilename = implode(DS, $pieces) . ".php";
 
 	$possiblePaths = array(
-		APP_DIR . DS . "console",
-		APP_DIR . DS . "controllers",
-		APP_DIR . DS . "controllers" . DS . "components",
-		APP_DIR . DS . "libraries",
-		APP_DIR . DS . "models",
-		APP_DIR . DS . "models" . DS . "couchdb",
-		APP_DIR . DS . "shells",
-		APP_DIR . DS . "views",
-		APP_DIR . DS . "views" . DS . "helpers",
-		CORE_DIR . DS . "console",
-		CORE_DIR . DS . "controllers",
-		CORE_DIR . DS . "controllers" . DS . "components",
-		CORE_DIR . DS . "libraries",
-		CORE_DIR . DS . "models",
-		CORE_DIR . DS . "models" . DS . "couchdb",
-		CORE_DIR . DS . "shells",
-		CORE_DIR . DS . "views",
-		CORE_DIR . DS . "views" . DS . "helpers",
+		APP_DIR,
+		CORE_DIR,
 	);
 
 	foreach ($possiblePaths as $possiblePath) {
-		$possiblePath .= DS . $filename;
+		$filename = $possiblePath . DS . $partialFilename;
 
-		if (is_file($possiblePath)) {
-			return include $possiblePath;
+		if (is_file($filename)) {
+			return require $filename;
 		}
 	}
 }

@@ -1,6 +1,8 @@
 <?php
-include CORE_DIR . DS . "models" . DS . "couchdb" . DS . "couch_db.php";
-include CORE_DIR . DS . "models" . DS . "couchdb" . DS . "couch_db_document.php";
+use Models\CouchDb\CouchDbDocument as CouchDbDocument;
+
+include CORE_DIR . DS . "models" . DS . "couch_db" . DS . "couch_db.php";
+include CORE_DIR . DS . "models" . DS . "couch_db" . DS . "couch_db_document.php";
 
 class CouchDbDocumentDataTest extends PHPUnit_Framework_TestCase {
 	/**

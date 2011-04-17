@@ -1,4 +1,8 @@
 <?php
+namespace Models\CouchDb;
+
+use \Exception as Exception;
+
 class CouchDb {
 	protected $databaseHost = "";
 	protected $databaseName = "";

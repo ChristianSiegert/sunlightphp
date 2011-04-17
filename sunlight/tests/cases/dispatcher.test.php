@@ -1,5 +1,5 @@
 <?php
-include(CORE_DIR . DS . "dispatcher.php");
+namespace Libraries;
 
 class Router {
 	public static function getRoute() {
@@ -7,9 +7,11 @@ class Router {
 	}
 }
 
+require CORE_DIR . DS . "libraries" . DS . "dispatcher.php";
+
 // Use assertEquals to compare arrays if key order unimportant.
 
-class DispatcherDataTest extends PHPUnit_Framework_TestCase {
+class DispatcherDataTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider parseParamsDataProvider
 	 */

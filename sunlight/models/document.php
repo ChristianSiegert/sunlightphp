@@ -1,5 +1,10 @@
 <?php
-class Document extends CouchDbDocument {
+namespace Models;
+
+use \Exception as Exception;
+use \InvalidArgumentException as InvalidArgumentException;
+
+class Document extends CouchDb\CouchDbDocument {
 	/**
 	 * Contains the validation rules that are used to validate the content of
 	 * the document.

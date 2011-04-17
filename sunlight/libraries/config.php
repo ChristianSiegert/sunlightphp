@@ -1,4 +1,6 @@
 <?php
+namespace Libraries;
+
 class Config {
 	protected static $config = array();
 

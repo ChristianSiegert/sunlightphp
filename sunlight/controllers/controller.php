@@ -1,4 +1,8 @@
 <?php
+namespace Controllers;
+
+use Libraries\Router as Router;
+
 class Controller {
 	public $components = array("Session");
 
@@ -33,9 +37,9 @@ class Controller {
 	public function loadComponents() {
 		// Load components
 		for ($i = 0; $i < count($this->components); $i++) {
-			include(CORE_DIR . DS . "controllers" . DS . "components" . DS . strtolower($this->components[$i]) . ".php");
+			require CORE_DIR . DS . "controllers" . DS . "components" . DS . strtolower($this->components[$i]) . ".php";
 
-			$componentClassName = $this->components[$i] . "Component";
+			$componentClassName = "Controllers\\Components\\" . $this->components[$i];
 			$componentObject = $this->{$this->components[$i]} = new $componentClassName($this);
 
 			if (isset($componentObject->components)) {
@@ -65,10 +69,10 @@ class Controller {
 
 	public function render() {
 		// Include core view file
-		include(CORE_DIR . DS . "views" . DS . "view.php");
+		require CORE_DIR . DS . "views" . DS . "view.php";
 
 		// Load view
-		$view = new View($this);
+		$view = new \Views\View($this);
 		$contentForLayout = $view->renderAction();
 		$document = $view->renderLayout($contentForLayout, $this->removeWhitespace);
 

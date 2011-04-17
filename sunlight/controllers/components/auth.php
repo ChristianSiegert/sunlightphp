@@ -1,5 +1,7 @@
 <?php
-class AuthComponent {
+namespace Controllers\Components;
+
+class Auth {
 	public $components = array("Session");
 
 	protected $allowedActions = array();

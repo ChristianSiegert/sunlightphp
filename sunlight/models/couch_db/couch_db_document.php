@@ -1,4 +1,9 @@
 <?php
+namespace Models\CouchDb;
+
+use \Exception as Exception;
+use Libraries\HttpRequest as HttpRequest;
+
 class CouchDbDocument extends CouchDb {
 	/**
 	 * Contains the actual document.
@@ -30,7 +35,7 @@ class CouchDbDocument extends CouchDb {
 	 * @param string $revision Document _rev
 	 */
 	public function __construct($id, $revision = "") {
-		$this->document = new stdClass();
+		$this->document = new \stdClass();
 		$this->document->_id = $id;
 
 		if (!empty($revision)) {

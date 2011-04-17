@@ -1,13 +1,13 @@
 <?php
-include CORE_DIR . DS . "models" . DS . "couchdb" . DS . "couch_db.php";
-include CORE_DIR . DS . "models" . DS . "couchdb" . DS . "couch_db_document.php";
+include CORE_DIR . DS . "models" . DS . "couch_db" . DS . "couch_db.php";
+include CORE_DIR . DS . "models" . DS . "couch_db" . DS . "couch_db_document.php";
 include CORE_DIR . DS . "models" . DS . "document.php";
 
 // Our fake database info
 define("DATABASE_HOST", "empty");
 define("DATABASE_NAME", "empty");
 
-class TestDocument extends Document {
+class TestDocument extends Models\Document {
 	public static function checkAgainstWhitelist($document, $whitelist) {
 		return parent::checkAgainstWhitelist($document, $whitelist);
 	}
@@ -495,14 +495,14 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 		$dataProvider = array();
 
 		// 0 fields, 0 rules, 0 expected validation errors
-		$document = new Document(new stdClass(), "test");
+		$document = new Models\Document(new stdClass(), "test");
 		$rules = array();
 		$expectedValidationErrors = array();
 
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
 
 		// 0 fields, 1 rule, 1 expected validation error
-		$document = new Document(new stdClass(), "test");
+		$document = new Models\Document(new stdClass(), "test");
 
 		$rules = array(
 			"foo" => array(
@@ -522,7 +522,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
 
 		// 1 field, 1 rule, 0 expected validation errors
-		$document = new Document(new stdClass(), "test");
+		$document = new Models\Document(new stdClass(), "test");
 		$document->foo = 3;
 
 		$rules = array(
@@ -536,7 +536,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
 
 		// 1 field, 1 rule, 1 expected validation error
-		$document = new Document(new stdClass(), "test");
+		$document = new Models\Document(new stdClass(), "test");
 		$document->foo = "3";
 
 		$rules = array(
@@ -556,7 +556,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
 
-		$document = new Document(new stdClass(), "test");
+		$document = new Models\Document(new stdClass(), "test");
 		$document->foo_a = "bar_a";
 		$document->foo_b = "bar_b";
 		$document->foo_c = "bar_c";

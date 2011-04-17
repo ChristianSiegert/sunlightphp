@@ -1,5 +1,7 @@
 <?php
-class SessionHelper {
+namespace Views\Helpers;
+
+class Session {
 	/**
 	 * Contains the session data.
 	 * @var array

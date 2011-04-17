@@ -1,5 +1,7 @@
 <?php
-class EmailComponent {
+namespace Controllers\Components;
+
+class Email {
 	public $from = null;
 
 	public $to = null;

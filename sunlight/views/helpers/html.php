@@ -1,5 +1,10 @@
 <?php
-class HtmlHelper extends Helper {
+namespace Views\Helpers;
+
+use Libraries\Element as Element;
+use Libraries\Router as Router;
+
+class Html extends Helper {
 	protected $crumbs = array();
 
 	protected $meta = array();
