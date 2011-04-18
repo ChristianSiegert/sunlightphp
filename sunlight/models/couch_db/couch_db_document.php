@@ -331,7 +331,7 @@ class CouchDbDocument extends CouchDb {
 	 * @param stdClass $object
 	 * @return CouchDbDocument
 	 */
-	public static function createFromObject(stdClass $object) {
+	public static function createFromObject(\stdClass $object) {
 		if (!isset($object->_id)) {
 			throw new Exception("CouchDB: Object is missing field '_id'.");
 		}
