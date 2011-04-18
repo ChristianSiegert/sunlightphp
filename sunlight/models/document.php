@@ -80,15 +80,10 @@ class Document extends CouchDb\CouchDbDocument {
 
 	/**
 	 * Merges $thing recursively with the document. Fields in $thing supersede
-	 * similarly named fields in the document.
-	 * @param array|object $thing
-	 */
-
-	/**
-	 * Merges $thing recursively with the document. Fields in $thing supersede
 	 * similarly named fields in the document. The fields in $thing must be
 	 * whitelisted.
 	 * @see CouchDbDocument::merge()
+	 * @param array|object $thing
 	 * @throws Exception
 	 */
 	public function merge($thing) {
