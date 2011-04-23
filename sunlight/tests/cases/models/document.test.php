@@ -1036,6 +1036,20 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
 
+		// Rule is PHP function
+		$document = new Models\Document(new stdClass(), "test");
+		$document->foo = "bar";
+
+		$rules = array(
+			"foo" => array(
+				"rule" => "is_string"
+			)
+		);
+
+		$expectedValidationErrors = array();
+
+		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
+
 		return $dataProvider;
 	}
 }

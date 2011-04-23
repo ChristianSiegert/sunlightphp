@@ -150,7 +150,13 @@ class Document extends CouchDb\CouchDbDocument {
 			if (isset($rule["rule"])) {
 				// The name of the function used to validate the field is passed as string
 				if (is_string($rule["rule"])) {
-					$validates = $this->$rule["rule"]($field);
+					if (method_exists($this, $rule["rule"])) {
+						$validates = $this->$rule["rule"]($field);
+					} elseif (function_exists($rule["rule"])) {
+						$validates = call_user_func($rule["rule"], $field);
+					} else {
+						throw new InvalidArgumentException("Rule '{$rule["rule"]}' is not referencing an existing function or method.");
+					}
 				// The name of the function used to validate the field is passed in an array (as first argument)
 				} elseif (is_array($rule["rule"])) {
 					$arguments = $rule["rule"];
@@ -179,10 +185,6 @@ class Document extends CouchDb\CouchDbDocument {
 		}
 
 		return $validationErrors;
-	}
-
-	public static function isBoolean($value) {
-		return is_bool($value);
 	}
 
 	public static function isInRange($value, $min, $max, $strict = true) {
