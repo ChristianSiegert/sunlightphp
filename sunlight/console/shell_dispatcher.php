@@ -32,11 +32,11 @@ class ShellDispatcher {
 
 	public function dispatch() {
 		// Include custom shell file
-		$customShellFile = APP_DIR . DS . "shells" . DS . $this->params["shell"] . "_shell.php";
+		$customShellFile = DS . "shells" . DS . $this->params["shell"] . "_shell.php";
 
 		if (preg_match('/^[a-z]+$/', $this->params["shell"])
-				&& is_file($customShellFile)) {
-			require $customShellFile;
+				&& is_file(APP_DIR . $customShellFile)) {
+			require APP_DIR . $customShellFile;
 
 			$shellClassName = "Shells\\" . ucfirst($this->params["shell"]) . "Shell";
 			$shell = new $shellClassName($this->params);
