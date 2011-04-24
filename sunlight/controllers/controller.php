@@ -37,8 +37,6 @@ class Controller {
 	public function loadComponents() {
 		// Load components
 		for ($i = 0; $i < count($this->components); $i++) {
-			require CORE_DIR . DS . "controllers" . DS . "components" . DS . strtolower($this->components[$i]) . ".php";
-
 			$componentClassName = "Controllers\\Components\\" . $this->components[$i];
 			$componentObject = $this->{$this->components[$i]} = new $componentClassName($this);
 
@@ -68,10 +66,6 @@ class Controller {
 	}
 
 	public function render() {
-		// Include core view file
-		require CORE_DIR . DS . "views" . DS . "view.php";
-
-		// Load view
 		$view = new \Views\View($this);
 		$contentForLayout = $view->renderAction();
 		$document = $view->renderLayout($contentForLayout, $this->removeWhitespace);

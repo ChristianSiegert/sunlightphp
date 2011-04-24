@@ -36,7 +36,7 @@ class ShellDispatcher {
 
 		if (preg_match('/^[a-z]+$/', $this->params["shell"])
 				&& is_file($customShellFile)) {
-			include($customShellFile);
+			require $customShellFile;
 
 			$shellClassName = "Shells\\" . ucfirst($this->params["shell"]) . "Shell";
 			$shell = new $shellClassName($this->params);

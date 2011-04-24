@@ -52,7 +52,7 @@ class Dispatcher {
 
 		if (preg_match('/^[a-z\-]+$/', $this->params["controller"])
 				&& is_file(APP_DIR . $customControllerFile)) {
-			include(APP_DIR . $customControllerFile);
+			require APP_DIR . $customControllerFile;
 
 			// Create controller object
 			$controllerClassName = "Controllers\\" . str_replace("-", "", mb_convert_case($this->params["controller"], MB_CASE_TITLE)) . "Controller";
@@ -70,7 +70,6 @@ class Dispatcher {
 
 		if (isset($errorMessage)) {
 			header("HTTP/1.1 404 Not found");
-			include(CORE_DIR . DS . "controllers" . DS . "errors_controller.php");
 
 			$this->params["controller"] = "errors";
 			$this->params["action"] = "error-404";

@@ -32,10 +32,10 @@ define("CCSS_URL", BASE_URL . "/ccss");
 define("CJS_URL", BASE_URL . "/cjs");
 
 // Include the core file that contains our autoloader
-include CORE_DIR . DS . "libraries" . DS . "basics.php";
+require CORE_DIR . DS . "libraries" . DS . "basics.php";
 
 // Include config file
-include APP_DIR . DS . "config" . DS . "core.php";
+require APP_DIR . DS . "config" . DS . "core.php";
 
 // Start a beautiful day of work
 $dispatcher = new Libraries\Dispatcher();

@@ -1,5 +1,5 @@
 <?php
-include(CORE_DIR . DS . "models" . DS . "model.php");
+require CORE_DIR . DS . "models" . DS . "model.php";
 
 class ModelDataTest extends PHPUnit_Framework_TestCase {
 	/**

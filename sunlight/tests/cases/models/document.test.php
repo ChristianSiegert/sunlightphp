@@ -1,7 +1,7 @@
 <?php
-include CORE_DIR . DS . "models" . DS . "couch_db" . DS . "couch_db.php";
-include CORE_DIR . DS . "models" . DS . "couch_db" . DS . "couch_db_document.php";
-include CORE_DIR . DS . "models" . DS . "document.php";
+require CORE_DIR . DS . "models" . DS . "couch_db" . DS . "couch_db.php";
+require CORE_DIR . DS . "models" . DS . "couch_db" . DS . "couch_db_document.php";
+require CORE_DIR . DS . "models" . DS . "document.php";
 
 // Our fake database info
 define("DATABASE_HOST", "empty");

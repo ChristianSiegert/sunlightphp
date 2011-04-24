@@ -31,13 +31,7 @@ class View {
 	}
 
 	private function loadHelpers() {
-		// Include core helper file
-		include(CORE_DIR . DS . "views" . DS . "helpers" . DS . "helper.php");
-
 		for ($i = 0; $i < count($this->helpers); $i++) {
-			// Include helper file
-			include(CORE_DIR . DS . "views" . DS . "helpers" . DS . strtolower($this->helpers[$i]) . ".php");
-
 			// Instantiate helper
 			$helperClassName = "Views\\Helpers\\" . $this->helpers[$i];
 			$helperObject = ${strtolower($this->helpers[$i])} = new $helperClassName($this);
@@ -67,9 +61,9 @@ class View {
 
 		// Load view file
 		if (is_file(APP_DIR . $viewFile)) {
-			include(APP_DIR . $viewFile);
+			require APP_DIR . $viewFile;
 		} elseif (is_file(CORE_DIR . $viewFile)) {
-			include(CORE_DIR . $viewFile);
+			require CORE_DIR . $viewFile;
 		} else {
 			if (Config::read("debug") > 0) {
 				$this->controller->Session->setFlash("View $viewFile does not exist.", "flash", array("class" => "flash-error-message"));
@@ -90,7 +84,7 @@ class View {
 
 		// Buffer output of the layout file
 		ob_start();
-		include(APP_DIR . DS . "views" . DS . "layouts" . DS . "default.stp");
+		require APP_DIR . DS . "views" . DS . "layouts" . DS . "default.stp";
 		$renderedLayout = ob_get_contents();
 		ob_end_clean();
 
