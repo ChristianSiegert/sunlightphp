@@ -9,5 +9,11 @@ class String {
 	public static function camelCaseToLowerCaseDash($string) {
 		return ltrim(strtolower(preg_replace('#([A-Z])#', "-$1", $string)), "-");
 	}
+
+	public static function dashToCamelCase($string) {
+		return lcfirst(preg_replace_callback('#-([a-zA-Z])#', function($match) {
+			return strtoupper($match[1]);
+		}, trim($string, "-")));
+	}
 }
 ?>

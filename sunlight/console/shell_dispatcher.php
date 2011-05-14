@@ -1,6 +1,8 @@
 <?php
 namespace Console;
 
+use Libraries\String;
+
 class ShellDispatcher {
 	public $params = array(
 		"controller" => "",
@@ -31,30 +33,34 @@ class ShellDispatcher {
 	}
 
 	public function dispatch() {
+		if (!preg_match('/^[a-z]+$/', $this->params["shell"])) {
+			exit("Shell must be called in lower-case dash notation, e.g. 'rental-periods'.\n");
+		}
+
+		if (!preg_match('/^[a-z\-]+$/', $this->params["action"])) {
+			exit("Action must be in lower-case dash notation, e.g. 'list-all'.\n");
+		}
+
 		// Include custom shell file
 		$customShellFile = DS . "shells" . DS . $this->params["shell"] . "_shell.php";
 
-		if (preg_match('/^[a-z]+$/', $this->params["shell"])
-				&& is_file(APP_DIR . $customShellFile)) {
-			require APP_DIR . $customShellFile;
-
-			$shellClassName = "Shells\\" . ucfirst($this->params["shell"]) . "Shell";
-			$shell = new $shellClassName($this->params);
-
-			$methodName = str_replace("-", "_", $this->params["action"]);
-
-			if (preg_match('/^[a-z-]+$/', $this->params["action"])
-					&& method_exists($shell, $methodName)) {
-				$shell->beforeFilter();
-
-				// Execute action
-				call_user_func_array(array($shell, $methodName),  $this->params["passed"]);
-			} else {
-				print("Method $methodName() does not exist in $shellClassName.\n");
-			}
-		} else {
-			print("Shell $customShellFile does not exist.\n");
+		if (!is_file(APP_DIR . $customShellFile)) {
+			exit("Shell $customShellFile does not exist.\n");
 		}
+
+		$shellClassName = "Shells\\" . ucfirst($this->params["shell"]) . "Shell";
+		$shell = new $shellClassName($this->params);
+
+		$methodName = String::dashToCamelCase($this->params["action"]);
+
+		if (!method_exists($shell, $methodName)) {
+			exit("Method '$methodName' does not exist in $shellClassName.\n");
+		}
+
+		$shell->beforeFilter();
+
+		// Execute action
+		call_user_func_array(array($shell, $methodName),  $this->params["passed"]);
 	}
 }
 ?>
