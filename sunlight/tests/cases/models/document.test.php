@@ -501,6 +501,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
 
+
 		// 0 fields, 1 rule, 1 expected validation error
 		$document = new Models\Document(new stdClass(), "test");
 
@@ -521,6 +522,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
 
+
 		// 1 field, 1 rule, 0 expected validation errors
 		$document = new Models\Document(new stdClass(), "test");
 		$document->foo = 3;
@@ -534,6 +536,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 		$expectedValidationErrors = array();
 
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
+
 
 		// 1 field, 1 rule, 1 expected validation error
 		$document = new Models\Document(new stdClass(), "test");
@@ -556,6 +559,34 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
 
+
+		// 0 fields, 1 nested rule, 1 expected validation error
+		$document = new Models\Document(new stdClass(), "test");
+
+		$rules = array(
+			"foo" => array(
+				"contains" => array(
+					"bar" => array(
+						"rule" => "isTimestamp"
+					)
+				)
+			)
+		);
+
+		$expectedValidationErrors = array(
+			"foo" => array(
+				"bar" => array(
+					array(
+						"message" => "Value for field 'bar' is not valid.",
+						"value" => "",
+					)
+				)
+			)
+		);
+
+		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
+
+		// Stress test
 		$document = new Models\Document(new stdClass(), "test");
 		$document->foo_a = "bar_a";
 		$document->foo_b = "bar_b";
@@ -1036,6 +1067,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
 
+
 		// Rule is PHP function
 		$document = new Models\Document(new stdClass(), "test");
 		$document->foo = "bar";
@@ -1049,6 +1081,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 		$expectedValidationErrors = array();
 
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
+
 
 		return $dataProvider;
 	}

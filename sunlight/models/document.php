@@ -1,8 +1,8 @@
 <?php
 namespace Models;
 
-use \Exception as Exception;
-use \InvalidArgumentException as InvalidArgumentException;
+use \Exception;
+use \InvalidArgumentException;
 
 class Document extends CouchDb\CouchDbDocument {
 	/**
@@ -145,22 +145,28 @@ class Document extends CouchDb\CouchDbDocument {
 				$document[$fieldName] = "";
 			}
 
-			$field = is_object($document) ? $document->$fieldName : $document[$fieldName];
+			if (is_object($document)) {
+				$fieldValue = $document->$fieldName;
+			} else if (is_array($document)) {
+				$fieldValue = $document[$fieldName];
+			} else {
+				$fieldValue = $document;
+			}
 
 			if (isset($rule["rule"])) {
 				// The name of the function used to validate the field is passed as string
 				if (is_string($rule["rule"])) {
 					if (method_exists($this, $rule["rule"])) {
-						$validates = $this->$rule["rule"]($field);
+						$validates = $this->$rule["rule"]($fieldValue);
 					} elseif (function_exists($rule["rule"])) {
-						$validates = call_user_func($rule["rule"], $field);
+						$validates = call_user_func($rule["rule"], $fieldValue);
 					} else {
 						throw new InvalidArgumentException("Rule '{$rule["rule"]}' is not referencing an existing function or method.");
 					}
 				// The name of the function used to validate the field is passed in an array (as first argument)
 				} elseif (is_array($rule["rule"])) {
 					$arguments = $rule["rule"];
-					$arguments[0] = $field;
+					$arguments[0] = $fieldValue;
 
 					$validates = call_user_func_array(array($this, $rule["rule"][0]), $arguments);
 				} else {
@@ -170,11 +176,11 @@ class Document extends CouchDb\CouchDbDocument {
 				if (!$validates) {
 					$validationErrors[$fieldName][] = array(
 						"message" => !empty($rule["message"]) ? $rule["message"] : "Value for field '$fieldName' is not valid.",
-						"value" => $field,
+						"value" => $fieldValue,
 					);
 				}
 			} elseif (isset($rule["contains"])) {
-				$errors = $this->validate($field, $rule["contains"]);
+				$errors = $this->validate($fieldValue, $rule["contains"]);
 
 				if (!empty($errors)) {
 					$validationErrors[$fieldName] = $errors;
