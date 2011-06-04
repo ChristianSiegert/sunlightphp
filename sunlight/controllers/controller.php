@@ -4,7 +4,7 @@ namespace Controllers;
 use Libraries\Router as Router;
 
 class Controller {
-	public $components = array("Session");
+	public $components = array();
 
 	public $helpers = array("Asset", "Html", "Session");
 
