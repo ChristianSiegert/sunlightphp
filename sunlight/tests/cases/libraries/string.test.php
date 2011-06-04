@@ -49,22 +49,36 @@ class StringDataTest extends PHPUnit_Framework_TestCase {
 	public function dashToCamelCaseDataProvider() {
 		return array(
 			array("foo", "foo"),
-			array("-foo", "foo"),
-			array("foo-", "foo"),
-			array("-foo-", "foo"),
+			array("-foo", "-foo"),
+			array("foo-", "foo-"),
+			array("-foo-", "-foo-"),
 			array("foo-bar", "fooBar"),
-			array("-foo-bar", "fooBar"),
-			array("foo-bar-", "fooBar"),
-			array("-foo-bar-", "fooBar"),
+			array("-foo-bar", "-fooBar"),
+			array("foo-bar-", "fooBar-"),
+			array("-foo-bar-", "-fooBar-"),
 
 			array("Foo", "foo"),
-			array("-Foo", "foo"),
-			array("Foo-", "foo"),
-			array("-Foo-", "foo"),
+			array("-Foo", "-foo"),
+			array("Foo-", "foo-"),
+			array("-Foo-", "-foo-"),
 			array("Foo-Bar", "fooBar"),
-			array("-Foo-Bar", "fooBar"),
-			array("Foo-Bar-", "fooBar"),
-			array("-Foo-Bar-", "fooBar"),
+			array("-Foo-Bar", "-fooBar"),
+			array("Foo-Bar-", "fooBar-"),
+			array("-Foo-Bar-", "-fooBar-"),
+
+			array("123", "123"),
+			array("-123", "-123"),
+			array("123-", "123-"),
+			array("-123-", "-123-"),
+			array("123-bar", "123Bar"),
+			array("-123-bar", "-123Bar"),
+			array("123-bar-", "123Bar-"),
+			array("-123-bar-", "-123Bar-"),
+
+			array("foo-123", "foo123"),
+			array("-foo-123", "-foo123"),
+			array("foo-123-", "foo123-"),
+			array("-foo-123-", "-foo123-"),
 		);
 	}
 }

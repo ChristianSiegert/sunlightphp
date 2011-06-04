@@ -11,9 +11,9 @@ class String {
 	}
 
 	public static function dashToCamelCase($string) {
-		return lcfirst(preg_replace_callback('#-([a-zA-Z])#', function($match) {
-			return strtoupper($match[1]);
-		}, trim($string, "-")));
+		return preg_replace_callback('#([a-zA-Z0-9])-([a-zA-Z0-9])#', function($match) {
+			return $match[1] . strtoupper($match[2]);
+		}, strtolower($string));
 	}
 }
 ?>
