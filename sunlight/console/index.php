@@ -16,7 +16,8 @@ define("VENDOR_DIR", APP_DIR . DS . "vendors");
 define("WEBROOT_DIR", APP_DIR . DS . "webroot");
 
 // Include the core file that contains our autoloader
-require CORE_DIR . DS . "libraries" . DS . "basics.php";
+$basicsFile = DS . "libraries" . DS . "basics.php";
+require is_file(APP_DIR . $basicsFile) ? APP_DIR . $basicsFile : CORE_DIR . $basicsFile;
 
 // Include config file
 require APP_DIR . DS . "config" . DS . "core.php";
