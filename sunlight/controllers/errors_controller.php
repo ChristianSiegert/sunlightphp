@@ -6,7 +6,7 @@ class ErrorsController extends AppController {
 
 	public $cacheActions = true;
 
-	public function error_404() {
+	public function error404() {
 
 	}
 }

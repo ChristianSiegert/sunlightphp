@@ -33,28 +33,29 @@ class ShellDispatcher {
 	}
 
 	public function dispatch() {
-		if (!preg_match('/^[a-z]+$/', $this->params["shell"])) {
+		if (!preg_match('/^[a-z0-9\-]+$/', $this->params["shell"])) {
 			exit("Shell must be called in lower-case dash notation, e.g. 'rental-periods'.\n");
 		}
 
-		if (!preg_match('/^[a-z\-]+$/', $this->params["action"])) {
+		if (!preg_match('/^[a-z0-9\-]+$/', $this->params["action"])) {
 			exit("Action must be in lower-case dash notation, e.g. 'list-all'.\n");
 		}
 
 		// Include custom shell file
-		$customShellFile = DS . "shells" . DS . $this->params["shell"] . "_shell.php";
+		$customShellFile = DS . "shells" . DS . str_replace("-", "_", $this->params["shell"]) . "_shell.php";
 
-		if (!is_file(APP_DIR . $customShellFile)) {
+		if (!is_file(APP_DIR . $customShellFile)
+				&& !is_file(CORE_DIR . $customShellFile)) {
 			exit("Shell $customShellFile does not exist.\n");
 		}
 
-		$shellClassName = "Shells\\" . ucfirst($this->params["shell"]) . "Shell";
+		$shellClassName = "Shells\\" . str_replace("-", "", mb_convert_case($this->params["shell"], MB_CASE_TITLE)) . "Shell";
 		$shell = new $shellClassName($this->params);
 
 		$methodName = String::dashToCamelCase($this->params["action"]);
 
 		if (!method_exists($shell, $methodName)) {
-			exit("Method '$methodName' does not exist in $shellClassName.\n");
+			exit("Method '$methodName()' does not exist in $shellClassName.\n");
 		}
 
 		$shell->beforeFilter();

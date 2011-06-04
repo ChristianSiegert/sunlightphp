@@ -46,38 +46,34 @@ class Dispatcher {
 		}
 	}
 
-	public function dispatch() {
+	public function dispatch($flashMessage = "") {
+		if (!preg_match('/^[a-z0-9\-]+$/', $this->params["controller"])) {
+			$this->exitWithError("Controller must be called in lower-case dash notation, e.g. 'rental-periods'.");
+		}
+
+		if (!preg_match('/^[a-z0-9\-]+$/', $this->params["action"])) {
+			$this->exitWithError("Action must be in lower-case dash notation, e.g. 'list-all'.");
+		}
+
 		// Include custom controller file
 		$customControllerFile = DS . "controllers" . DS . str_replace("-", "_", $this->params["controller"]) . "_controller.php";
 
-		if (preg_match('/^[a-z\-]+$/', $this->params["controller"])
-				&& is_file(APP_DIR . $customControllerFile)) {
-			require APP_DIR . $customControllerFile;
-
-			// Create controller object
-			$controllerClassName = "Controllers\\" . str_replace("-", "", mb_convert_case($this->params["controller"], MB_CASE_TITLE)) . "Controller";
-			$controller = new $controllerClassName($this->params);
-
-			$methodName = str_replace("-", "_", $this->params["action"]);
-
-			if (!preg_match('/^[a-z-]+$/', $this->params["action"])
-					|| !method_exists($controller, $methodName)) {
-				$errorMessage = "Method $methodName() does not exist in $controllerClassName.";
-			}
-		} else {
-			$errorMessage = "Controller $customControllerFile does not exist.";
+		if (!is_file(APP_DIR . $customControllerFile)
+				&& !is_file(CORE_DIR . $customControllerFile)) {
+			$this->exitWithError("Controller $customControllerFile does not exist.");
 		}
 
-		if (isset($errorMessage)) {
-			header("HTTP/1.1 404 Not found");
+		// Create controller object
+		$controllerClassName = "Controllers\\" . str_replace("-", "", mb_convert_case($this->params["controller"], MB_CASE_TITLE)) . "Controller";
+		$controller = new $controllerClassName($this->params);
 
-			$this->params["controller"] = "errors";
-			$this->params["action"] = "error-404";
+		$methodName = String::dashToCamelCase($this->params["action"]);
 
-			$controller = new \Controllers\ErrorsController($this->params);
-			$methodName = str_replace("-", "_", $this->params["action"]);
+		if (!method_exists($controller, $methodName)) {
+			$this->exitWithError("Method '$methodName()' does not exist in $controllerClassName.");
 		}
 
+		// If caching of actions is enabled, retrieve rendered page from cache if possible
 		if ($controller->cacheActions && $controller->autoRender && Config::read("debug") === 0) {
 			$cacheKey = "dispatcher:dispatch:" . $this->params["controller"] . ":" . $this->params["action"] . ":" . serialize($this->params["passed"]);
 			$page = Cache::fetch($cacheKey);
@@ -95,10 +91,12 @@ class Dispatcher {
 		// Execute action
 		call_user_func_array(array($controller, $methodName), $this->params["passed"]);
 
-		if (Config::read("debug") > 0 && isset($errorMessage)) {
-			$controller->Session->setFlash($errorMessage, "flash", array("class" => "flash-error-message"));
+		// Display any messages
+		if (Config::read("debug") > 0 && $flashMessage) {
+			$controller->Session->setFlash($flashMessage, "flash", array("class" => "flash-error-message"));
 		}
 
+		// Render page
 		if ($controller->autoRender) {
 			$page = $controller->render();
 
@@ -108,6 +106,16 @@ class Dispatcher {
 
 			echo $page;
 		}
+	}
+
+	protected function exitWithError($errorMessage) {
+		header("HTTP/1.1 404 Not found");
+
+		$this->params["controller"] = "errors";
+		$this->params["action"] = "error-404";
+
+		$this->dispatch($errorMessage);
+		exit;
 	}
 }
 ?>
