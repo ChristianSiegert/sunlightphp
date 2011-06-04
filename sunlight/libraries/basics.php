@@ -1,7 +1,6 @@
 <?php
 /**
- * Prints human-readable information about expressions.
- *
+ * Prints human-readable information about expressions. Adds filename and line number to the output.
  * @param mixed $expression,... Unlimited number of expressions
  */
 function debug() {
@@ -27,8 +26,7 @@ function debug() {
 }
 
 /**
- * Returns information about an expression. The output is valid PHP code.
- *
+ * Returns human-readable information about expressions.
  * @param string $expression
  * @param integer $nestingLevel
  */
@@ -41,7 +39,6 @@ function express($expression, $nestingLevel = 0) {
 		case "boolean":
 			return $expression === true ? "true" : "false";
 		case "integer":
-			return $expression;
 		case "double":
 			return $expression;
 		case "string":
@@ -54,9 +51,7 @@ function express($expression, $nestingLevel = 0) {
 			}
 
 			$output = preg_replace("/,$/", "\n" . str_repeat("    ", $nestingLevel), $output);
-
-			$output .= ")";
-			return $output;
+			return $output . ")";
 		case "object":
 			$output = get_class($expression) . " object (";
 
@@ -65,9 +60,7 @@ function express($expression, $nestingLevel = 0) {
 			}
 
 			$output = preg_replace("/,$/", "\n" . str_repeat("    ", $nestingLevel), $output);
-
-			$output .= ")";
-			return $output;
+			return $output . ")";
 		default:
 			return "($type) $expression";
 	}
