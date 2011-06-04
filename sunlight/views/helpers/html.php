@@ -42,7 +42,7 @@ class Html extends Helper {
 	}
 
 	public function image($url, $description = "", $attributes = array()) {
-		$attributes["src"] = preg_match('#^https?://#', $url) ? $url : BASE_URL . "/img/$url";
+		$attributes["src"] = preg_match('#^https?://#', $url) ? $url : BASE_URL . "/$url";
 		$attributes["alt"] = $description;
 
 		$element = new Element("img", $attributes);

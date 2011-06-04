@@ -4,6 +4,7 @@ This log documents changes made to SunlightPHP that break previous installations
 
 ## 2011
 
+* **2011-06-04** HtmlHelper::image() does not prepend "/img/" to relative paths anymore.
 * **2011-05-14** Method names in shells must now be written in camelCase notation. 
 * **2011-04-17** Added namespaces.
 * **2011-04-10** Removed class AppModel in favor of AppDocument and AppView.
