@@ -1,0 +1,79 @@
+#
+# EXAMPLE CONFIG FILE FOR NGINX
+# =============================
+#
+# This example config can be used to deliver images with nginx.
+#
+# To activate this config, copy it to:
+#	/etc/nginx/sites-available/example.net
+#
+# Edit IP, paths, etc. to match your server configuration.
+#
+# Then open a terminal and issue these commands:
+#	sudo ln -s /etc/nginx/sites-available/example.net /etc/nginx/sites-enabled/example.net
+#	sudo service nginx reload
+#
+# You can deactivate it with:
+#	sudo rm /etc/nginx/sites-enabled/example.net
+#	sudo service nginx reload
+#
+# You can rename "example.net" to whatever you like.
+
+
+server {
+		# Listen at port 80 (IP v4)
+		listen 12.34.56.78:80;
+
+		# Listen at port 8080 (IP v6)
+		listen [::]:8080 default ipv6only=on;
+
+		# This config handles requests for 0.example.net and 1.example.net
+		server_name ~^[0-1]\.example\.net$;
+		
+		# Logs
+		access_log /domains/example.net/logs/access.log;
+		error_log /domains/example.net/logs/error.log;
+
+		# Our webroot
+		root /domains/example.net/images;
+
+		# Hide nginx version number
+		server_tokens off;
+
+		# Optimize connection and transmission settings
+		keepalive_timeout 3;
+		sendfile on;
+		tcp_nodelay on;
+		tcp_nopush on;
+
+		# Enable compression
+		gzip on;
+		gzip_comp_level 9;
+		gzip_disable "msie6";
+		gzip_min_length 0;
+		gzip_types application/javascript application/json application/x-javascript application/xml application/xml+rss image/bmp text/css text/javascript text/js text/plain text/xml;
+		gzip_vary off;
+
+		# Set caching headers for static files
+		location ~* \.(a?png|css|gif|ico|jpe?g|js)$ {
+				access_log off;
+				add_header Cache-Control "public";
+				add_header Vary "User-Agent";
+				expires 1y;
+				log_not_found off;
+		}
+	
+		# Deny access to git, ht and svn files	
+		location ~ /\.(git|ht|svn) {
+				access_log off;
+				deny all;
+				log_not_found off;
+		}
+
+		# Deny access to PHP files
+		location ~ \.php$ {
+				access_log off;
+				deny all;
+				log_not_found off;
+		}
+}
