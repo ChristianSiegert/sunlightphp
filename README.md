@@ -1,7 +1,5 @@
 # SunlightPHP
 
-## Introduction
-
 Hello there,
 
 thanks for downloading SunlightPHP. I put many months of work into this small
@@ -14,11 +12,13 @@ all-rounder and might not be suited for your purposes. Try it and find out.
 * **MVC pattern.** You have controllers, components, models, views and helpers.
 * **Support for CouchDB.** Even with validation of document fields.
 * **Support for CLI.** Start scripts via command line. Great for cronjobs.  
-* **Asset compression.** Your CSS and JS files can be merged  automatically into one file each. Afterwards they are compressed.
-* **Asset caching.** Static files like images, stylesheets and scripts automatically receive appropriate caching headers so browsers do not ask for them over and over again. If you update your CSS or JS, just change the URL salt in app/config/core.php and the files will look new to browsers. To sum up: Your files are always cached by browsers but never outdated.
-* **Whitespace removal.** Whitespace between HTML tags is removed.
+* **Asset compression.** Your CSS/JS files can be merged and compressed automatically.
+* **Asset caching.** Static files like images, stylesheets and scripts receive appropriate caching headers so browsers do not ask for them over and over again.
+* **Authentication.** Protect pages from unwanted access.
 * **Namespaces.** Name clashes are a thing of the past.
 * **Autoloader.** Classes are automatically included the first time they are used.
+* **Whitespace removal.** Whitespace between HTML tags is removed.
+* **Unit tests.** Write unit tests and run them from the unit test page.
 * **Small code base, no magic.** I write code for humans and try to keep it as straight forward as possible.
 
 ## Requirements
