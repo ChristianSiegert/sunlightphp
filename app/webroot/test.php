@@ -21,7 +21,7 @@ function getFilenames($directory) {
 
 	if ($handle = opendir($directory)) {
 		while (($file = readdir($handle)) !== false) {
-			if ($file !== "." && $file !== "..") {
+			if ($file !== "." && $file !== ".." && $file !== "empty") {
 				if (is_file($directory . DS . $file)) {
 					$filenames[] = preg_replace('#^(?:' . ROOT_DIR . ')/#', "", $directory . DS . $file);
 				} elseif (is_dir($directory . DS . $file)) {
