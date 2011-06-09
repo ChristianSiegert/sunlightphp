@@ -39,76 +39,88 @@ if (defined("APC_IS_ENABLED") && defined("MEMCACHE_IS_ENABLED")) {
 		exit;
 	}
 } else {
-	$errors[] = "Constant APC_IS_ENABLED and/or MEMCACHE_IS_ENABLED is not set.";
+	$errors[]["message"] = "Constant APC_IS_ENABLED and/or MEMCACHE_IS_ENABLED is not set.";
+	$errors[]["help"] = "Set the constant in app/config/core.php.";
 }
 
 // Check PHP version
 if (preg_match("/[0-9]+\.[0-9]+\.[0-9]+/", phpversion(), $phpVersion) === 1) {
 	if ($phpVersion[0] < "5.3.0") {
-		$errors[] = "SunlightPHP requires PHP 5.3 or higher. The installed version is $phpVersion[0].";
+		$errors[]["message"] = "SunlightPHP requires PHP 5.3 or higher. The installed version is $phpVersion[0].";
+		$errors[]["help"] = "Upgrade PHP to version 5.3 or higher.";
 	}
 } else {
-	$errors[] = "SunlightPHP requires PHP 5.3 or higher. The installed version could not be determined.";
+	$errors[]["message"] = "SunlightPHP requires PHP 5.3 or higher. The installed version could not be determined.";
+	$errors[]["help"] = "Upgrade PHP to version 5.3 or higher.";
 }
 
-$logsDir = APP_DIR . DS . "tmp" . DS . "logs";
-if (!is_writable($logsDir)) {
-	$errors[] = "$logsDir is not writable.";
+// Check if all necessary directories are writable
+$directories = array(
+	APP_DIR . DS . "tmp" . DS . "logs",
+	APP_DIR . DS . "tmp" . DS . "sessions",
+	WEBROOT_DIR . DS . "ccss",
+	WEBROOT_DIR . DS . "cjs",
+);
+
+$unwritableDirectories = array();
+
+foreach ($directories as $directory) {
+	if (!is_writable($directory)) {
+		$errors[]["message"] = "$directory is not writable.";
+		$unwritableDirectories[] = $directory;
+	}
 }
 
-$sessionsDir = APP_DIR . DS . "tmp" . DS . "sessions";
-if (!is_writable($sessionsDir)) {
-	$errors[] = "$sessionsDir is not writable.";
-}
+if ($unwritableDirectories) {
+	$chgrp = "sudo chgrp www-data";
+	$chmod = "sudo chmod g+w";
 
-$ccssDir = WEBROOT_DIR . DS . "ccss";
-if (!is_writable($ccssDir)) {
-	$errors[] = "$ccssDir is not writable.";
-}
+	foreach ($unwritableDirectories as $unwritableDirectory) {
+		$chgrp .= " $unwritableDirectory";
+		$chmod .= " $unwritableDirectory";
+	}
 
-$cjsDir = WEBROOT_DIR . DS . "cjs";
-if (!is_writable($cjsDir)) {
-	$errors[] = "$cjsDir is not writable.";
+	$errors[]["help"] = $chgrp . "<br />" . $chmod;
 }
 
 if (!isset($_SERVER["HTTP_HOST"])) {
-	$errors[] = '$_SERVER["HTTP_HOST"] does not exist.';
+	$errors[]["message"] = '$_SERVER["HTTP_HOST"] does not exist.';
 }
 
 if (!isset($_SERVER["SERVER_PROTOCOL"])) {
-	$errors[] = '$_SERVER["SERVER_PROTOCOL"] is not "HTTP/1.1".';
+	$errors[]["message"] = '$_SERVER["SERVER_PROTOCOL"] is not "HTTP/1.1".';
 }
 
 if (ini_get("session.auto_start") == true) {
-	$errors[] = "session.auto_start is not disabled.";
+	$errors[]["message"] = "session.auto_start is not disabled.";
 }
 
 if ($displayErrors == true) {
-	$errors[] = "display_errors is not disabled.";
+	$errors[]["message"] = "display_errors is not disabled.";
 }
 
 if (ini_get("error_reporting") > 0) {
-	$errors[] = "error_reporting is not disabled.";
+	$errors[]["message"] = "error_reporting is not disabled.";
 }
 
 if (!in_array("curl", get_loaded_extensions())) {
-	$errors[] = "The curl module is not installed.";
+	$errors[]["message"] = "The curl module is not installed.";
 }
 
 if (!in_array("intl", get_loaded_extensions())) {
-	$errors[] = "The intl module is not installed.";
+	$errors[]["message"] = "The intl module is not installed.";
 }
 
 if (!in_array("apc", get_loaded_extensions())) {
-	$errors[] = "The APC module is not installed.";
+	$errors[]["message"] = "The APC module is not installed.";
 }
 
 if (!in_array("memcache", get_loaded_extensions())) {
-	$errors[] = "The memcache module is not installed.";
+	$errors[]["message"] = "The memcache module is not installed.";
 }
 
 if (!is_file("PHPUnit" . DS . "Framework.php")) {
-	$errors[] = "PHPUnit is not installed.";
+	$errors[]["message"] = "PHPUnit is not installed.";
 }
 ?>
 
@@ -142,6 +154,22 @@ if (!is_file("PHPUnit" . DS . "Framework.php")) {
 				font-size: 30px;
 				margin: 30px 0 0;
 			}
+
+			#error-list {
+
+			}
+
+				.error-list-item {
+
+				}
+
+				.error-list-item-message {
+					background-color: #F00;
+				}
+
+				.error-list-item-help {
+					background-color: #0FF;
+				}
 		</style>
 	</head>
 	<body>
@@ -155,9 +183,15 @@ if (!is_file("PHPUnit" . DS . "Framework.php")) {
 			<?php } ?>
 		</p>
 
-		<ul>
+		<ul id="error-list">
 			<?php foreach ($errors as $error) { ?>
-				<li><?php echo $error; ?></li>
+				<?php if (isset($error["message"])) { ?>
+					<li class="error-list-item error-list-item-message"><?php echo $error["message"]; ?></li>
+				<?php } ?>
+
+				<?php if (isset($error["help"])) { ?>
+					<li class="error-list-item error-list-item-help"><?php echo $error["help"]; ?></li>
+				<?php } ?>
 			<?php }?>
 		</ul>
 	</body>
