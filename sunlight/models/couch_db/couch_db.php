@@ -1,7 +1,7 @@
 <?php
 namespace Models\CouchDb;
 
-use \Exception as Exception;
+use Models\DocumentException;
 
 class CouchDb {
 	protected $databaseHost = "";
@@ -12,13 +12,17 @@ class CouchDb {
 		$this->databaseName = $databaseName;
 	}
 
+	/**
+	 * Checks if the database host and database name is set.
+	 * @throws \Models\DocumentException
+	 */
 	protected function requireDatabase() {
 		if (empty($this->databaseHost)) {
-			throw new Exception("CouchDB: Please provide the database host.");
+			throw new DocumentException("Please provide the database host.");
 		}
 
 		if (empty($this->databaseName)) {
-			throw new Exception("CouchDB: Please provide the database name.");
+			throw new DocumentException("Please provide the database name.");
 		}
 	}
 
@@ -47,19 +51,19 @@ class CouchDb {
 				case "conflict":
 					switch ($response->reason) {
 						case "Document update conflict.":
-							return "CouchDB: The document could not be updated/deleted due to a conflict.";
+							return "The document could not be updated/deleted due to a conflict.";
 						default: break;
 					}
 				case "not_found":
 					switch ($response->reason) {
 						case "deleted":
-							return "CouchDB: Document '{$arguments[1]}' does not exist anymore.";
+							return "Document '{$arguments[1]}' does not exist anymore.";
 						case "missing":
 							return empty($arguments[2]) ? "CouchDB: Document '{$arguments[1]}' does not exist." : "CouchDB: Document '{$arguments[1]}' with revision '{$arguments[2]}' does not exist.";
 						case "missing_named_view":
-							return "CouchDB: View '{$arguments[2]}' does not exist in design '{$arguments[1]}'.";
+							return "View '{$arguments[2]}' does not exist in design '{$arguments[1]}'.";
 						case "no_db_file":
-							return "CouchDB: Database '" . DATABASE_NAME . "' does not exist.";
+							return "Database '" . DATABASE_NAME . "' does not exist.";
 						default: break;
 					}
 			}

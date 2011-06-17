@@ -12,7 +12,7 @@ class Document extends CouchDb\CouchDbDocument {
 	protected $validationRules = array();
 
 	/**
-	 * Contains the validation errors.
+	 * Contains validation errors.
 	 * @var array
 	 */
 	protected $validationErrors = array();
@@ -29,17 +29,15 @@ class Document extends CouchDb\CouchDbDocument {
 	 * Constructs the Document object and sets the database. You can overwrite
 	 * the default database by calling $this->setDatabase() manually after you
 	 * created the Document.
-	 * @param string $id Document _id
-	 * @param string $revision Document _rev
 	 */
-	public function __construct($id, $revision = "") {
-		parent::__construct($id, $revision);
+	public function __construct() {
+		parent::__construct();
 		$this->setDatabase(DATABASE_HOST, DATABASE_NAME);
 	}
 
 	/**
 	 * Validates the document and, if it is valid, saves it.
-	 * @throws Models\DocumentException
+	 * @throws \Models\DocumentException
 	 * @see CouchDbDocument::save()
 	 */
 	public function save() {
@@ -73,8 +71,8 @@ class Document extends CouchDb\CouchDbDocument {
 	 * similarly named fields in the document. The fields in $thing must be
 	 * whitelisted.
 	 * @param array|object $thing
-	 * @throws Models\DocumentException
-	 * @see CouchDbDocument::merge()
+	 * @throws \Models\DocumentException
+	 * @see \Models\CouchDb\CouchDbDocument::merge()
 	 */
 	public function merge($thing) {
 		if (empty($this->whitelist)) {
@@ -123,7 +121,7 @@ class Document extends CouchDb\CouchDbDocument {
 	 * @param object|array $document
 	 * @param array $rules Validation rules
 	 * @return array Validation errors
-	 * @throws InvalidArgumentException
+	 * @throws \InvalidArgumentException
 	 */
 	public function validate($document, $rules) {
 		$validationErrors = array();

@@ -1,8 +1,9 @@
 <?php
 namespace Models\CouchDb;
 
-use \Exception as Exception;
+use \Exception;
 use Libraries\HttpRequest as HttpRequest;
+use Models\DocumentException;
 
 class CouchDbDocument extends CouchDb {
 	/**
@@ -31,16 +32,9 @@ class CouchDbDocument extends CouchDb {
 
 	/**
 	 * Constructs the object.
-	 * @param string $id Document _id
-	 * @param string $revision Document _rev
 	 */
-	public function __construct($id, $revision = "") {
+	public function __construct() {
 		$this->document = new \stdClass();
-		$this->document->_id = $id;
-
-		if (!empty($revision)) {
-			$this->document->_rev = $revision;
-		}
 	}
 
 	/**
@@ -62,7 +56,7 @@ class CouchDbDocument extends CouchDb {
 	/**
 	 * Writes to a document field (only if the write request comes from outside
 	 * class). If $fieldValue is an associative array, it is converted to a
-	 * stdClass object.
+	 * \stdClass object.
 	 * @param string $fieldName
 	 * @param mixed $fieldValue
 	 */
@@ -100,8 +94,8 @@ class CouchDbDocument extends CouchDb {
 	/**
 	 * Fetches the document from the database. (Fetches the most recent one if
 	 * _rev is not set.)
- 	 * @return CouchDbDocument
-	 * @throws Exception
+ 	 * @return object document
+	 * @throws \Models\DocumentException
 	 */
 	public function fetch() {
 		$this->requireDatabase();
@@ -111,11 +105,15 @@ class CouchDbDocument extends CouchDb {
 			$this->options["rev"] = $this->document->_rev;
 		}
 
-		$request = new HttpRequest();
-		$request->setUrl($this->databaseHost . "/" . rawurlencode($this->databaseName) . "/" . rawurlencode($this->document->_id) . self::encodeOptions($this->options));
-		$request->send();
+		try {
+			$request = new HttpRequest();
+			$request->setUrl($this->databaseHost . "/" . rawurlencode($this->databaseName) . "/" . rawurlencode($this->document->_id) . self::encodeOptions($this->options));
+			$request->send();
 
-		$request->response = json_decode($request->response);
+			$request->response = json_decode($request->response);
+		} catch (Exception $exception) {
+			throw new DocumentException("HTTP request failed.", DocumentException::HTTP_REQUEST_FAILED, $exception);
+		}
 
 		if ($request->status === 200) {
 			foreach ($request->response as $fieldName => $fieldValue) {
@@ -124,9 +122,9 @@ class CouchDbDocument extends CouchDb {
 
 			return $this;
 		} elseif (isset($this->document->_rev)) {
-			throw new Exception(self::describeError($request->response, $this->document->_id, $this->document->_rev));
+			throw new DocumentException(self::describeError($request->response, $this->document->_id, $this->document->_rev));
 		} else {
-			throw new Exception(self::describeError($request->response, $this->document->_id));
+			throw new DocumentException(self::describeError($request->response, $this->document->_id));
 		}
 	}
 
@@ -138,7 +136,7 @@ class CouchDbDocument extends CouchDb {
 	 * is the document classname.
 	 *
 	 * @return boolean True if preSave, save and postSave completed successfully, otherwise false
-	 * @throws Exception
+	 * @throws \Models\DocumentException
 	 */
 	public function save() {
 		if (!$this->preSave()) {
@@ -152,13 +150,17 @@ class CouchDbDocument extends CouchDb {
 			$this->document->type = get_class($this);
 		}
 
-		$request = new HttpRequest();
-		$request->setUrl($this->databaseHost . "/" . rawurlencode($this->databaseName) . "/" . rawurlencode($this->document->_id));
-		$request->setMethod("put");
-		$request->setData(json_encode($this->document));
-		$request->send();
+		try {
+			$request = new HttpRequest();
+			$request->setUrl($this->databaseHost . "/" . rawurlencode($this->databaseName) . "/" . rawurlencode($this->document->_id));
+			$request->setMethod("put");
+			$request->setData(json_encode($this->document));
+			$request->send();
 
-		$request->response = json_decode($request->response);
+			$request->response = json_decode($request->response);
+		} catch (Exception $exception) {
+			throw new DocumentException("HTTP request failed.", DocumentException::HTTP_REQUEST_FAILED, $exception);
+		}
 
 		if ($request->status === 201) {
 			$this->document->_id = $request->response->id;
@@ -166,7 +168,7 @@ class CouchDbDocument extends CouchDb {
 
 			return $this->postSave();
 		} else {
-			throw new Exception(self::describeError($request->response));
+			throw new DocumentException(self::describeError($request->response));
 		}
 	}
 
@@ -191,7 +193,7 @@ class CouchDbDocument extends CouchDb {
 	/**
 	 * Deletes the document from the database.
 	 * @return boolean True if preDelete, delete and postDelete completed successfully, otherwise false
-	 * @throws Exception
+	 * @throws \Models\DocumentException
 	 */
 	public function delete() {
 		if (!$this->preDelete()) {
@@ -204,12 +206,16 @@ class CouchDbDocument extends CouchDb {
 
 		$this->options["rev"] = $this->document->_rev;
 
-		$request = new HttpRequest();
-		$request->setUrl($this->databaseHost . "/" . rawurlencode($this->databaseName) . "/" . rawurlencode($this->document->_id) . self::encodeOptions($this->options));
-		$request->setMethod("delete");
-		$request->send();
+		try {
+			$request = new HttpRequest();
+			$request->setUrl($this->databaseHost . "/" . rawurlencode($this->databaseName) . "/" . rawurlencode($this->document->_id) . self::encodeOptions($this->options));
+			$request->setMethod("delete");
+			$request->send();
 
-		$request->response = json_decode($request->response);
+			$request->response = json_decode($request->response);
+		} catch (Exception $exception) {
+			throw new DocumentException("HTTP request failed.", DocumentException::HTTP_REQUEST_FAILED, $exception);
+		}
 
 		if ($request->status === 200) {
 			$this->document->_id = $request->response->id;
@@ -217,7 +223,7 @@ class CouchDbDocument extends CouchDb {
 
 			return $this->postDelete();
 		} else {
-			throw new Exception(self::describeError($request->response));
+			throw new DocumentException(self::describeError($request->response));
 		}
 	}
 
@@ -253,21 +259,21 @@ class CouchDbDocument extends CouchDb {
 
 	/**
 	 * Checks if _id is set.
-	 * @throws Exception
+	 * @throws \Models\DocumentException
 	 */
 	protected function requireId() {
 		if (empty($this->document->_id)) {
-			throw new Exception("CouchDB: Please provide an _id.");
+			throw new DocumentException("Please provide an _id.");
 		}
 	}
 
 	/**
 	 * Checks if _rev is set.
-	 * @throws Exception
+	 * @throws \Models\DocumentException
 	 */
 	protected function requireRev() {
 		if (empty($this->document->_rev)) {
-			throw new Exception("CouchDB: Please provide a _rev.");
+			throw new DocumentException("Please provide a _rev.");
 		}
 	}
 
@@ -306,17 +312,12 @@ class CouchDbDocument extends CouchDb {
 	}
 
 	/**
-	 * Creates a CouchDbDocument object, fills it with data from $array and
-	 * returns it.
+	 * Creates an object, fills it with data from $array and returns it.
 	 * @param array $array
-	 * @return CouchDbDocument
+	 * @return object
 	 */
 	public static function createFromArray($array) {
-		if (!isset($array["_id"])) {
-			throw new Exception("CouchDB: Array is missing field '_id'.");
-		}
-
-		$document = new CouchDbDocument($array["_id"]);
+		$document = new static();
 
 		foreach ($array as $fieldName => $fieldValue) {
 			$document->$fieldName = $fieldValue;
@@ -326,23 +327,13 @@ class CouchDbDocument extends CouchDb {
 	}
 
 	/**
-	 * Creates a CouchDbDocument object, fills it with data from stdClass object
-	 * and returns it.
-	 * @param stdClass $object
-	 * @return CouchDbDocument
+	 * Creates an object, fills it with data from \stdClass object and returns
+	 * it.
+	 * @param \stdClass $object
+	 * @return object
 	 */
 	public static function createFromObject(\stdClass $object) {
-		if (!isset($object->_id)) {
-			throw new Exception("CouchDB: Object is missing field '_id'.");
-		}
-
-		$document = new CouchDbDocument($object->_id);
-
-		foreach ($object as $fieldName => $fieldValue) {
-			$document->$fieldName = $fieldValue;
-		}
-
-		return $document;
+		static::createFromArray($object);
 	}
 }
 ?>
