@@ -14,12 +14,12 @@ class CouchDbDocumentDataTest extends PHPUnit_Framework_TestCase {
 		$couchDbDocumentClone = clone $couchDbDocument;
 		$couchDbDocumentClone->foo = "bar";
 
-		$this->assertSame('{"_id":"test"}', (string) $couchDbDocument);
-		$this->assertSame('{"_id":"test","foo":"bar"}', (string) $couchDbDocumentClone);
+		$this->assertSame('{}', (string) $couchDbDocument);
+		$this->assertSame('{"foo":"bar"}', (string) $couchDbDocumentClone);
 	}
 
 	public function __cloneDataProvider() {
-		$couchDbDocument = new CouchDbDocument("test");
+		$couchDbDocument = new CouchDbDocument();
 		return array(array($couchDbDocument));
 	}
 
