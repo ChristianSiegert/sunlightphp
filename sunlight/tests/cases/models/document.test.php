@@ -495,7 +495,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 		$dataProvider = array();
 
 		// 0 fields, 0 rules, 0 expected validation errors
-		$document = new Models\Document(new stdClass(), "test");
+		$document = new Models\Document("test");
 		$rules = array();
 		$expectedValidationErrors = array();
 
@@ -503,7 +503,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 
 		// 0 fields, 1 rule, 1 expected validation error
-		$document = new Models\Document(new stdClass(), "test");
+		$document = new Models\Document("test");
 
 		$rules = array(
 			"foo" => array(
@@ -524,7 +524,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 
 		// 1 field, 1 rule, 0 expected validation errors
-		$document = new Models\Document(new stdClass(), "test");
+		$document = new Models\Document("test");
 		$document->foo = 3;
 
 		$rules = array(
@@ -539,7 +539,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 
 		// 1 field, 1 rule, 1 expected validation error
-		$document = new Models\Document(new stdClass(), "test");
+		$document = new Models\Document("test");
 		$document->foo = "3";
 
 		$rules = array(
@@ -561,7 +561,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 
 		// 0 fields, 1 nested rule, 1 expected validation error
-		$document = new Models\Document(new stdClass(), "test");
+		$document = new Models\Document("test");
 
 		$rules = array(
 			"foo" => array(
@@ -587,7 +587,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 		$dataProvider[] = array($document, $rules, $expectedValidationErrors);
 
 		// Stress test
-		$document = new Models\Document(new stdClass(), "test");
+		$document = new Models\Document("test");
 		$document->foo_a = "bar_a";
 		$document->foo_b = "bar_b";
 		$document->foo_c = "bar_c";
@@ -1069,7 +1069,7 @@ class DocumentDataTest extends PHPUnit_Framework_TestCase {
 
 
 		// Rule is PHP function
-		$document = new Models\Document(new stdClass(), "test");
+		$document = new Models\Document("test");
 		$document->foo = "bar";
 
 		$rules = array(

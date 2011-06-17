@@ -1,19 +1,24 @@
 <?php
 namespace Models;
 
-use \Exception;
 use \InvalidArgumentException;
 
 class Document extends CouchDb\CouchDbDocument {
 	/**
-	 * Contains the validation rules that are used to validate the content of
-	 * the document.
+	 * Contains the validation rules that are used to validate the document
+	 * content.
 	 * @var array
 	 */
 	protected $validationRules = array();
 
 	/**
-	 * Contains a list of fields that are allowed to be present when saving the
+	 * Contains the validation errors.
+	 * @var array
+	 */
+	protected $validationErrors = array();
+
+	/**
+	 * Contains a list of fields that are allowed to be present when merging the
 	 * document. Fields that are in the document but not in this list are
 	 * regarded as hostile. Saving the document will then be prohibited.
 	 * @var array
@@ -21,35 +26,20 @@ class Document extends CouchDb\CouchDbDocument {
 	protected $whitelist = array();
 
 	/**
-	 * The controller of the document. Can be any object, usually it is an
-	 * instance of "Controller" or "Shell".
-	 * @var object
-	 */
-	protected $controller;
-
-	/**
-	 * Exception codes.
-	 * @var integer
-	 */
-	const EXCEPTION_INVALID_DATA = 1;
-	const EXCEPTION_MISSING_WHITELIST = 2;
-	const EXCEPTION_MISSING_VALIDATION_RULES = 3;
-	const EXCEPTION_NON_WHITELISTED_FIELD_PRESENT = 4;
-
-	/**
-	 * Constructs the Document object and sets the database.
-	 * @param object $controller
+	 * Constructs the Document object and sets the database. You can overwrite
+	 * the default database by calling $this->setDatabase() manually after you
+	 * created the Document.
 	 * @param string $id Document _id
 	 * @param string $revision Document _rev
 	 */
-	public function __construct(&$controller, $id, $revision = "") {
+	public function __construct($id, $revision = "") {
 		parent::__construct($id, $revision);
 		$this->setDatabase(DATABASE_HOST, DATABASE_NAME);
-		$this->controller = $controller;
 	}
 
 	/**
 	 * Validates the document and, if it is valid, saves it.
+	 * @throws Models\DocumentException
 	 * @see CouchDbDocument::save()
 	 */
 	public function save() {
@@ -58,20 +48,20 @@ class Document extends CouchDb\CouchDbDocument {
 		}
 
 		if (empty($this->validationRules)) {
-			throw new Exception("Please define validation rules for document type '{$this->document->type}'.", self::EXCEPTION_MISSING_VALIDATION_RULES);
+			throw new DocumentException("Please define validation rules for document type '{$this->document->type}'.", DocumentException::MISSING_VALIDATION_RULES);
 		}
 
-		$this->controller->validationErrors = $this->validate($this, $this->validationRules);
+		$this->validationErrors = $this->validate($this, $this->validationRules);
 
-		if (!empty($this->controller->validationErrors)) {
-			throw new Exception("Data did not validate successfully.", self::EXCEPTION_INVALID_DATA);
+		if ($this->validationErrors) {
+			throw new DocumentException("Data did not validate successfully.", DocumentException::HAS_VALIDATION_ERRORS);
 		}
 
 		return parent::save();
 	}
 
 	/**
-	 * Sets the whitelist.
+	 * Sets the merge whitelist.
 	 * @param array $whitelist
 	 */
 	public function setWhitelist($whitelist) {
@@ -82,13 +72,13 @@ class Document extends CouchDb\CouchDbDocument {
 	 * Merges $thing recursively with the document. Fields in $thing supersede
 	 * similarly named fields in the document. The fields in $thing must be
 	 * whitelisted.
-	 * @see CouchDbDocument::merge()
 	 * @param array|object $thing
-	 * @throws Exception
+	 * @throws Models\DocumentException
+	 * @see CouchDbDocument::merge()
 	 */
 	public function merge($thing) {
 		if (empty($this->whitelist)) {
-			throw new Exception("Please set a whitelist before the merge.", self::EXCEPTION_MISSING_WHITELIST);
+			throw new DocumentException("Please set a whitelist before the merge.", DocumentException::MISSING_WHITELIST);
 		}
 
 		$thing = json_decode(json_encode($thing));
@@ -96,7 +86,7 @@ class Document extends CouchDb\CouchDbDocument {
 		$result = self::checkAgainstWhitelist($thing, $this->whitelist);
 
 		if ($result !== true) {
-			throw new Exception("Data contains non-whitelisted field '$result'", self::EXCEPTION_NON_WHITELISTED_FIELD_PRESENT);
+			throw new DocumentException("Data contains non-whitelisted field '$result'", DocumentException::NON_WHITELISTED_FIELD_PRESENT);
 		}
 
 		parent::merge($thing);
@@ -191,6 +181,14 @@ class Document extends CouchDb\CouchDbDocument {
 		}
 
 		return $validationErrors;
+	}
+
+	/**
+	 * Returns validation errors.
+	 * @return array
+	 */
+	public function getValidationErrors() {
+		return $this->validationErrors;
 	}
 
 	public static function isInRange($value, $min, $max, $strict = true) {
