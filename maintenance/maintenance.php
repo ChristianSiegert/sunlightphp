@@ -122,6 +122,11 @@ if (!in_array("memcache", get_loaded_extensions())) {
 if (!is_file("PHPUnit" . DS . "Framework.php")) {
 	$errors[]["message"] = "PHPUnit is not installed.";
 }
+
+if (ini_get("mail.add_x_header")) {
+	$errors[]["message"] = "X-header is automatically added to outgoing e-mails.";
+	$errors[]["help"] = "Set \"mail.add_x_header = Off\" in /etc/php5/apache2/php.ini and /etc/php5/cli/php.ini.";
+}
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
