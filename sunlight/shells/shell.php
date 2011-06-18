@@ -2,8 +2,6 @@
 namespace Shells;
 
 class Shell {
-	public $models = array();
-
 	public $params;
 
 	public $validationErrors;
