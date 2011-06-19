@@ -36,6 +36,15 @@ class Document extends CouchDb\CouchDbDocument {
 	}
 
 	/**
+	 * Sets the validation rules. To disable validation, set the validation
+	 * rules to false.
+	 * @param array|boolean $rules array with validation rules, or false
+	 */
+	public function setValidationRules($rules) {
+		$this->validationRules = $rules;
+	}
+
+	/**
 	 * Validates the document and, if it is valid, saves it.
 	 * @throws \Models\DocumentException
 	 * @see CouchDbDocument::save()
@@ -45,22 +54,25 @@ class Document extends CouchDb\CouchDbDocument {
 			$this->document->type = get_class($this);
 		}
 
-		if (empty($this->validationRules)) {
-			throw new DocumentException("Please define validation rules for document type '{$this->document->type}'.", DocumentException::MISSING_VALIDATION_RULES);
-		}
+		if ($this->validationRules !== false) {
+			if (empty($this->validationRules)) {
+				throw new DocumentException("Please define validation rules for document type '{$this->document->type}'.", DocumentException::MISSING_VALIDATION_RULES);
+			}
 
-		$this->validationErrors = $this->validate($this, $this->validationRules);
+			$this->validationErrors = $this->validate($this, $this->validationRules);
 
-		if ($this->validationErrors) {
-			throw new DocumentException("Data did not validate successfully.", DocumentException::HAS_VALIDATION_ERRORS);
+			if ($this->validationErrors) {
+				throw new DocumentException("Data did not validate successfully.", DocumentException::HAS_VALIDATION_ERRORS);
+			}
 		}
 
 		return parent::save();
 	}
 
 	/**
-	 * Sets the merge whitelist.
-	 * @param array $whitelist
+	 * Sets the merge whitelist. To disable whitelist checking when merging,
+	 * set the whitelist to false.
+	 * @param array|boolean $whitelist array with whitelisted fields, or false
 	 */
 	public function setWhitelist($whitelist) {
 		$this->whitelist = $whitelist;
@@ -75,16 +87,18 @@ class Document extends CouchDb\CouchDbDocument {
 	 * @see \Models\CouchDb\CouchDbDocument::merge()
 	 */
 	public function merge($thing) {
-		if (empty($this->whitelist)) {
-			throw new DocumentException("Please set a whitelist before the merge.", DocumentException::MISSING_WHITELIST);
-		}
-
 		$thing = json_decode(json_encode($thing));
 
-		$result = self::checkAgainstWhitelist($thing, $this->whitelist);
+		if ($this->whitelist !== false) {
+			if (empty($this->whitelist)) {
+				throw new DocumentException("Please set a whitelist before the merge.", DocumentException::MISSING_WHITELIST);
+			}
 
-		if ($result !== true) {
-			throw new DocumentException("Data contains non-whitelisted field '$result'", DocumentException::NON_WHITELISTED_FIELD_PRESENT);
+			$result = self::checkAgainstWhitelist($thing, $this->whitelist);
+
+			if ($result !== true) {
+				throw new DocumentException("Data contains non-whitelisted field '$result'", DocumentException::NON_WHITELISTED_FIELD_PRESENT);
+			}
 		}
 
 		parent::merge($thing);
