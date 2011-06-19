@@ -32,7 +32,7 @@ if (Libraries\Config::read("debug") > 0) {
 	$memoryUsage = ceil(memory_get_usage() / 1024) . " KiB";
 	$memoryPeakUsage = ceil(memory_get_peak_usage() / 1024) . " KiB";
 	$executionTime = round((microtime(true) - $startTime) * 1000, 1);
-	$requestCount = class_exists("HttpRequest", false) ? (Libraries\HttpRequest::getCount() === 1 ? "1 query" : Libraries\HttpRequest::getCount() . " queries" ) : "0 queries";
+	$requestCount = class_exists("Libraries\\HttpRequest", false) ? (Libraries\HttpRequest::getCount() === 1 ? "1 query" : Libraries\HttpRequest::getCount() . " queries" ) : "0 queries";
 	printf("\n\nMemory: %s (Peak: %s)\n%sms (%s)\n", $memoryUsage, $memoryPeakUsage, $executionTime, $requestCount);
 	printf("Cache hits:   %d\nCache misses: %d\n\n", Libraries\Cache::$writeCount <= Libraries\Cache::$readCount ? Libraries\Cache::$readCount - Libraries\Cache::$writeCount : 0, Libraries\Cache::$writeCount);
 
