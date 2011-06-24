@@ -113,14 +113,17 @@ if (!in_array("intl", get_loaded_extensions())) {
 
 if (!in_array("apc", get_loaded_extensions())) {
 	$errors[]["message"] = "The APC module is not installed.";
+	$errors[]["help"] = "sudo apt-get install php-apc";
 }
 
 if (!in_array("memcache", get_loaded_extensions())) {
 	$errors[]["message"] = "The memcache module is not installed.";
+	$errors[]["help"] = "sudo apt-get install memcached php5-memcache";
 }
 
 if (!is_file("PHPUnit" . DS . "Framework.php")) {
 	$errors[]["message"] = "PHPUnit is not installed.";
+	$errors[]["help"] = "sudo apt-get install phpunit";
 }
 
 if (ini_get("mail.add_x_header")) {
