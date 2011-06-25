@@ -4,6 +4,7 @@ This log documents changes made to SunlightPHP that break previous installations
 
 ## 2011
 
+* **2011-06-25** Constructor of class \Libraries\Element now treats item "html" in $attributes argument as attribute. To set HTML, use the new constructor parameter $html, or use the new ::setHtml() method. 
 * **2011-06-04** Method names in controllers must now be written in camelCase notation.
 * **2011-06-04** HtmlHelper::image() does not prepend "/img/" to relative paths anymore.
 * **2011-05-14** Method names in shells must now be written in camelCase notation.

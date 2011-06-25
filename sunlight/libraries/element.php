@@ -7,50 +7,115 @@ class Element {
 	protected $html = "";
 	protected $children = array();
 
-	function __construct($tag, $attributes = array()) {
+	/**
+	 * Constructs an element.
+	 * @param string $tag
+	 * @param array $attributes
+	 * @param string $html
+	 * @return \Libraries\Element
+	 */
+	function __construct($tag, $attributes = array(), $html = "") {
 		$this->tag = $tag;
-
-		if (isset($attributes["html"])) {
-			$this->html = $attributes["html"];
-			unset($attributes["html"]);
-		}
-
 		$this->attributes = $attributes;
+		$this->html = $html;
 		return $this;
 	}
 
-	public function inject($parent) {
+	/**
+	 * Returns an attribute.
+	 * @param string $attributeName
+	 * @return mixed|null Returns attribute if it exists, otherwise null
+	 */
+	public function __get($attributeName) {
+		return isset($this->attributes[$attributeName]) ? $this->attributes[$attributeName] : null;
+	}
+
+	/**
+	 * Sets an attribute.
+	 * @param string $attributeName
+	 * @param mixed $attributeValue
+	 */
+	public function __set($attributeName, $attributeValue) {
+		$this->attributes[$attributeName] = $attributeValue;
+	}
+
+	/**
+	 * Deletes an attribute
+	 * @param string $attributeName
+	 */
+	public function __unset($attributeName) {
+		unset($this->attributes[$attributeName]);
+	}
+
+	/**
+	 * Checks if an attribute is set.
+	 * @param string $attributeName
+	 * @return boolean
+	 */
+	public function __isset($attributeName) {
+		return isset($this->attributes[$attributeName]);
+	}
+
+	/**
+	 * Returns the element as string.
+	 * @return string Element.
+	 */
+	public function __toString() {
+		return $this->toString();
+	}
+
+	/**
+	 * Injects this element into another element (means this element becomes a
+	 * child element of the other element).
+	 * @param \Libraries\Element $parent
+	 */
+	public function inject(Element $parent) {
 		$parent->children[] = $this;
 	}
 
-	public function grab($child) {
+	/**
+	 * Grabs an element and makes it a child of this element.
+	 * @param \Libraries\Element $child
+	 */
+	public function grab(Element $child) {
 		$this->children[] = $child;
 	}
 
 	/**
-	 * Returns element as string.
+	 * Returns the HTML of this element (the part between the opening and
+	 * closing tag; does not include any child elements).
+	 */
+	public function getHtml() {
+		return $this->html;
+	}
+
+	/**
+	 * Sets the HTML of this element (the part between the opening and closing
+	 * tag; does not interfere with child elements).
+	 * @param string $html
+	 */
+	public function setHtml($html) {
+		$this->html = $html;
+	}
+
+	/**
+	 * Returns the element as string.
 	 * @return string Element in string form
 	 */
 	public function toString() {
-		// Create string for attributes
+		// Create string with attributes
 		$attributes = "";
 		foreach ($this->attributes as $attributeName => $attributeValue) {
 			$attributes .= " $attributeName=\"$attributeValue\"";
 		}
 
-		// Create string for open-tag
+		// Create open-tag with attributes and HTML
 		$string = "<{$this->tag}$attributes>{$this->html}";
 
-		// Create string for child elements
-		foreach ($this->children as $child) {
-			if (is_object($child)) {
-				$string .= $child->toString();
-			} else {
-				$string .= $child;
-			}
-		}
+		// Append stringified child elements
+		$string .= implode("", $this->children);
 
-		// Create string for close-tag
+		// Append close-tag
 		$string .= "</{$this->tag}>";
 
 		return $string;
