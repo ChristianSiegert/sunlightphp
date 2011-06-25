@@ -1,6 +1,8 @@
 <?php
-#$asset->css("pages" . DS . "home.css");
-#$asset->js("pages" . DS . "home.js");
+use \Views\Helpers\Asset;
+
+#Asset::css("pages" . DS . "home.css");
+#Asset::js("pages" . DS . "home.js");
 
 $this->pageTitle = "Welcome to SunlightPHP";
 #$html->addCrumb("Parent crumb", array("controller" => "controller", "action" => "index"));

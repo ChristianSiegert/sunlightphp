@@ -1,12 +1,12 @@
 <?php
 namespace Controllers;
 
-use Libraries\Router as Router;
+use Libraries\Router;
 
 class Controller {
 	public $components = array();
 
-	public $helpers = array("Asset", "Html", "Session");
+	public $helpers = array("Html", "Session");
 
 	public $cacheActions = false;
 

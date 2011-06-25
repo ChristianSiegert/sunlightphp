@@ -1,3 +1,7 @@
+<?php
+use \Views\Helpers\Asset;
+?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
@@ -5,10 +9,10 @@
 		<title><?php if (!empty($this->pageTitle)) echo $this->pageTitle . " - "; ?>Your App Name Here</title>
 		<?php echo $html->metaForLayout(); ?>
 
-		<?php $asset->css("reset.css", "top"); ?>
-		<?php $asset->css("sunlight.css", "top"); ?>
+		<?php Asset::css("reset.css", "top"); ?>
+		<?php Asset::css("sunlight.css", "top"); ?>
 
-		<?php echo $asset->cssForLayout(); ?>
+		<?php echo Asset::cssForLayout(); ?>
 	</head>
 	<body>
 		<div id="content">
@@ -23,6 +27,6 @@
 			<?php echo $contentForLayout; ?>
 		</div>
 
-		<?php echo $asset->jsForLayout(); ?>
+		<?php echo Asset::jsForLayout(); ?>
 	</body>
 </html>
