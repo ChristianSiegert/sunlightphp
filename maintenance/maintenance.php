@@ -56,6 +56,7 @@ if (preg_match("/[0-9]+\.[0-9]+\.[0-9]+/", phpversion(), $phpVersion) === 1) {
 
 // Check if all necessary directories are writable
 $directories = array(
+	APP_DIR . DS . "tmp",
 	APP_DIR . DS . "tmp" . DS . "logs",
 	APP_DIR . DS . "tmp" . DS . "sessions",
 	WEBROOT_DIR . DS . "ccss",
@@ -66,21 +67,25 @@ $unwritableDirectories = array();
 
 foreach ($directories as $directory) {
 	if (!is_writable($directory)) {
-		$errors[]["message"] = "$directory is not writable.";
 		$unwritableDirectories[] = $directory;
 	}
 }
 
 if ($unwritableDirectories) {
-	$chgrp = "sudo chgrp www-data";
-	$chmod = "sudo chmod g+w";
+	$directories = "";
+	$chgrp = "";
+	$chmod = "";
 
 	foreach ($unwritableDirectories as $unwritableDirectory) {
-		$chgrp .= " $unwritableDirectory";
-		$chmod .= " $unwritableDirectory";
+		$directories .= "$unwritableDirectory is not writable\n";
+		$chgrp .= "sudo chgrp www-data $unwritableDirectory\n";
+		$chmod .= "sudo chmod g+w $unwritableDirectory\n";
 	}
 
-	$errors[]["help"] = $chgrp . "<br />" . $chmod;
+	$errors[] = array(
+		"message" => "<pre>" . $directories . "<pre>",
+		"help" => "<pre>" . $chgrp . $chmod . "</pre>"
+	);
 }
 
 if (!isset($_SERVER["HTTP_HOST"])) {
