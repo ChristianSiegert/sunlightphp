@@ -1,5 +1,6 @@
 <?php
 use \Views\Helpers\Asset;
+use \Views\Helpers\Html;
 
 #Asset::css("pages" . DS . "home.css");
 #Asset::js("pages" . DS . "home.js");
@@ -13,4 +14,4 @@ $html->addCrumb($this->pageTitle);
 
 <p>What a beautiful day.</p>
 
-<p><?php echo $html->link("See if your server is set up correctly for SunlightPHP.", "maintenance/maintenance.php"); ?></p>
+<p><?php echo Html::link("See if your server is set up correctly for SunlightPHP.", "maintenance/maintenance.php"); ?></p>

@@ -4,6 +4,7 @@ This log documents changes made to SunlightPHP that break previous installations
 
 ## 2011
 
+* **2011-06-26** Following methods of class \Views\Helpers\Html are now static: ::link(), ::image(), ::icon(), ::script(), ::scriptLink(), ::atom().
 * **2011-06-26** Methods of class \Views\Helpers\Time are now static.
 * **2011-06-25** Methods of class \Views\Helpers\Asset are now static. 
 * **2011-06-25** Constructor of class \Libraries\Element now treats item "html" in $attributes argument as attribute. To set HTML, use the new constructor parameter $html, or use the new ::setHtml() method. 
