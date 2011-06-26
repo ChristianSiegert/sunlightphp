@@ -28,15 +28,14 @@ class Session {
 		session_destroy();
 	}
 
-	public function setFlash($message, $key = "flash", $options = array()) {
-		$options["html"] = $message;
+	public function setFlash($message, $key = "flash", $attributes = array()) {
+		$element = new Element("div", $attributes, $message);
 
-		if (!isset($options["class"])) {
-			$options["class"] = "flash-message";
+		if (!isset($element->class)) {
+			$element->class = "flash-message";
 		}
 
-		$flashElement = new Element("div", $options);
-		$this->data["messages"][$key] = $flashElement->toString();
+		$this->data["messages"][$key] = $element->toString();
 	}
 }
 ?>
