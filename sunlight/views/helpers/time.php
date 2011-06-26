@@ -2,7 +2,7 @@
 namespace Views\Helpers;
 
 class Time extends Helper {
-	public function timeAgoInWords($timestamp) {
+	public static function timeAgoInWords($timestamp) {
 		$delta = time() - $timestamp;
 
 		if ($delta < 60) {
@@ -34,7 +34,7 @@ class Time extends Helper {
 		}
 	}
 
-	public function timeAgoInWordsLikeFacebook($timestamp, $timezone) {
+	public static function timeAgoInWordsLikeFacebook($timestamp, $timezone) {
 		$delta = time() - $timestamp;
 		$adjustedTimestamp = $timestamp + $timezone * 3600;
 
