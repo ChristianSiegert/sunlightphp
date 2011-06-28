@@ -2,6 +2,7 @@
 use Views\Helpers\Html;
 
 require CORE_DIR . DS . "libraries" . DS . "element.php";
+require CORE_DIR . DS . "libraries" . DS . "object.php";
 require CORE_DIR . DS . "views" . DS . "helpers" . DS . "helper.php";
 require CORE_DIR . DS . "views" . DS . "helpers" . DS . "html.php";
 
