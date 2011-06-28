@@ -1,57 +1,35 @@
 <?php
 namespace Views;
 
-use Libraries\Config as Config;
+use Libraries\Config;
+use Libraries\Object;
 
-class View {
-	private $controller;
+class View extends Object {
+	protected $controller;
 
 	public $data;
-	public $helpers;
 	public $params;
 	public $assignedVariables;
 	public $validationErrors;
 	public $view;
 
-	public $helperObjects = array();
-
 	public $pageTitle = "";
 	public $pageKeywords = "";
 
 	public function __construct(&$controller) {
+		parent::__construct();
+
 		$this->controller = $controller;
 		$this->data = $controller->data;
-		$this->helpers = $controller->helpers;
 		$this->params = $controller->params;
 		$this->assignedVariables = $controller->assignedVariables;
 		$this->validationErrors = $controller->validationErrors;
 		$this->view = $controller->view;
-
-		$this->loadHelpers();
-	}
-
-	private function loadHelpers() {
-		for ($i = 0; $i < count($this->helpers); $i++) {
-			// Instantiate helper
-			$helperClassName = "Views\\Helpers\\" . $this->helpers[$i];
-			$helperObject = ${strtolower($this->helpers[$i])} = new $helperClassName($this);
-
-			// Queue all helpers that this helper requires for loading
-			if (isset($helperObject->helpers)) {
-				$this->helpers = array_unique(array_merge($this->helpers, $helperObject->helpers));
-			}
-
-			// Make helper accessible to the view
-			$this->helperObjects = array_merge($this->helperObjects, array(
-				strtolower($this->helpers[$i]) => $helperObject
-			));
-		}
 	}
 
 	public function renderAction() {
-		// Make assigned variables and helpers available to the view
+		// Make assigned variables available to the view
 		extract($this->assignedVariables);
-		extract($this->helperObjects);
 
 		// Filename of the view
 		$viewFile = DS . "views" . DS . str_replace("-", "_", mb_convert_case($this->params["controller"], MB_CASE_LOWER)) . DS . (empty($this->view) ? str_replace("-", "_", $this->params["action"]) : $this->view) . ".stp";
@@ -78,9 +56,8 @@ class View {
 	}
 
 	public function renderLayout($contentForLayout, $removeWhitespace) {
-		// Make assigned variables and helpers available to the layout
+		// Make assigned variables available to the layout
 		extract($this->assignedVariables);
-		extract($this->helperObjects);
 
 		// Buffer output of the layout file
 		ob_start();
