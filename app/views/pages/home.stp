@@ -5,6 +5,8 @@ use \Views\Helpers\Html;
 #Asset::css("pages" . DS . "home.css");
 #Asset::js("pages" . DS . "home.js");
 
+if (!$html = Html::getInstance()) $html = new Html();
+
 $this->pageTitle = "Welcome to SunlightPHP";
 #$html->addCrumb("Parent crumb", array("controller" => "controller", "action" => "index"));
 $html->addCrumb($this->pageTitle);

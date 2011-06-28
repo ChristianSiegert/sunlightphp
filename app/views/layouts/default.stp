@@ -1,5 +1,10 @@
 <?php
 use \Views\Helpers\Asset;
+use \Views\Helpers\Html;
+use \Views\Helpers\Session;
+
+if (!$html = Html::getInstance()) $html = new Html();
+if (!$session = Session::getInstance()) $session = new Session();
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
