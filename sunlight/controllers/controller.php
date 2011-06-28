@@ -6,8 +6,6 @@ use Libraries\Router;
 class Controller {
 	public $components = array();
 
-	public $helpers = array("Html", "Session");
-
 	public $cacheActions = false;
 
 	public $view = "";
