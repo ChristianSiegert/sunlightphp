@@ -1,14 +1,15 @@
 <?php
 namespace Views\Helpers;
 
-class Session {
+class Session extends Helper {
 	/**
 	 * Contains the session data.
 	 * @var array
 	 */
 	public $data = array();
 
-	public function __construct() {
+	public function __construct($instanceName = "default") {
+		parent::__construct($instanceName, get_called_class());
 		$this->data =& $_SESSION;
 	}
 
