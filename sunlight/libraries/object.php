@@ -6,11 +6,14 @@ class Object {
 
 	/**
 	 * Constructs the object. You can give the instance a name of your choice.
-	 * Use ::getInstance() to retrieve that instance.
+	 * Use ::getInstance() to retrieve that instance. Use $className to add the
+	 * instance in the name of another class.
 	 * @param string $instanceName
+	 * @param string $className
 	 */
-	public function __construct($instanceName = "default") {
-		self::$instances[get_called_class()][$instanceName] = $this;
+	public function __construct($instanceName = "default", $className = null) {
+		$className = $className ? $className : get_called_class();
+		self::$instances[$className][$instanceName] = $this;
 	}
 
 	/**
