@@ -1,13 +1,13 @@
 <?php
 namespace Views\Helpers;
 
-use \Exception as Exception;
-use \Libraries\Element as Element;
-use \Libraries\Router as Router;
-use \Libraries\Sanitizer as Sanitizer;
+use \Exception;
+use \Libraries\Element;
+use \Libraries\Router;
+use \Libraries\Sanitizer;
 
 class Form extends Helper {
-	protected function sanitizeFieldName($fieldName) {
+	protected static function sanitizeFieldName($fieldName) {
 		return trim(preg_replace('#[^a-z0-9\-]#', "-", mb_convert_case($fieldName, MB_CASE_LOWER)), "-");
 	}
 
@@ -35,36 +35,34 @@ class Form extends Helper {
 	}
 
 	public function submit($label, $attributes = array()) {
-		$attributes["value"] = $label;
-		$attributes["type"] = "submit";
-
 		$element = new Element("input", $attributes);
-		return $element->toString();
+		$element->type = "submit";
+		$element->value = $label;
+		return $element;
 	}
 
 	public function button($label, $value = null, $attributes = array()) {
-		$attributes["html"] = $label;
+		$element = new Element("button", $attributes, $label);
 
-		if (!isset($attributes["name"])) {
-			$attributes["name"] =  mb_strtolower($label);
+		if (!isset($element->name)) {
+			$element->name =  mb_strtolower($label);
 		}
 
 		if ($value !== null) {
-			$attributes["value"] = $value;
+			$element->value = $value;
 		}
 
-		$element = new Element("button", $attributes);
-		return $element->toString();
+		return $element;
 	}
 
 	public function redirect($label, $redirectUrl = array("action" => "index"), $attributes = array()) {
-		$attributes["name"] = "system[redirectUrl]";
-
 		if (is_array($redirectUrl)) {
 			$redirectUrl = Router::url($redirectUrl);
 		}
 
-		return $this->button($label, $redirectUrl, $attributes);
+		$element = $this->button($label, $redirectUrl, $attributes);
+		$element->name = "system[redirectUrl]";
+		return $element;
 	}
 
 	public function input($fieldName, $attributes = array(), $fieldNameSuffix = "") {
@@ -81,7 +79,7 @@ class Form extends Helper {
 
 		// Set default id if necessary
 		if (!isset($attributes["id"])) {
-			$attributes["id"] = $this->sanitizeFieldName($fieldName) . "-input" . $fieldNameSuffix;
+			$attributes["id"] = self::sanitizeFieldName($fieldName) . "-input" . $fieldNameSuffix;
 		}
 
 		// Set maxlength attribute if possible
@@ -159,28 +157,23 @@ class Form extends Helper {
 			$label = ucfirst(preg_replace('/_/', " ", $fieldName));
 		}
 
-		$attributes["for"] = $this->sanitizeFieldName($fieldName) . "-input" . $fieldNameSuffix;
-		$attributes["html"] = $label;
-
-		$element = new Element("label", $attributes);
-		return $element->toString();
+		$element = new Element("label", $attributes, $label);
+		$element->for = self::sanitizeFieldName($fieldName) . "-input" . $fieldNameSuffix;
+		return $element;
 	}
 
 	public function select($fieldName, $choices = array(), $attributes = array()) {
 		$attributes["name"] = $fieldName;
 
 		if (!isset($attributes["id"])) {
-			$attributes["id"] = $this->sanitizeFieldName($fieldName) . "-input";
+			$attributes["id"] = self::sanitizeFieldName($fieldName) . "-input";
 		}
 
 		$selectElement = new Element("select", $attributes);
 
 		// Fill element with provided choices
 		foreach ($choices as $value => $label) {
-			$choice = new Element("option", array(
-				"html" => $label,
-				"value" => $value
-			));
+			$choice = new Element("option", array("value" => $value), $label);
 
 			// Pre-select choice
 			if (isset($this->data[$fieldName])
@@ -194,15 +187,25 @@ class Form extends Helper {
 		return $selectElement->toString();
 	}
 
-	public function textarea($fieldName, $attributes = array()) {
-		$attributes["name"] = $fieldName;
-		$attributes["id"] = $this->sanitizeFieldName($fieldName) . "-input";
-		$attributes["rows"] = 3;
-		$attributes["cols"] = 27;
+	public function textarea($fieldName, $attributes = array(), $text = "") {
+		$element = new Element("textarea", $attributes, $text);
+		$element->name = $fieldName;
 
-		if (!isset($attributes["html"])) {
+		if (!isset($element->id)) {
+			$element->id = self::sanitizeFieldName($fieldName) . "-input";
+		}
+
+		if (!isset($element->rows)) {
+			$element->rows = 3;
+		}
+
+		if (!isset($element->cols)) {
+			$element->cols = 27;
+		}
+
+		if (empty($text)) {
 			try {
-				$attributes["html"] = Sanitizer::encodeHtml($this->getValueByFieldName($fieldName));
+				$element->setHtml(Sanitizer::encodeHtml($this->getValueByFieldName($fieldName)));
 			} catch (Exception $exception) {}
 		}
 
@@ -211,10 +214,9 @@ class Form extends Helper {
 
 		// Highlight field if it has any validation errors
 		if (!empty($errorMessageList)) {
-			$attributes["class"] = isset($attributes["class"]) ? $attributes["class"] . " has-validation-errors" : "has-validation-errors";
+			$element->class .= " has-validation-errors";
 		}
 
-		$element = new Element("textarea", $attributes);
 		return $element->toString() . $errorMessageList;
 	}
 
@@ -227,16 +229,10 @@ class Form extends Helper {
 		$validationErrors = $this->getValidationErrorsByFieldName($fieldName);
 
 		if (!empty($validationErrors)) {
-			$errorList = new Element("ul", array(
-				"class" => "form-error-list"
-			));
+			$errorList = new Element("ul", array("class" => "form-error-list"));
 
 			foreach ($this->getValidationErrorsByFieldName($fieldName) as $error) {
-				$listItem = new Element("li", array(
-					"class" => "form-error-list-item",
-					"html" => $error["message"]
-				));
-
+				$listItem = new Element("li", array("class" => "form-error-list-item"), $error["message"]);
 				$listItem->inject($errorList);
 			}
 
