@@ -67,7 +67,7 @@ class View extends Object {
 
 		// Remove whitespace between HTML tags
 		if ($removeWhitespace) {
-			$renderedLayout = preg_replace('#>\s+<#', "><", $renderedLayout);
+			$renderedLayout = preg_replace('#>\s+<#', "><", trim($renderedLayout));
 		}
 
 		return $renderedLayout;
