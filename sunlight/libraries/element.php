@@ -14,7 +14,7 @@ class Element {
 	 * @param string $html
 	 * @return \Libraries\Element
 	 */
-	function __construct($tag, $attributes = array(), $html = "") {
+	function __construct($tag, array $attributes = array(), $html = "") {
 		$this->tag = $tag;
 		$this->attributes = $attributes;
 		$this->html = $html;
@@ -119,6 +119,53 @@ class Element {
 		$string .= "</{$this->tag}>";
 
 		return $string;
+	}
+
+	/**
+	 * Adds a CSS class to the element.
+	 * @return \Libraries\Element
+	 */
+	public function addClass($className) {
+		if (!isset($this->attributes["class"])) {
+			$this->attributes["class"] = $className;
+			return;
+		}
+
+		$this->attributes["class"] .= " $className";
+		return $this;
+	}
+
+	/**
+	 * Removes a CSS class from the element.
+	 * @return \Libraries\Element
+	 */
+	public function removeClass($className) {
+		if (!isset($this->attributes["class"])) return $this;
+
+		$classes = explode(" ", $this->attributes["class"]);
+		$classCount = count($classes);
+
+		for ($i = 0; $i < $classCount; $i++) {
+			if ($classes[$i] === $className) {
+				array_splice($classes, $i, 1);
+				break;
+			}
+		}
+
+		$this->attributes["class"] = implode(" ", $classes);
+		if ($this->attributes["class"] === "") unset($this->attributes["class"]);
+		return $this;
+	}
+
+	/**
+	 * Checks if the element has a certain CSS class.
+	 * @return boolean True if element has class, otherwise false
+	 */
+	public function hasClass($className) {
+		if (!isset($this->attributes["class"])) return false;
+
+		$classes = explode(" ", $this->attributes["class"]);
+		return in_array($className, $classes);
 	}
 }
 ?>

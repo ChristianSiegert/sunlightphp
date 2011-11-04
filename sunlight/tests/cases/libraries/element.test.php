@@ -126,5 +126,110 @@ class ElementDataTest extends PHPUnit_Framework_TestCase {
 			array($element6, '<div><a href="/about.htm">Link text<img alt="Image text" height="220" width="432"></img></a></div>'),
 		);
 	}
+
+	/**
+	 * @dataProvider addClassDataProvider
+	 */
+	public function testAddClass($element, $expected) {
+		$result = (string) $element;
+		$this->assertSame($expected, $result);
+	}
+
+	public function addClassDataProvider() {
+		$element1 = new Element("div");
+		$element1->addClass("foo");
+
+		$element2 = new Element("div", array("class" => "foo"));
+		$element2->addClass("bar");
+
+		return array(
+			array($element1, '<div class="foo"></div>'),
+			array($element2, '<div class="foo bar"></div>'),
+		);
+	}
+
+	/**
+	 * @dataProvider removeClassDataProvider
+	 */
+	public function testRemoveClass($element, $expected) {
+		$result = (string) $element;
+		$this->assertSame($expected, $result);
+	}
+
+	public function removeClassDataProvider() {
+		// Remove class when class attribute doesn't exist
+		$element1 = new Element("div");
+		$element1->removeClass("foo");
+
+		// Remove class
+		$element2 = new Element("div", array("class" => "foo"));
+		$element2->removeClass("foo");
+
+		// Remove class that doesn't exist
+		$element3 = new Element("div", array("class" => "foo"));
+		$element3->removeClass("bar");
+
+		// Remove second of two classes
+		$element4 = new Element("div", array("class" => "foo bar"));
+		$element4->removeClass("bar");
+
+		// Remove first of two classes
+		$element5 = new Element("div", array("class" => "foo bar"));
+		$element5->removeClass("foo");
+
+		// Remove first of three classes
+		$element6 = new Element("div", array("class" => "foo bar hello"));
+		$element6->removeClass("foo");
+
+		// Remove second of three classes
+		$element7 = new Element("div", array("class" => "foo bar hello"));
+		$element7->removeClass("bar");
+
+		// Remove third of three classes
+		$element8 = new Element("div", array("class" => "foo bar hello"));
+		$element8->removeClass("hello");
+
+		return array(
+			array($element1, '<div></div>'),
+			array($element2, '<div></div>'),
+			array($element3, '<div class="foo"></div>'),
+			array($element4, '<div class="foo"></div>'),
+			array($element5, '<div class="bar"></div>'),
+			array($element6, '<div class="bar hello"></div>'),
+			array($element7, '<div class="foo hello"></div>'),
+			array($element8, '<div class="foo bar"></div>'),
+		);
+	}
+
+	/**
+	 * @dataProvider hasClassDataProvider
+	 */
+	public function testHasClass($element, $className, $expected) {
+		$result = $element->hasClass($className);
+		$this->assertSame($expected, $result);
+	}
+
+	public function hasClassDataProvider() {
+		$element1 = new Element("div");
+		$element2 = new Element("div", array("class" => ""));
+		$element3 = new Element("div", array("class" => "foo"));
+		$element4 = new Element("div", array("class" => "foo bar"));
+		$element5 = new Element("div", array("class" => "foo bar hello"));
+
+		return array(
+			array($element1, "foo", false),
+			array($element2, "foo", false),
+			array($element3, "foo", true),
+
+			array($element4, "foo", true),
+			array($element4, "bar", true),
+			array($element4, "hello", false),
+
+			array($element5, "foo", true),
+			array($element5, "bar", true),
+			array($element5, "hello", true),
+			array($element5, "world", false),
+		);
+	}
 }
 ?>
