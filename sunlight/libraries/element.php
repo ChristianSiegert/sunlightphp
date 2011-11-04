@@ -1,7 +1,15 @@
 <?php
 namespace Libraries;
 
+use \InvalidArgumentException;
+
 class Element {
+	const STANDARD_HTML_5 = 1;
+	const STANDARD_XHTML_1_0 = 2;
+
+	// By default, elements adhere to the HTML 5 standard
+	protected static $standard = self::STANDARD_HTML_5;
+
 	protected $tag;
 	protected $attributes = array();
 	protected $html = "";
@@ -109,16 +117,31 @@ class Element {
 			$attributes .= " $attributeName=\"$attributeValue\"";
 		}
 
-		// Create open-tag with attributes and HTML
+		// Create start tag with attributes and HTML
 		$string = "<{$this->tag}$attributes>{$this->html}";
 
 		// Append stringified child elements
 		$string .= implode("", $this->children);
 
-		// Append close-tag
-		$string .= "</{$this->tag}>";
+		// Append end tag
+		if ($this->hasEndTag()) $string .= "</{$this->tag}>";
 
 		return $string;
+	}
+
+	public function hasEndTag() {
+		// All XHTML elements are allowed to have an end tag
+		if (self::$standard === self::STANDARD_XHTML_1_0) return true;
+
+		$html5EndTagExclusionMap = self::getHtml5EndTagExclusionMap();
+		return !isset($html5EndTagExclusionMap[$this->tag]);
+	}
+
+	public static function getHtml5EndTagExclusionMap() {
+		return array(
+			"img" => false,
+			"meta" => false,
+		);
 	}
 
 	/**
@@ -166,6 +189,17 @@ class Element {
 
 		$classes = explode(" ", $this->attributes["class"]);
 		return in_array($className, $classes);
+	}
+
+	/**
+	 * Sets the HTML standard that should be used when elements are stringified.
+	 */
+	public static function setStandard($standard) {
+		if ($standard !== self::STANDARD_HTML_5 && $standard !== self::STANDARD_XHTML_1_0) {
+			throw new InvalidArgumentException("Unrecognized standard.");
+		}
+
+		self::$standard = $standard;
 	}
 }
 ?>

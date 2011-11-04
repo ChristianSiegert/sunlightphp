@@ -118,12 +118,12 @@ class ElementDataTest extends PHPUnit_Framework_TestCase {
 		$element6->grab($element5);
 
 		return array(
-			array($element1, '<img></img>'),
-			array($element2, '<img alt="Image text" height="220" width="432"></img>'),
+			array($element1, '<img>'),
+			array($element2, '<img alt="Image text" height="220" width="432">'),
 			array($element3, '<a href="/about.htm">Link text</a>'),
-			array($element5, '<a href="/about.htm">Link text<img alt="Image text" height="220" width="432"></img></a>'),
-			array($element5, '<a href="/about.htm">Link text<img alt="Image text" height="220" width="432"></img></a>'),
-			array($element6, '<div><a href="/about.htm">Link text<img alt="Image text" height="220" width="432"></img></a></div>'),
+			array($element5, '<a href="/about.htm">Link text<img alt="Image text" height="220" width="432"></a>'),
+			array($element5, '<a href="/about.htm">Link text<img alt="Image text" height="220" width="432"></a>'),
+			array($element6, '<div><a href="/about.htm">Link text<img alt="Image text" height="220" width="432"></a></div>'),
 		);
 	}
 
@@ -229,6 +229,31 @@ class ElementDataTest extends PHPUnit_Framework_TestCase {
 			array($element5, "bar", true),
 			array($element5, "hello", true),
 			array($element5, "world", false),
+		);
+	}
+
+	/**
+	 * @dataProvider setStandardDataProvider
+	 */
+	public function testSetStandard($element, $standard, $expected) {
+		Element::setStandard($standard);
+		$result = (string) $element;
+		$this->assertSame($expected, $result);
+	}
+
+	public function setStandardDataProvider() {
+		$element1 = new Element("div");
+		$element2 = new Element("img");
+		$element3 = new Element("meta");
+
+		return array(
+			array($element1, Element::STANDARD_HTML_5, '<div></div>'),
+			array($element2, Element::STANDARD_HTML_5, '<img>'),
+			array($element3, Element::STANDARD_HTML_5, '<meta>'),
+
+			array($element1, Element::STANDARD_XHTML_1_0, '<div></div>'),
+			array($element2, Element::STANDARD_XHTML_1_0, '<img></img>'),
+			array($element3, Element::STANDARD_XHTML_1_0, '<meta></meta>'),
 		);
 	}
 }
