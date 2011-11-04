@@ -11,7 +11,7 @@ class Form extends Helper {
 		return trim(preg_replace('#[^a-z0-9\-]#', "-", mb_convert_case($fieldName, MB_CASE_LOWER)), "-");
 	}
 
-	public function create($attributes = array()) {
+	public function create(array $attributes = array()) {
 		$attributes["accept-charset"] = mb_internal_encoding();
 
 		if (!isset($attributes["method"])) {
@@ -34,14 +34,14 @@ class Form extends Helper {
 		return "</form>";
 	}
 
-	public function submit($label, $attributes = array()) {
+	public function submit($label, array $attributes = array()) {
 		$element = new Element("input", $attributes);
 		$element->type = "submit";
 		$element->value = $label;
 		return $element;
 	}
 
-	public function button($label, $value = null, $attributes = array()) {
+	public function button($label, $value = null, array $attributes = array()) {
 		$element = new Element("button", $attributes, $label);
 
 		if (!isset($element->name)) {
@@ -55,7 +55,7 @@ class Form extends Helper {
 		return $element;
 	}
 
-	public function redirect($label, $redirectUrl = array("action" => "index"), $attributes = array()) {
+	public function redirect($label, $redirectUrl = array("action" => "index"), array $attributes = array()) {
 		if (is_array($redirectUrl)) {
 			$redirectUrl = Router::url($redirectUrl);
 		}
@@ -65,7 +65,7 @@ class Form extends Helper {
 		return $element;
 	}
 
-	public function input($fieldName, $attributes = array(), $fieldNameSuffix = "") {
+	public function input($fieldName, array $attributes = array(), $fieldNameSuffix = "") {
 		// Set default type to "text" if necessary
 		if (!isset($attributes["type"])) {
 			$attributes["type"] = "text";
@@ -109,7 +109,7 @@ class Form extends Helper {
 		return $element->toString() . $errorMessageList;
 	}
 
-	public function checkbox($fieldName, $value = "on", $attributes = array(), $fieldNameSuffix = "") {
+	public function checkbox($fieldName, $value = "on", array $attributes = array(), $fieldNameSuffix = "") {
 		$attributes["type"] = "checkbox";
 		$attributes["value"] = $value;
 
@@ -122,12 +122,12 @@ class Form extends Helper {
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function radio($fieldName, $value = "on", $attributes = array(), $fieldNameSuffix = "") {
+	public function radio($fieldName, $value = "on", array $attributes = array(), $fieldNameSuffix = "") {
 		$attributes["type"] = "radio";
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function hidden($fieldName, $value = "", $attributes = array(), $fieldNameSuffix = "") {
+	public function hidden($fieldName, $value = "", array $attributes = array(), $fieldNameSuffix = "") {
 		$attributes["type"] = "hidden";
 
 		if (!empty($value)) {
@@ -137,7 +137,7 @@ class Form extends Helper {
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function file($fieldName = "file", $attributes = array(), $fieldNameSuffix = "") {
+	public function file($fieldName = "file", array $attributes = array(), $fieldNameSuffix = "") {
 		$attributes["type"] = "file";
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
@@ -147,12 +147,12 @@ class Form extends Helper {
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function text($fieldName, $attributes = array(), $fieldNameSuffix = "") {
+	public function text($fieldName, array $attributes = array(), $fieldNameSuffix = "") {
 		$attributes["type"] = "text";
 		return $this->input($fieldName, $attributes, $fieldNameSuffix);
 	}
 
-	public function label($fieldName, $label = "", $attributes = array(), $fieldNameSuffix = "") {
+	public function label($fieldName, $label = "", array $attributes = array(), $fieldNameSuffix = "") {
 		if (empty($label)) {
 			$label = ucfirst(preg_replace('/_/', " ", $fieldName));
 		}
@@ -162,7 +162,7 @@ class Form extends Helper {
 		return $element;
 	}
 
-	public function select($fieldName, $choices = array(), $attributes = array()) {
+	public function select($fieldName, array $choices = array(), array $attributes = array()) {
 		$attributes["name"] = $fieldName;
 
 		if (!isset($attributes["id"])) {
@@ -187,7 +187,7 @@ class Form extends Helper {
 		return $selectElement->toString();
 	}
 
-	public function textarea($fieldName, $attributes = array(), $text = "") {
+	public function textarea($fieldName, array $attributes = array(), $text = "") {
 		$element = new Element("textarea", $attributes, $text);
 		$element->name = $fieldName;
 
@@ -297,7 +297,7 @@ class Form extends Helper {
 	 * @param array $array (Multidimensional) associative array
 	 * @return array The keys of the (multidimensional) associative array
 	 */
-	protected function getFieldNameList($array) {
+	protected function getFieldNameList(array $array) {
 		$keys = array();
 
 		foreach ($array as $key => $value) {
