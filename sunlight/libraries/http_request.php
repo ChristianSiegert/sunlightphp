@@ -1,7 +1,7 @@
 <?php
 namespace Libraries;
 
-use \Exception as Exception;
+use \Exception;
 
 class HttpRequest {
 	public $status;

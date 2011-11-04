@@ -1,7 +1,7 @@
 <?php
 namespace Libraries;
 
-use \Exception as Exception;
+use \Exception;
 
 class Feed {
 	public function atom($feedElements, $posts) {

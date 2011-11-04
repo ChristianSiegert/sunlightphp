@@ -1,7 +1,7 @@
 <?php
 namespace Libraries;
 
-use \Memcache as Memcache;
+use \Memcache;
 
 class Cache {
 	protected static $memcache = null;

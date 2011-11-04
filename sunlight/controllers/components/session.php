@@ -1,7 +1,7 @@
 <?php
 namespace Controllers\Components;
 
-use Libraries\Element as Element;
+use Libraries\Element;
 
 class Session {
 	/**
